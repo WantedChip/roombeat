@@ -1,0 +1,30 @@
+# Agent planning and process artifacts
+.agents/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Android & Gradle
+.gradle/
+build/
+android/build/
+android/app/build/
+android/.cxx/
+*.apk
+*.aab
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Node & Astro
+node_modules/
+dist/
+site/dist/
+.astro/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
