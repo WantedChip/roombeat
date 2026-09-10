@@ -21,6 +21,10 @@
     <!-- Forward-compatibility permission for Android 17 (API 37) Local Network Access -->
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
 
+    <!-- Camera Permission & Feature for QR Scanning -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
         android:allowBackup="true"
         android:label="RoomBeat"
