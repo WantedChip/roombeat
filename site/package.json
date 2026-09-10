@@ -1,0 +1,19 @@
+{
+  "name": "roombeat-site",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@lucide/astro": "^1.44.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.2",
+    "lucide-astro": "npm:@lucide/astro@^1.44.0",
+    "roombeat-monorepo": "file:..",
+    "tailwindcss": "^4.3.3"
+  }
+}

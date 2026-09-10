@@ -1,0 +1,15 @@
+{
+  "name": "roombeat-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RoomBeat monorepo: Native Android audio sync client and Astro landing page",
+  "scripts": {
+    "android:assembleDebug": "gradlew.bat :app:assembleDebug",
+    "android:build": "gradlew.bat build",
+    "android:clean": "gradlew.bat clean",
+    "site:install": "npm --prefix site install",
+    "site:dev": "npm --prefix site run dev",
+    "site:build": "npm --prefix site run build",
+    "site:preview": "npm --prefix site run preview"
+  }
+}
