@@ -417,6 +417,56 @@ class ProtocolSerializationTest {
         assertEquals(original, deserialized)
     }
 
+    @Test
+    fun testMulticastTestBeaconRoundTrip() {
+        val original = RoomBeatPacket.MulticastTestBeacon(
+            seq = 5,
+            sessionId = "SESSION-TEST-42",
+            timestampMs = 1726005555000L,
+            totalBurst = 10
+        )
+        val json = PacketSerializer.serialize(original)
+
+        assertTrue(json.contains("\"type\":\"MULTICAST_TEST_BEACON\""))
+        assertTrue(json.contains("\"seq\":5"))
+        assertTrue(json.contains("\"session_id\":\"SESSION-TEST-42\""))
+        assertTrue(json.contains("\"timestamp_ms\":1726005555000"))
+        assertTrue(json.contains("\"total_burst\":10"))
+
+        val deserialized = PacketSerializer.deserialize(json)
+        assertNotNull(deserialized)
+        assertTrue(deserialized is RoomBeatPacket.MulticastTestBeacon)
+        assertEquals(original, deserialized)
+        assertEquals(RoomBeatPacket.TYPE_MULTICAST_TEST_BEACON, (deserialized as RoomBeatPacket.MulticastTestBeacon).packetType)
+    }
+
+    @Test
+    fun testMulticastProbeReportRoundTrip() {
+        val original = RoomBeatPacket.MulticastProbeReport(
+            deviceId = "pixel-8-node",
+            sessionId = "SESSION-TEST-42",
+            receivedCount = 9,
+            totalSent = 10,
+            receptionRate = 0.90,
+            isBlocked = false
+        )
+        val json = PacketSerializer.serialize(original)
+
+        assertTrue(json.contains("\"type\":\"MULTICAST_PROBE_REPORT\""))
+        assertTrue(json.contains("\"device_id\":\"pixel-8-node\""))
+        assertTrue(json.contains("\"session_id\":\"SESSION-TEST-42\""))
+        assertTrue(json.contains("\"received_count\":9"))
+        assertTrue(json.contains("\"total_sent\":10"))
+        assertTrue(json.contains("\"reception_rate\":0.9"))
+        assertTrue(json.contains("\"is_blocked\":false"))
+
+        val deserialized = PacketSerializer.deserialize(json)
+        assertNotNull(deserialized)
+        assertTrue(deserialized is RoomBeatPacket.MulticastProbeReport)
+        assertEquals(original, deserialized)
+        assertEquals(RoomBeatPacket.TYPE_MULTICAST_PROBE_REPORT, (deserialized as RoomBeatPacket.MulticastProbeReport).packetType)
+    }
+
     // =========================================================================
     // 2. Line-Delimited & Byte Serialization Tests
     // =========================================================================

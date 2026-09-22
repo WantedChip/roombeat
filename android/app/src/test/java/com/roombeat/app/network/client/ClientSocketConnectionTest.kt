@@ -141,7 +141,13 @@ class ClientSocketConnectionTest {
         assertTrue(initialConnectLatch.await(5, TimeUnit.SECONDS))
 
         // Force server to disconnect the client without client initiating disconnect
-        val connectedClient = server.getConnectedClients().first()
+        val deadline = System.currentTimeMillis() + 5000
+        var clients = server.getConnectedClients()
+        while (clients.isEmpty() && System.currentTimeMillis() < deadline) {
+            Thread.sleep(20)
+            clients = server.getConnectedClients()
+        }
+        val connectedClient = clients.first()
         server.disconnectClient(connectedClient.clientId, "Server force drop")
 
         // Verify client enters reconnecting state

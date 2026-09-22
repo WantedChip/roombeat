@@ -240,6 +240,34 @@ sealed interface RoomBeatPacket {
         override val packetType: String get() = TYPE_SPOTIFY_STATE_REPORT
     }
 
+    // ==========================================
+    // Multicast Health & Diagnostics
+    // ==========================================
+
+    @Serializable
+    @SerialName(TYPE_MULTICAST_TEST_BEACON)
+    data class MulticastTestBeacon(
+        @SerialName("seq") val seq: Int,
+        @SerialName("session_id") val sessionId: String,
+        @SerialName("timestamp_ms") val timestampMs: Long,
+        @SerialName("total_burst") val totalBurst: Int = 10
+    ) : RoomBeatPacket {
+        override val packetType: String get() = TYPE_MULTICAST_TEST_BEACON
+    }
+
+    @Serializable
+    @SerialName(TYPE_MULTICAST_PROBE_REPORT)
+    data class MulticastProbeReport(
+        @SerialName("device_id") val deviceId: String,
+        @SerialName("session_id") val sessionId: String,
+        @SerialName("received_count") val receivedCount: Int,
+        @SerialName("total_sent") val totalSent: Int = 10,
+        @SerialName("reception_rate") val receptionRate: Double = 0.0,
+        @SerialName("is_blocked") val isBlocked: Boolean = false
+    ) : RoomBeatPacket {
+        override val packetType: String get() = TYPE_MULTICAST_PROBE_REPORT
+    }
+
     companion object {
         const val TYPE_CALIB_PROBE = "CALIB_PROBE"
         const val TYPE_CALIB_ECHO = "CALIB_ECHO"
@@ -268,5 +296,8 @@ sealed interface RoomBeatPacket {
         const val TYPE_SPOTIFY_WARM = "SPOTIFY_WARM"
         const val TYPE_SPOTIFY_CMD = "SPOTIFY_CMD"
         const val TYPE_SPOTIFY_STATE_REPORT = "SPOTIFY_STATE_REPORT"
+
+        const val TYPE_MULTICAST_TEST_BEACON = "MULTICAST_TEST_BEACON"
+        const val TYPE_MULTICAST_PROBE_REPORT = "MULTICAST_PROBE_REPORT"
     }
 }
