@@ -12,6 +12,7 @@ build/
 android/build/
 android/app/build/
 .cxx/
+.kotlin/
 *.apk
 *.aab
 local.properties
