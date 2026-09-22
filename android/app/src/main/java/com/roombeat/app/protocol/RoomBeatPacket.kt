@@ -45,7 +45,8 @@ sealed interface RoomBeatPacket {
     @SerialName(TYPE_CALIB_RESULT)
     data class CalibResult(
         @SerialName("offset_ms") val offsetMs: Double,
-        @SerialName("rtt_ms") val rttMs: Double
+        @SerialName("rtt_ms") val rttMs: Double,
+        @SerialName("jitter_ms") val jitterMs: Double = 0.0
     ) : RoomBeatPacket {
         override val packetType: String get() = TYPE_CALIB_RESULT
     }

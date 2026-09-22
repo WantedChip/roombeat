@@ -33,6 +33,7 @@ data class PeerNode(
     val ip: String,
     val rttMs: Double = 0.0,
     val offsetMs: Double = 0.0,
+    val jitterMs: Double = 0.0,
     val volume: Float = 1.0f,
     val isMuted: Boolean = false,
     val state: PeerConnectionState = PeerConnectionState.CONNECTED,
@@ -353,6 +354,7 @@ class PeerSessionManager(
             val updated = existing.copy(
                 offsetMs = packet.offsetMs,
                 rttMs = packet.rttMs,
+                jitterMs = packet.jitterMs,
                 lastSeenMs = timeProvider(),
                 state = PeerConnectionState.CONNECTED
             )
@@ -520,7 +522,9 @@ class PeerSessionManager(
 
     fun getConnectedPeerCount(): Int = peerMap.size
 
-    private fun syncPeersFlow() {
+    private val flowLock = Any()
+
+    private fun syncPeersFlow() = synchronized(flowLock) {
         _peers.value = peerMap.values.toList()
     }
 }

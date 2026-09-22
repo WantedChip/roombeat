@@ -70,6 +70,17 @@ data class CalibrationBurstResult(
      */
     val isSuccessful: Boolean
         get() = successfulSamples.isNotEmpty()
+
+    /**
+     * Peer synchronization metrics computed via Cristian's filter with outlier rejection.
+     */
+    val syncMetrics: SyncMetrics
+        get() = ClockSyncCalculator.calculateSyncMetrics(successfulSamples, peerId)
+
+    /**
+     * Packages metrics into a [RoomBeatPacket.CalibResult] message for protocol transmission.
+     */
+    fun toCalibResult(): RoomBeatPacket.CalibResult = syncMetrics.toCalibResult()
 }
 
 /**
@@ -87,6 +98,17 @@ data class PeerCalibrationStats(
 
     val packetLossPercent: Double
         get() = packetLossRate * 100.0
+
+    /**
+     * Peer synchronization metrics computed via Cristian's filter with outlier rejection.
+     */
+    val syncMetrics: SyncMetrics
+        get() = ClockSyncCalculator.calculateSyncMetrics(samples, peerId)
+
+    /**
+     * Packages metrics into a [RoomBeatPacket.CalibResult] message for protocol transmission.
+     */
+    fun toCalibResult(): RoomBeatPacket.CalibResult = syncMetrics.toCalibResult()
 }
 
 /**
@@ -397,6 +419,47 @@ class CalibrationProbeEngine(
             addAll(pendingProbes.keys)
         }
         return allPeers.associateWith { getPeerStats(it) }
+    }
+
+    /**
+     * Calculates synchronization metrics for [peerId] using Cristian's algorithm with outlier rejection.
+     */
+    fun getSyncMetricsForPeer(peerId: String): SyncMetrics {
+        val samples = getSamplesForPeer(peerId)
+        return ClockSyncCalculator.calculateSyncMetrics(samples, peerId)
+    }
+
+    /**
+     * Packages synchronization results for [peerId] into a [RoomBeatPacket.CalibResult].
+     */
+    fun createCalibResult(peerId: String): RoomBeatPacket.CalibResult? {
+        val samples = getSamplesForPeer(peerId)
+        if (samples.isEmpty()) return null
+        return ClockSyncCalculator.createCalibResult(samples, peerId)
+    }
+
+    /**
+     * Dispatches a [RoomBeatPacket.CalibResult] to [peerId] over [transport].
+     * @return true if packet was successfully dispatched.
+     */
+    fun sendCalibResult(peerId: String): Boolean {
+        val result = createCalibResult(peerId) ?: return false
+        val sent = transport?.sendPacket(peerId, result) ?: false
+        if (sent) {
+            logger?.invoke("Dispatched CALIB_RESULT to $peerId: offset=${result.offsetMs}ms, rtt=${result.rttMs}ms, jitter=${result.jitterMs}ms")
+        }
+        return sent
+    }
+
+    /**
+     * Broadcasts [RoomBeatPacket.CalibResult] to all peers with gathered samples.
+     */
+    fun broadcastAllCalibResults(): Map<String, Boolean> {
+        val results = mutableMapOf<String, Boolean>()
+        for (peerId in peerSamples.keys) {
+            results[peerId] = sendCalibResult(peerId)
+        }
+        return results
     }
 
     /**
