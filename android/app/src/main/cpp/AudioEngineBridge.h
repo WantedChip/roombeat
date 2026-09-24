@@ -4,6 +4,11 @@
 #include <jni.h>
 
 #ifdef __cplusplus
+#include <memory>
+namespace roombeat {
+class AudioSource;
+void setEngineAudioSource(std::shared_ptr<AudioSource> source);
+}
 extern "C" {
 #endif
 
@@ -79,6 +84,13 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetUnderrunCount(
     jobject thiz
 );
 
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(
+    JNIEnv* env,
+    jobject thiz,
+    jlong jitterBufferHandle
+);
+
 /*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
@@ -147,6 +159,13 @@ Java_com_roombeat_app_audio_NativeAudioEngine_getUnderrunCount(
     jobject thiz
 );
 
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_attachJitterBuffer(
+    JNIEnv* env,
+    jobject thiz,
+    jlong jitterBufferHandle
+);
+
 /*
  * JNI methods for nested DefaultJniBridge
  */
@@ -213,6 +232,13 @@ JNIEXPORT jlong JNICALL
 Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetUnderrunCount(
     JNIEnv* env,
     jobject thiz
+);
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeAttachJitterBuffer(
+    JNIEnv* env,
+    jobject thiz,
+    jlong jitterBufferHandle
 );
 
 #ifdef __cplusplus

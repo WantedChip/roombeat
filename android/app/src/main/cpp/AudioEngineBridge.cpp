@@ -122,6 +122,13 @@ static jint destroyEngine() {
     return EngineResult::SUCCESS;
 }
 
+void setEngineAudioSource(std::shared_ptr<AudioSource> source) {
+    auto* engine = getOrCreateEngine();
+    if (engine) {
+        engine->getPlayer().setAudioSource(std::move(source));
+    }
+}
+
 } // namespace roombeat
 
 // Helper macros for exception-safe JNI execution
@@ -439,6 +446,40 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetUnd
     jobject thiz
 ) {
     return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetUnderrunCount(env, thiz);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/,
+    jlong jitterBufferHandle
+) {
+    if (jitterBufferHandle == 0) {
+        roombeat::setEngineAudioSource(nullptr);
+        return JNI_TRUE;
+    }
+    auto* source = reinterpret_cast<roombeat::AudioSource*>(jitterBufferHandle);
+    std::shared_ptr<roombeat::AudioSource> sharedSource(source, [](roombeat::AudioSource*){});
+    roombeat::setEngineAudioSource(sharedSource);
+    return JNI_TRUE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_attachJitterBuffer(
+    JNIEnv* env,
+    jobject thiz,
+    jlong jitterBufferHandle
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(env, thiz, jitterBufferHandle);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeAttachJitterBuffer(
+    JNIEnv* env,
+    jobject thiz,
+    jlong jitterBufferHandle
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(env, thiz, jitterBufferHandle);
 }
 
 } // extern "C"

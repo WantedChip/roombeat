@@ -80,6 +80,12 @@ class NativeAudioEngineTest {
         override fun getUnderrunCount(): Long {
             return underrunCountValue
         }
+
+        var lastAttachedHandle: Long = -1L
+        override fun attachJitterBuffer(handle: Long): Boolean {
+            lastAttachedHandle = handle
+            return true
+        }
     }
 
     private lateinit var fakeBridge: FakeAudioEngineBridge
@@ -319,5 +325,29 @@ class NativeAudioEngineTest {
         assertEquals(0, NativeAudioEngine.getAvailableFrames())
         assertEquals(0L, NativeAudioEngine.getUnderrunCount())
         NativeAudioEngine.clearBuffer()
+    }
+
+    @Test
+    fun attachJitterBuffer_delegatesToBridge() {
+        val buffer = com.roombeat.app.audio.buffer.AudioJitterBuffer()
+        val result = engineWithBridge.attachJitterBuffer(buffer)
+        assertTrue(result)
+        assertEquals(buffer.handle, fakeBridge.lastAttachedHandle)
+        buffer.close()
+    }
+
+    @Test
+    fun attachJitterBuffer_nullBufferPassesZeroHandle() {
+        val result = engineWithBridge.attachJitterBuffer(null)
+        assertTrue(result)
+        assertEquals(0L, fakeBridge.lastAttachedHandle)
+    }
+
+    @Test
+    fun hostJvmEnvironment_attachJitterBufferReturnsFalse() {
+        val buffer = com.roombeat.app.audio.buffer.AudioJitterBuffer()
+        assertFalse(defaultHostEngine.attachJitterBuffer(buffer))
+        assertFalse(NativeAudioEngine.attachJitterBuffer(buffer))
+        buffer.close()
     }
 }

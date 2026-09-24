@@ -40,6 +40,7 @@ interface AudioEngineBridge {
     fun getAvailableFrames(): Int = 0
     fun clearBuffer() {}
     fun getUnderrunCount(): Long = 0L
+    fun attachJitterBuffer(handle: Long): Boolean = false
 }
 
 /**
@@ -126,6 +127,8 @@ open class NativeAudioEngine(
         fun getAvailableFrames(): Int = defaultInstance.getAvailableFrames()
         fun clearBuffer() = defaultInstance.clearBuffer()
         fun getUnderrunCount(): Long = defaultInstance.getUnderrunCount()
+        fun attachJitterBuffer(jitterBuffer: com.roombeat.app.audio.buffer.AudioJitterBuffer?): Boolean =
+            defaultInstance.attachJitterBuffer(jitterBuffer)
     }
 
     private val lock = Any()
@@ -388,6 +391,19 @@ open class NativeAudioEngine(
         }
     }
 
+    /**
+     * Attaches an AudioJitterBuffer directly to the Oboe audio stream as its AudioSource provider.
+     */
+    fun attachJitterBuffer(jitterBuffer: com.roombeat.app.audio.buffer.AudioJitterBuffer?): Boolean {
+        val bridge = resolveBridge() ?: return false
+        return try {
+            bridge.attachJitterBuffer(jitterBuffer?.handle ?: 0L)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error attaching jitter buffer: ${e.message}")
+            false
+        }
+    }
+
     private fun resolveBridge(): AudioEngineBridge? {
         if (customBridge != null) return customBridge
         if (isLibraryLoaded) return DefaultJniBridge
@@ -415,6 +431,8 @@ open class NativeAudioEngine(
         override fun clearBuffer() = nativeClearBuffer()
 
         override fun getUnderrunCount(): Long = nativeGetUnderrunCount()
+
+        override fun attachJitterBuffer(handle: Long): Boolean = nativeAttachJitterBuffer(handle)
 
         @JvmStatic
         private external fun nativeInitEngine(): Int
@@ -445,5 +463,8 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeGetUnderrunCount(): Long
+
+        @JvmStatic
+        private external fun nativeAttachJitterBuffer(handle: Long): Boolean
     }
 }
