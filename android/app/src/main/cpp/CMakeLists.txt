@@ -10,6 +10,7 @@ find_package(oboe REQUIRED CONFIG)
 
 # Define native shared library
 add_library(roombeat_audio SHARED
+    OboeAudioPlayer.cpp
     AudioEngineBridge.cpp
 )
 

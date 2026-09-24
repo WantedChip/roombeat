@@ -34,6 +34,12 @@ interface AudioEngineBridge {
     fun stopStream(): Int
     fun getAudioLatencyMillis(): Int
     fun teardownEngine(): Int
+
+    fun writeAudioFrames(audioData: FloatArray, numFrames: Int): Int = 0
+    fun writePcm16Frames(audioData: ShortArray, numFrames: Int): Int = 0
+    fun getAvailableFrames(): Int = 0
+    fun clearBuffer() {}
+    fun getUnderrunCount(): Long = 0L
 }
 
 /**
@@ -110,6 +116,16 @@ open class NativeAudioEngine(
         fun startStreamWithResult(): AudioEngineResult = defaultInstance.startStreamWithResult()
         fun stopStreamWithResult(): AudioEngineResult = defaultInstance.stopStreamWithResult()
         fun teardownEngineWithResult(): AudioEngineResult = defaultInstance.teardownEngineWithResult()
+
+        fun writeAudioFrames(audioData: FloatArray, numFrames: Int): Int =
+            defaultInstance.writeAudioFrames(audioData, numFrames)
+
+        fun writePcm16Frames(audioData: ShortArray, numFrames: Int): Int =
+            defaultInstance.writePcm16Frames(audioData, numFrames)
+
+        fun getAvailableFrames(): Int = defaultInstance.getAvailableFrames()
+        fun clearBuffer() = defaultInstance.clearBuffer()
+        fun getUnderrunCount(): Long = defaultInstance.getUnderrunCount()
     }
 
     private val lock = Any()
@@ -305,6 +321,73 @@ open class NativeAudioEngine(
         }
     }
 
+    /**
+     * Writes interleaved stereo Float32 audio frames into the native playback ring buffer.
+     * Returns the number of frames actually written.
+     */
+    fun writeAudioFrames(audioData: FloatArray, numFrames: Int): Int {
+        val bridge = resolveBridge() ?: return 0
+        return try {
+            bridge.writeAudioFrames(audioData, numFrames)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error writing float audio frames: ${e.message}")
+            0
+        }
+    }
+
+    /**
+     * Writes interleaved stereo PCM16 audio frames into the native playback ring buffer,
+     * converting them to Float32 on the native side.
+     * Returns the number of frames actually written.
+     */
+    fun writePcm16Frames(audioData: ShortArray, numFrames: Int): Int {
+        val bridge = resolveBridge() ?: return 0
+        return try {
+            bridge.writePcm16Frames(audioData, numFrames)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error writing PCM16 audio frames: ${e.message}")
+            0
+        }
+    }
+
+    /**
+     * Returns the number of audio frames currently queued in the native ring buffer.
+     */
+    fun getAvailableFrames(): Int {
+        val bridge = resolveBridge() ?: return 0
+        return try {
+            bridge.getAvailableFrames()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error querying available frames: ${e.message}")
+            0
+        }
+    }
+
+    /**
+     * Discards all queued frames in the native ring buffer.
+     */
+    fun clearBuffer() {
+        val bridge = resolveBridge() ?: return
+        try {
+            bridge.clearBuffer()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error clearing buffer: ${e.message}")
+        }
+    }
+
+    /**
+     * Returns the total number of underrun frames (silence rendered due to buffer starvation).
+     */
+    fun getUnderrunCount(): Long {
+        val bridge = resolveBridge() ?: return 0L
+        return try {
+            bridge.getUnderrunCount()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error querying underrun count: ${e.message}")
+            0L
+        }
+    }
+
     private fun resolveBridge(): AudioEngineBridge? {
         if (customBridge != null) return customBridge
         if (isLibraryLoaded) return DefaultJniBridge
@@ -321,6 +404,18 @@ open class NativeAudioEngine(
         override fun getAudioLatencyMillis(): Int = nativeGetAudioLatencyMillis()
         override fun teardownEngine(): Int = nativeTeardownEngine()
 
+        override fun writeAudioFrames(audioData: FloatArray, numFrames: Int): Int =
+            nativeWriteAudioFrames(audioData, numFrames)
+
+        override fun writePcm16Frames(audioData: ShortArray, numFrames: Int): Int =
+            nativeWritePcm16Frames(audioData, numFrames)
+
+        override fun getAvailableFrames(): Int = nativeGetAvailableFrames()
+
+        override fun clearBuffer() = nativeClearBuffer()
+
+        override fun getUnderrunCount(): Long = nativeGetUnderrunCount()
+
         @JvmStatic
         private external fun nativeInitEngine(): Int
 
@@ -335,5 +430,20 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeTeardownEngine(): Int
+
+        @JvmStatic
+        private external fun nativeWriteAudioFrames(audioData: FloatArray, numFrames: Int): Int
+
+        @JvmStatic
+        private external fun nativeWritePcm16Frames(audioData: ShortArray, numFrames: Int): Int
+
+        @JvmStatic
+        private external fun nativeGetAvailableFrames(): Int
+
+        @JvmStatic
+        private external fun nativeClearBuffer()
+
+        @JvmStatic
+        private external fun nativeGetUnderrunCount(): Long
     }
 }

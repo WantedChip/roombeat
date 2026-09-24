@@ -51,6 +51,35 @@ class NativeAudioEngineTest {
             teardownCallCount++
             return teardownReturnCode
         }
+
+        var writtenFloatFrames = 0
+        var writtenShortFrames = 0
+        var availableFramesValue = 0
+        var clearBufferCallCount = 0
+        var underrunCountValue = 0L
+
+        override fun writeAudioFrames(audioData: FloatArray, numFrames: Int): Int {
+            writtenFloatFrames += numFrames
+            return numFrames
+        }
+
+        override fun writePcm16Frames(audioData: ShortArray, numFrames: Int): Int {
+            writtenShortFrames += numFrames
+            return numFrames
+        }
+
+        override fun getAvailableFrames(): Int {
+            return availableFramesValue
+        }
+
+        override fun clearBuffer() {
+            clearBufferCallCount++
+            availableFramesValue = 0
+        }
+
+        override fun getUnderrunCount(): Long {
+            return underrunCountValue
+        }
     }
 
     private lateinit var fakeBridge: FakeAudioEngineBridge
@@ -229,5 +258,66 @@ class NativeAudioEngineTest {
         val latency = NativeAudioEngine.getAudioLatencyMillis()
         assertTrue("Latency must be a non-negative integer", latency >= 0)
         assertNotNull(NativeAudioEngine.state)
+    }
+
+    // --- Audio Buffer & Underrun Operations ---
+
+    @Test
+    fun writeAudioFrames_delegatesToBridge() {
+        val floatData = FloatArray(960 * 2) { 0.5f }
+        val written = engineWithBridge.writeAudioFrames(floatData, 960)
+        assertEquals(960, written)
+        assertEquals(960, fakeBridge.writtenFloatFrames)
+    }
+
+    @Test
+    fun writePcm16Frames_delegatesToBridge() {
+        val shortData = ShortArray(480 * 2) { 1000 }
+        val written = engineWithBridge.writePcm16Frames(shortData, 480)
+        assertEquals(480, written)
+        assertEquals(480, fakeBridge.writtenShortFrames)
+    }
+
+    @Test
+    fun getAvailableFrames_queriesBridge() {
+        fakeBridge.availableFramesValue = 1920
+        assertEquals(1920, engineWithBridge.getAvailableFrames())
+    }
+
+    @Test
+    fun clearBuffer_delegatesToBridge() {
+        fakeBridge.availableFramesValue = 960
+        assertEquals(960, engineWithBridge.getAvailableFrames())
+        engineWithBridge.clearBuffer()
+        assertEquals(1, fakeBridge.clearBufferCallCount)
+        assertEquals(0, engineWithBridge.getAvailableFrames())
+    }
+
+    @Test
+    fun getUnderrunCount_queriesBridge() {
+        fakeBridge.underrunCountValue = 480L
+        assertEquals(480L, engineWithBridge.getUnderrunCount())
+    }
+
+    @Test
+    fun hostJvmEnvironment_bufferOperationsReturnSafeDefaults() {
+        val floatData = FloatArray(100)
+        val shortData = ShortArray(100)
+        assertEquals(0, defaultHostEngine.writeAudioFrames(floatData, 50))
+        assertEquals(0, defaultHostEngine.writePcm16Frames(shortData, 50))
+        assertEquals(0, defaultHostEngine.getAvailableFrames())
+        assertEquals(0L, defaultHostEngine.getUnderrunCount())
+        defaultHostEngine.clearBuffer() // should not throw
+    }
+
+    @Test
+    fun companionApi_bufferOperationsExecuteSafely() {
+        val floatData = FloatArray(100)
+        val shortData = ShortArray(100)
+        assertEquals(0, NativeAudioEngine.writeAudioFrames(floatData, 50))
+        assertEquals(0, NativeAudioEngine.writePcm16Frames(shortData, 50))
+        assertEquals(0, NativeAudioEngine.getAvailableFrames())
+        assertEquals(0L, NativeAudioEngine.getUnderrunCount())
+        NativeAudioEngine.clearBuffer()
     }
 }

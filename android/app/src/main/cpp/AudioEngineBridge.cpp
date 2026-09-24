@@ -1,12 +1,11 @@
 #include "AudioEngineBridge.h"
+#include "OboeAudioPlayer.h"
 
-#include <oboe/Oboe.h>
 #include <android/log.h>
+#include <cmath>
+#include <exception>
 #include <memory>
 #include <mutex>
-#include <cmath>
-#include <cstring>
-#include <exception>
 
 #define LOG_TAG "RoomBeatAudio"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -25,15 +24,10 @@ enum EngineResult : jint {
     ERROR_UNKNOWN = -100
 };
 
-// Target audio specifications per project guidelines
-constexpr int32_t kSampleRate = 48000;
-constexpr int32_t kChannelCount = 2; // Stereo
-
-class AudioEngine : public oboe::AudioStreamDataCallback,
-                    public oboe::AudioStreamErrorCallback {
+class AudioEngine {
 public:
     AudioEngine() = default;
-    ~AudioEngine() override {
+    ~AudioEngine() {
         teardown();
     }
 
@@ -48,7 +42,13 @@ public:
             return EngineResult::SUCCESS;
         }
 
-        LOGI("Initializing RoomBeat AudioEngine (48kHz, stereo, low latency)...");
+        LOGI("Initializing RoomBeat AudioEngine via OboeAudioPlayer (48kHz, stereo, low latency)...");
+        const oboe::Result result = player_.open();
+        if (result != oboe::Result::OK) {
+            LOGE("Failed to open audio player stream. Error: %s", oboe::convertToText(result));
+            return EngineResult::ERROR_STREAM_OPEN_FAILED;
+        }
+
         isInitialized_ = true;
         return EngineResult::SUCCESS;
     }
@@ -60,46 +60,9 @@ public:
             return EngineResult::ERROR_INVALID_STATE;
         }
 
-        if (stream_ && stream_->getState() == oboe::StreamState::Started) {
-            LOGI("Audio stream is already running.");
-            return EngineResult::SUCCESS;
-        }
-
-        // Cleanly close and release any existing stream
-        if (stream_) {
-            stream_->stop();
-            stream_->close();
-            stream_.reset();
-        }
-
-        oboe::AudioStreamBuilder builder;
-        builder.setDirection(oboe::Direction::Output)
-               ->setPerformanceMode(oboe::PerformanceMode::LowLatency)
-               ->setSharingMode(oboe::SharingMode::Exclusive)
-               ->setFormat(oboe::AudioFormat::I16)
-               ->setChannelCount(kChannelCount)
-               ->setSampleRate(kSampleRate)
-               ->setUsage(oboe::Usage::Media)
-               ->setContentType(oboe::ContentType::Music)
-               ->setDataCallback(this)
-               ->setErrorCallback(this);
-
-        oboe::Result result = builder.openStream(stream_);
-        if (result != oboe::Result::OK) {
-            LOGE("Failed to open Oboe audio stream. Error: %s", oboe::convertToText(result));
-            return EngineResult::ERROR_STREAM_OPEN_FAILED;
-        }
-
-        LOGI("Oboe audio stream opened: sampleRate=%d, channels=%d, bufferCapacity=%d",
-             stream_->getSampleRate(),
-             stream_->getChannelCount(),
-             stream_->getBufferCapacityInFrames());
-
-        result = stream_->requestStart();
+        const oboe::Result result = player_.start();
         if (result != oboe::Result::OK) {
             LOGE("Failed to start Oboe audio stream. Error: %s", oboe::convertToText(result));
-            stream_->close();
-            stream_.reset();
             return EngineResult::ERROR_STREAM_START_FAILED;
         }
 
@@ -109,90 +72,31 @@ public:
 
     jint stopStream() {
         std::lock_guard<std::mutex> lock(engineMutex_);
-        if (!stream_) {
-            LOGI("Audio stream is not running.");
-            return EngineResult::SUCCESS;
-        }
-
-        oboe::Result result = stream_->requestStop();
-        if (result != oboe::Result::OK) {
-            LOGW("Failed to requestStop stream: %s", oboe::convertToText(result));
-        }
-
-        result = stream_->close();
-        if (result != oboe::Result::OK) {
-            LOGW("Failed to close stream: %s", oboe::convertToText(result));
-        }
-
-        stream_.reset();
-        LOGI("Oboe audio stream stopped and closed.");
+        player_.stop();
+        LOGI("Oboe audio stream stopped.");
         return EngineResult::SUCCESS;
     }
 
     jint getAudioLatencyMillis() {
-        std::lock_guard<std::mutex> lock(engineMutex_);
-        if (!stream_) {
-            return 0;
-        }
-
-        auto latencyResult = stream_->calculateLatencyMillis();
-        if (latencyResult) {
-            double latencyMs = latencyResult.value();
-            if (latencyMs < 0.0) latencyMs = 0.0;
-            return static_cast<jint>(std::round(latencyMs));
-        }
-
-        // Fallback: calculate estimated latency from buffer size and sample rate
-        int32_t bufferSize = stream_->getBufferSizeInFrames();
-        int32_t sampleRate = stream_->getSampleRate();
-        if (sampleRate > 0 && bufferSize > 0) {
-            double estimatedMs = (static_cast<double>(bufferSize) / sampleRate) * 1000.0;
-            return static_cast<jint>(std::round(estimatedMs));
-        }
-
-        return 0;
+        const double latencyMs = player_.getLatencyMillis();
+        return static_cast<jint>(std::round(latencyMs));
     }
 
     jint teardown() {
         std::lock_guard<std::mutex> lock(engineMutex_);
-        if (stream_) {
-            stream_->requestStop();
-            stream_->close();
-            stream_.reset();
-        }
+        player_.close();
         isInitialized_ = false;
         LOGI("AudioEngine teardown complete.");
         return EngineResult::SUCCESS;
     }
 
-    // oboe::AudioStreamDataCallback implementation
-    oboe::DataCallbackResult onAudioReady(
-        oboe::AudioStream* /*oboeStream*/,
-        void* audioData,
-        int32_t numFrames
-    ) override {
-        // Output silence (16-bit PCM stereo: 2 channels * 2 bytes per frame)
-        const size_t bytesToWrite = static_cast<size_t>(numFrames) * kChannelCount * sizeof(int16_t);
-        std::memset(audioData, 0, bytesToWrite);
-        return oboe::DataCallbackResult::Continue;
-    }
-
-    // oboe::AudioStreamErrorCallback implementation
-    void onErrorBeforeClose(oboe::AudioStream* /*oboeStream*/, oboe::Result error) override {
-        LOGW("Oboe stream error before close: %s", oboe::convertToText(error));
-    }
-
-    void onErrorAfterClose(oboe::AudioStream* /*oboeStream*/, oboe::Result error) override {
-        LOGW("Oboe stream error after close: %s", oboe::convertToText(error));
-        std::lock_guard<std::mutex> lock(engineMutex_);
-        if (stream_) {
-            stream_.reset();
-        }
+    OboeAudioPlayer& getPlayer() {
+        return player_;
     }
 
 private:
     std::mutex engineMutex_;
-    std::shared_ptr<oboe::AudioStream> stream_;
+    OboeAudioPlayer player_;
     bool isInitialized_{false};
 };
 
@@ -211,7 +115,7 @@ static AudioEngine* getOrCreateEngine() {
 static jint destroyEngine() {
     std::lock_guard<std::mutex> lock(gEngineMutex);
     if (gAudioEngine) {
-        jint result = gAudioEngine->teardown();
+        const jint result = gAudioEngine->teardown();
         gAudioEngine.reset();
         return result;
     }
@@ -275,6 +179,93 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeTeardownEngine(
 }
 
 /*
+ * Buffer feeding & telemetry query JNI methods
+ */
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeWriteAudioFrames(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jfloatArray audioData,
+    jint numFrames
+) {
+    if (!audioData || numFrames <= 0) return 0;
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (!engine) return 0;
+
+        jfloat* data = env->GetFloatArrayElements(audioData, nullptr);
+        if (!data) return 0;
+
+        const jint written = engine->getPlayer().write(reinterpret_cast<const float*>(data), numFrames);
+        env->ReleaseFloatArrayElements(audioData, data, JNI_ABORT);
+        return written;
+    } catch (const std::exception& ex) {
+        LOGE("Unhandled exception in nativeWriteAudioFrames: %s", ex.what());
+        return 0;
+    } catch (...) {
+        LOGE("Unknown exception in nativeWriteAudioFrames");
+        return 0;
+    }
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeWritePcm16Frames(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jshortArray audioData,
+    jint numFrames
+) {
+    if (!audioData || numFrames <= 0) return 0;
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (!engine) return 0;
+
+        jshort* data = env->GetShortArrayElements(audioData, nullptr);
+        if (!data) return 0;
+
+        const jint written = engine->getPlayer().write(reinterpret_cast<const int16_t*>(data), numFrames);
+        env->ReleaseShortArrayElements(audioData, data, JNI_ABORT);
+        return written;
+    } catch (const std::exception& ex) {
+        LOGE("Unhandled exception in nativeWritePcm16Frames: %s", ex.what());
+        return 0;
+    } catch (...) {
+        LOGE("Unknown exception in nativeWritePcm16Frames");
+        return 0;
+    }
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetAvailableFrames(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/
+) {
+    JNI_METHOD_WRAPPER(roombeat::getOrCreateEngine()->getPlayer().getAvailableFrames(), 0)
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeClearBuffer(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/
+) {
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (engine) engine->getPlayer().clearBuffer();
+    } catch (...) {
+        LOGE("Exception in nativeClearBuffer");
+    }
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetUnderrunCount(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/
+) {
+    JNI_METHOD_WRAPPER(static_cast<jlong>(roombeat::getOrCreateEngine()->getPlayer().getUnderrunCount()), 0)
+}
+
+/*
  * Direct alias exports matching methods without 'native' prefix
  */
 
@@ -316,6 +307,50 @@ Java_com_roombeat_app_audio_NativeAudioEngine_teardownEngine(
     jobject thiz
 ) {
     return Java_com_roombeat_app_audio_NativeAudioEngine_nativeTeardownEngine(env, thiz);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_writeAudioFrames(
+    JNIEnv* env,
+    jobject thiz,
+    jfloatArray audioData,
+    jint numFrames
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeWriteAudioFrames(env, thiz, audioData, numFrames);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_writePcm16Frames(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray audioData,
+    jint numFrames
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeWritePcm16Frames(env, thiz, audioData, numFrames);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_getAvailableFrames(
+    JNIEnv* env,
+    jobject thiz
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetAvailableFrames(env, thiz);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_clearBuffer(
+    JNIEnv* env,
+    jobject thiz
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeClearBuffer(env, thiz);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_getUnderrunCount(
+    JNIEnv* env,
+    jobject thiz
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetUnderrunCount(env, thiz);
 }
 
 /*
@@ -362,5 +397,48 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeTeardo
     return Java_com_roombeat_app_audio_NativeAudioEngine_nativeTeardownEngine(env, thiz);
 }
 
-} // extern "C"
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeWriteAudioFrames(
+    JNIEnv* env,
+    jobject thiz,
+    jfloatArray audioData,
+    jint numFrames
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeWriteAudioFrames(env, thiz, audioData, numFrames);
+}
 
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeWritePcm16Frames(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray audioData,
+    jint numFrames
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeWritePcm16Frames(env, thiz, audioData, numFrames);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetAvailableFrames(
+    JNIEnv* env,
+    jobject thiz
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetAvailableFrames(env, thiz);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeClearBuffer(
+    JNIEnv* env,
+    jobject thiz
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeClearBuffer(env, thiz);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetUnderrunCount(
+    JNIEnv* env,
+    jobject thiz
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetUnderrunCount(env, thiz);
+}
+
+} // extern "C"

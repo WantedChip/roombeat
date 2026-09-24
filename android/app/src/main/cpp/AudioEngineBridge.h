@@ -42,6 +42,44 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeTeardownEngine(
 );
 
 /*
+ * Buffer feeding & telemetry query JNI methods
+ */
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeWriteAudioFrames(
+    JNIEnv* env,
+    jobject thiz,
+    jfloatArray audioData,
+    jint numFrames
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeWritePcm16Frames(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray audioData,
+    jint numFrames
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetAvailableFrames(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeClearBuffer(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT jlong JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetUnderrunCount(
+    JNIEnv* env,
+    jobject thiz
+);
+
+/*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
 
@@ -71,6 +109,40 @@ Java_com_roombeat_app_audio_NativeAudioEngine_getAudioLatencyMillis(
 
 JNIEXPORT jint JNICALL
 Java_com_roombeat_app_audio_NativeAudioEngine_teardownEngine(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_writeAudioFrames(
+    JNIEnv* env,
+    jobject thiz,
+    jfloatArray audioData,
+    jint numFrames
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_writePcm16Frames(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray audioData,
+    jint numFrames
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_getAvailableFrames(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_clearBuffer(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT jlong JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_getUnderrunCount(
     JNIEnv* env,
     jobject thiz
 );
@@ -105,6 +177,40 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetAud
 
 JNIEXPORT jint JNICALL
 Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeTeardownEngine(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeWriteAudioFrames(
+    JNIEnv* env,
+    jobject thiz,
+    jfloatArray audioData,
+    jint numFrames
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeWritePcm16Frames(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray audioData,
+    jint numFrames
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetAvailableFrames(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeClearBuffer(
+    JNIEnv* env,
+    jobject thiz
+);
+
+JNIEXPORT jlong JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetUnderrunCount(
     JNIEnv* env,
     jobject thiz
 );
