@@ -178,7 +178,13 @@ class FakeMulticastSocketWrapper : MulticastSocketWrapper {
     val sentPackets = CopyOnWriteArrayList<MulticastDatagramPacket>()
     val incomingQueue = LinkedBlockingQueue<MulticastDatagramPacket>()
 
-    var linkedPeer: FakeMulticastSocketWrapper? = null
+    val linkedPeers = CopyOnWriteArrayList<FakeMulticastSocketWrapper>()
+    var linkedPeer: FakeMulticastSocketWrapper?
+        get() = linkedPeers.firstOrNull()
+        set(value) {
+            linkedPeers.clear()
+            if (value != null) linkedPeers.add(value)
+        }
     var dropFilter: ((seq: Int) -> Boolean)? = null
 
     override val isClosed: Boolean get() = closed.get()
@@ -198,15 +204,16 @@ class FakeMulticastSocketWrapper : MulticastSocketWrapper {
         val packet = MulticastDatagramPacket(data, targetAddress, port)
         sentPackets.add(packet)
 
-        // Route to linked peer if connected
-        val peer = linkedPeer
-        if (peer != null && !peer.isClosed) {
-            val beacon = decodeBeacon(data)
-            if (beacon != null && dropFilter?.invoke(beacon.seq) == true) {
-                // Drop packet intentionally for test simulation
-                return
+        // Route to linked peers if connected
+        for (peer in linkedPeers) {
+            if (!peer.isClosed) {
+                val beacon = decodeBeacon(data)
+                if (beacon != null && dropFilter?.invoke(beacon.seq) == true) {
+                    // Drop packet intentionally for test simulation
+                    continue
+                }
+                peer.incomingQueue.offer(packet)
             }
-            peer.incomingQueue.offer(packet)
         }
     }
 
@@ -235,8 +242,12 @@ class FakeMulticastSocketWrapper : MulticastSocketWrapper {
     }
 
     fun link(other: FakeMulticastSocketWrapper) {
-        this.linkedPeer = other
-        other.linkedPeer = this
+        if (!linkedPeers.contains(other)) {
+            linkedPeers.add(other)
+        }
+        if (!other.linkedPeers.contains(this)) {
+            other.linkedPeers.add(this)
+        }
     }
 
     private fun decodeBeacon(bytes: ByteArray): MulticastTestBeacon? =

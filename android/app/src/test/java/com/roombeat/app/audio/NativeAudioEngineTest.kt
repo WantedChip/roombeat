@@ -86,6 +86,25 @@ class NativeAudioEngineTest {
             lastAttachedHandle = handle
             return true
         }
+
+        var pushedChunksCount = 0
+        var lastPushedSeq: Long = -1L
+        var lastPushedPresentationTime: Long = -1L
+        var lastPushedDataSize: Int = 0
+
+        override fun pushAudioChunk(
+            seq: Long,
+            presentationTimeUs: Long,
+            opusData: ByteArray,
+            offset: Int,
+            length: Int
+        ): Boolean {
+            pushedChunksCount++
+            lastPushedSeq = seq
+            lastPushedPresentationTime = presentationTimeUs
+            lastPushedDataSize = length
+            return true
+        }
     }
 
     private lateinit var fakeBridge: FakeAudioEngineBridge
@@ -349,5 +368,23 @@ class NativeAudioEngineTest {
         assertFalse(defaultHostEngine.attachJitterBuffer(buffer))
         assertFalse(NativeAudioEngine.attachJitterBuffer(buffer))
         buffer.close()
+    }
+
+    @Test
+    fun pushAudioChunk_delegatesToBridge() {
+        val dummyData = byteArrayOf(1, 2, 3, 4)
+        val result = engineWithBridge.pushAudioChunk(101L, 202020L, dummyData)
+        assertTrue(result)
+        assertEquals(1, fakeBridge.pushedChunksCount)
+        assertEquals(101L, fakeBridge.lastPushedSeq)
+        assertEquals(202020L, fakeBridge.lastPushedPresentationTime)
+        assertEquals(4, fakeBridge.lastPushedDataSize)
+    }
+
+    @Test
+    fun hostJvmEnvironment_pushAudioChunkWithoutBridgeReturnsFalse() {
+        val dummyData = byteArrayOf(1, 2, 3, 4)
+        assertFalse(defaultHostEngine.pushAudioChunk(101L, 202020L, dummyData))
+        assertFalse(NativeAudioEngine.pushAudioChunk(101L, 202020L, dummyData))
     }
 }

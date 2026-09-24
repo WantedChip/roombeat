@@ -41,6 +41,13 @@ interface AudioEngineBridge {
     fun clearBuffer() {}
     fun getUnderrunCount(): Long = 0L
     fun attachJitterBuffer(handle: Long): Boolean = false
+    fun pushAudioChunk(
+        seq: Long,
+        presentationTimeUs: Long,
+        opusData: ByteArray,
+        offset: Int = 0,
+        length: Int = opusData.size
+    ): Boolean = false
 }
 
 /**
@@ -129,6 +136,14 @@ open class NativeAudioEngine(
         fun getUnderrunCount(): Long = defaultInstance.getUnderrunCount()
         fun attachJitterBuffer(jitterBuffer: com.roombeat.app.audio.buffer.AudioJitterBuffer?): Boolean =
             defaultInstance.attachJitterBuffer(jitterBuffer)
+
+        fun pushAudioChunk(
+            seq: Long,
+            presentationTimeUs: Long,
+            opusData: ByteArray,
+            offset: Int = 0,
+            length: Int = opusData.size
+        ): Boolean = defaultInstance.pushAudioChunk(seq, presentationTimeUs, opusData, offset, length)
     }
 
     private val lock = Any()
@@ -316,6 +331,7 @@ open class NativeAudioEngine(
 
         _state = AudioEngineState.UNINITIALIZED
         _lastError = null
+        attachedJitterBuffer = null
 
         if (result == SUCCESS) {
             AudioEngineResult.Success
@@ -391,15 +407,42 @@ open class NativeAudioEngine(
         }
     }
 
+    @Volatile
+    private var attachedJitterBuffer: com.roombeat.app.audio.buffer.AudioJitterBuffer? = null
+
     /**
      * Attaches an AudioJitterBuffer directly to the Oboe audio stream as its AudioSource provider.
      */
     fun attachJitterBuffer(jitterBuffer: com.roombeat.app.audio.buffer.AudioJitterBuffer?): Boolean {
+        this.attachedJitterBuffer = jitterBuffer
         val bridge = resolveBridge() ?: return false
         return try {
             bridge.attachJitterBuffer(jitterBuffer?.handle ?: 0L)
         } catch (e: Exception) {
             Log.w(TAG, "Error attaching jitter buffer: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Directly pushes an incoming audio chunk into the attached jitter buffer via fast JNI bridge.
+     */
+    fun pushAudioChunk(
+        seq: Long,
+        presentationTimeUs: Long,
+        opusData: ByteArray,
+        offset: Int = 0,
+        length: Int = opusData.size
+    ): Boolean {
+        val currentBuffer = attachedJitterBuffer
+        if (!isLibraryLoaded && customBridge == null && currentBuffer != null) {
+            return currentBuffer.pushPacket(seq, presentationTimeUs, opusData, offset, length)
+        }
+        val bridge = resolveBridge() ?: return false
+        return try {
+            bridge.pushAudioChunk(seq, presentationTimeUs, opusData, offset, length)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error pushing audio chunk: ${e.message}")
             false
         }
     }
@@ -434,6 +477,14 @@ open class NativeAudioEngine(
 
         override fun attachJitterBuffer(handle: Long): Boolean = nativeAttachJitterBuffer(handle)
 
+        override fun pushAudioChunk(
+            seq: Long,
+            presentationTimeUs: Long,
+            opusData: ByteArray,
+            offset: Int,
+            length: Int
+        ): Boolean = nativePushAudioChunk(seq, presentationTimeUs, opusData, offset, length)
+
         @JvmStatic
         private external fun nativeInitEngine(): Int
 
@@ -466,5 +517,14 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeAttachJitterBuffer(handle: Long): Boolean
+
+        @JvmStatic
+        private external fun nativePushAudioChunk(
+            seq: Long,
+            presentationTimeUs: Long,
+            opusData: ByteArray,
+            offset: Int,
+            length: Int
+        ): Boolean
     }
 }

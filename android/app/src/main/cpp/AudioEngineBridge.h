@@ -7,7 +7,12 @@
 #include <memory>
 namespace roombeat {
 class AudioSource;
+namespace buffer {
+class AudioJitterBuffer;
+}
 void setEngineAudioSource(std::shared_ptr<AudioSource> source);
+void setAttachedJitterBuffer(roombeat::buffer::AudioJitterBuffer* jitterBuffer);
+roombeat::buffer::AudioJitterBuffer* getAttachedJitterBuffer();
 }
 extern "C" {
 #endif
@@ -91,6 +96,17 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(
     jlong jitterBufferHandle
 );
 
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativePushAudioChunk(
+    JNIEnv* env,
+    jobject thiz,
+    jlong seq,
+    jlong presentationTimeUs,
+    jbyteArray opusData,
+    jint offset,
+    jint length
+);
+
 /*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
@@ -166,6 +182,17 @@ Java_com_roombeat_app_audio_NativeAudioEngine_attachJitterBuffer(
     jlong jitterBufferHandle
 );
 
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_pushAudioChunk(
+    JNIEnv* env,
+    jobject thiz,
+    jlong seq,
+    jlong presentationTimeUs,
+    jbyteArray opusData,
+    jint offset,
+    jint length
+);
+
 /*
  * JNI methods for nested DefaultJniBridge
  */
@@ -239,6 +266,17 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeAttach
     JNIEnv* env,
     jobject thiz,
     jlong jitterBufferHandle
+);
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativePushAudioChunk(
+    JNIEnv* env,
+    jobject thiz,
+    jlong seq,
+    jlong presentationTimeUs,
+    jbyteArray opusData,
+    jint offset,
+    jint length
 );
 
 #ifdef __cplusplus

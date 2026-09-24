@@ -1,7 +1,9 @@
 #include "AudioEngineBridge.h"
 #include "OboeAudioPlayer.h"
+#include "buffer/AudioJitterBuffer.h"
 
 #include <android/log.h>
+#include <atomic>
 #include <cmath>
 #include <exception>
 #include <memory>
@@ -112,8 +114,19 @@ static AudioEngine* getOrCreateEngine() {
     return gAudioEngine.get();
 }
 
+static std::atomic<roombeat::buffer::AudioJitterBuffer*> gAttachedJitterBuffer{nullptr};
+
+void setAttachedJitterBuffer(roombeat::buffer::AudioJitterBuffer* jitterBuffer) {
+    gAttachedJitterBuffer.store(jitterBuffer, std::memory_order_release);
+}
+
+roombeat::buffer::AudioJitterBuffer* getAttachedJitterBuffer() {
+    return gAttachedJitterBuffer.load(std::memory_order_acquire);
+}
+
 static jint destroyEngine() {
     std::lock_guard<std::mutex> lock(gEngineMutex);
+    setAttachedJitterBuffer(nullptr);
     if (gAudioEngine) {
         const jint result = gAudioEngine->teardown();
         gAudioEngine.reset();
@@ -455,11 +468,13 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(
     jlong jitterBufferHandle
 ) {
     if (jitterBufferHandle == 0) {
+        roombeat::setAttachedJitterBuffer(nullptr);
         roombeat::setEngineAudioSource(nullptr);
         return JNI_TRUE;
     }
-    auto* source = reinterpret_cast<roombeat::AudioSource*>(jitterBufferHandle);
-    std::shared_ptr<roombeat::AudioSource> sharedSource(source, [](roombeat::AudioSource*){});
+    auto* jitterBuffer = reinterpret_cast<roombeat::buffer::AudioJitterBuffer*>(jitterBufferHandle);
+    roombeat::setAttachedJitterBuffer(jitterBuffer);
+    std::shared_ptr<roombeat::AudioSource> sharedSource(jitterBuffer, [](roombeat::AudioSource*){});
     roombeat::setEngineAudioSource(sharedSource);
     return JNI_TRUE;
 }
@@ -480,6 +495,73 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeAttach
     jlong jitterBufferHandle
 ) {
     return Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(env, thiz, jitterBufferHandle);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativePushAudioChunk(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jlong seq,
+    jlong presentationTimeUs,
+    jbyteArray opusData,
+    jint offset,
+    jint length
+) {
+    if (!opusData || length <= 0 || offset < 0) {
+        return JNI_FALSE;
+    }
+    auto* jitterBuffer = roombeat::getAttachedJitterBuffer();
+    if (!jitterBuffer) {
+        return JNI_FALSE;
+    }
+    if (static_cast<size_t>(length) > roombeat::buffer::kMaxOpusPayloadBytes) {
+        return JNI_FALSE;
+    }
+
+    uint8_t tempPayload[roombeat::buffer::kMaxOpusPayloadBytes];
+    env->GetByteArrayRegion(opusData, offset, length, reinterpret_cast<jbyte*>(tempPayload));
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        return JNI_FALSE;
+    }
+
+    const bool queued = jitterBuffer->pushPacket(
+        static_cast<uint64_t>(seq),
+        static_cast<int64_t>(presentationTimeUs),
+        tempPayload,
+        static_cast<size_t>(length)
+    );
+    return queued ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_pushAudioChunk(
+    JNIEnv* env,
+    jobject thiz,
+    jlong seq,
+    jlong presentationTimeUs,
+    jbyteArray opusData,
+    jint offset,
+    jint length
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativePushAudioChunk(
+        env, thiz, seq, presentationTimeUs, opusData, offset, length
+    );
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativePushAudioChunk(
+    JNIEnv* env,
+    jobject thiz,
+    jlong seq,
+    jlong presentationTimeUs,
+    jbyteArray opusData,
+    jint offset,
+    jint length
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativePushAudioChunk(
+        env, thiz, seq, presentationTimeUs, opusData, offset, length
+    );
 }
 
 } // extern "C"
