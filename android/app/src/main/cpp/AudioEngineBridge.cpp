@@ -92,6 +92,18 @@ public:
         return EngineResult::SUCCESS;
     }
 
+    void setChannelVolume(float volumeDb) {
+        player_.setChannelVolume(volumeDb);
+    }
+
+    void setMasterVolume(float volumeDb) {
+        player_.setMasterVolume(volumeDb);
+    }
+
+    void setMuted(bool isMuted) {
+        player_.setMuted(isMuted);
+    }
+
     OboeAudioPlayer& getPlayer() {
         return player_;
     }
@@ -562,6 +574,118 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativePushAu
     return Java_com_roombeat_app_audio_NativeAudioEngine_nativePushAudioChunk(
         env, thiz, seq, presentationTimeUs, opusData, offset, length
     );
+}
+
+/*
+ * Volume & Gain Control JNI implementations
+ */
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetChannelVolume(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/,
+    jfloat volumeDb
+) {
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (engine) {
+            engine->setChannelVolume(static_cast<float>(volumeDb));
+        }
+    } catch (const std::exception& ex) {
+        LOGE("Exception in nativeSetChannelVolume: %s", ex.what());
+    } catch (...) {
+        LOGE("Unknown exception in nativeSetChannelVolume");
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMasterVolume(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/,
+    jfloat volumeDb
+) {
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (engine) {
+            engine->setMasterVolume(static_cast<float>(volumeDb));
+        }
+    } catch (const std::exception& ex) {
+        LOGE("Exception in nativeSetMasterVolume: %s", ex.what());
+    } catch (...) {
+        LOGE("Unknown exception in nativeSetMasterVolume");
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMuted(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/,
+    jboolean isMuted
+) {
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (engine) {
+            engine->setMuted(static_cast<bool>(isMuted));
+        }
+    } catch (const std::exception& ex) {
+        LOGE("Exception in nativeSetMuted: %s", ex.what());
+    } catch (...) {
+        LOGE("Unknown exception in nativeSetMuted");
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setChannelVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetChannelVolume(env, thiz, volumeDb);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setMasterVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMasterVolume(env, thiz, volumeDb);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setMuted(
+    JNIEnv* env,
+    jobject thiz,
+    jboolean isMuted
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMuted(env, thiz, isMuted);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetChannelVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetChannelVolume(env, thiz, volumeDb);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetMasterVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMasterVolume(env, thiz, volumeDb);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetMuted(
+    JNIEnv* env,
+    jobject thiz,
+    jboolean isMuted
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMuted(env, thiz, isMuted);
 }
 
 } // extern "C"

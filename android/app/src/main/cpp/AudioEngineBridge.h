@@ -107,6 +107,27 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativePushAudioChunk(
     jint length
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetChannelVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMasterVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMuted(
+    JNIEnv* env,
+    jobject thiz,
+    jboolean isMuted
+);
+
 /*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
@@ -193,6 +214,27 @@ Java_com_roombeat_app_audio_NativeAudioEngine_pushAudioChunk(
     jint length
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setChannelVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setMasterVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setMuted(
+    JNIEnv* env,
+    jobject thiz,
+    jboolean isMuted
+);
+
 /*
  * JNI methods for nested DefaultJniBridge
  */
@@ -277,6 +319,27 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativePushAu
     jbyteArray opusData,
     jint offset,
     jint length
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetChannelVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetMasterVolume(
+    JNIEnv* env,
+    jobject thiz,
+    jfloat volumeDb
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetMuted(
+    JNIEnv* env,
+    jobject thiz,
+    jboolean isMuted
 );
 
 #ifdef __cplusplus

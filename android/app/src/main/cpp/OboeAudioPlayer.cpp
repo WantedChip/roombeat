@@ -225,6 +225,8 @@ oboe::Result OboeAudioPlayer::openInternal() {
          stream_->getFramesPerBurst(),
          stream_->getBufferCapacityInFrames());
 
+    gainProcessor_.setSampleRate(stream_->getSampleRate());
+
     return oboe::Result::OK;
 }
 
@@ -414,6 +416,42 @@ void OboeAudioPlayer::setAutoReconnect(bool autoReconnect) {
     autoReconnect_.store(autoReconnect, std::memory_order_release);
 }
 
+void OboeAudioPlayer::setChannelVolume(float volumeDb) {
+    gainProcessor_.setChannelVolumeDb(volumeDb);
+}
+
+void OboeAudioPlayer::setMasterVolume(float volumeDb) {
+    gainProcessor_.setMasterVolumeDb(volumeDb);
+}
+
+void OboeAudioPlayer::setMuted(bool isMuted) {
+    gainProcessor_.setMuted(isMuted);
+}
+
+void OboeAudioPlayer::setChannelGain(float linearGain) {
+    gainProcessor_.setChannelGain(linearGain);
+}
+
+void OboeAudioPlayer::setMasterGain(float linearGain) {
+    gainProcessor_.setMasterGain(linearGain);
+}
+
+float OboeAudioPlayer::getChannelVolume() const {
+    return gainProcessor_.getChannelVolumeDb();
+}
+
+float OboeAudioPlayer::getMasterVolume() const {
+    return gainProcessor_.getMasterVolumeDb();
+}
+
+bool OboeAudioPlayer::isMuted() const {
+    return gainProcessor_.isMuted();
+}
+
+float OboeAudioPlayer::getEffectiveGain() const {
+    return gainProcessor_.getCurrentGain();
+}
+
 // ============================================================================
 // Real-time Audio & Error Callbacks
 // ============================================================================
@@ -454,6 +492,9 @@ oboe::DataCallbackResult OboeAudioPlayer::onAudioReady(
             std::memset(silenceDest, 0, silenceFrames * kDefaultChannelCount * sizeof(float));
             ringBuffer_.recordUnderrun(silenceFrames);
         }
+
+        // 4. Apply click-free per-channel and master digital gain scaling
+        gainProcessor_.process(floatOut, numFrames, kDefaultChannelCount);
     } else if (format == oboe::AudioFormat::I16) {
         int16_t* i16Out = static_cast<int16_t*>(audioData);
         constexpr int32_t kStackFrames = 1024;
@@ -482,6 +523,9 @@ oboe::DataCallbackResult OboeAudioPlayer::onAudioReady(
                 std::memset(silenceDest, 0, silenceFrames * kDefaultChannelCount * sizeof(float));
                 ringBuffer_.recordUnderrun(silenceFrames);
             }
+
+            // Apply click-free digital gain scaling on the Float32 chunk
+            gainProcessor_.process(tempFloat, chunkFrames, kDefaultChannelCount);
 
             int16_t* chunkOut = i16Out + (framesProcessed * kDefaultChannelCount);
             for (int32_t s = 0; s < chunkFrames * kDefaultChannelCount; ++s) {

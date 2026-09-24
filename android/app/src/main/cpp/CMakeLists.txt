@@ -19,6 +19,7 @@ find_package(oboe REQUIRED CONFIG)
 # Define native shared library
 add_library(roombeat_audio SHARED
     OboeAudioPlayer.cpp
+    audio/GainProcessor.cpp
     codec/OpusEncoderWrapper.cpp
     codec/OpusDecoderWrapper.cpp
     codec/OpusCodecJni.cpp
@@ -29,6 +30,7 @@ add_library(roombeat_audio SHARED
 
 target_include_directories(roombeat_audio PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/audio
     ${CMAKE_CURRENT_SOURCE_DIR}/codec
     ${CMAKE_CURRENT_SOURCE_DIR}/buffer
 )

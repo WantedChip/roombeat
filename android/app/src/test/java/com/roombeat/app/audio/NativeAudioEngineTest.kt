@@ -105,6 +105,27 @@ class NativeAudioEngineTest {
             lastPushedDataSize = length
             return true
         }
+
+        var lastChannelVolume: Float = 0.0f
+        var setChannelVolumeCallCount = 0
+        override fun setChannelVolume(volumeDb: Float) {
+            setChannelVolumeCallCount++
+            lastChannelVolume = volumeDb
+        }
+
+        var lastMasterVolume: Float = 0.0f
+        var setMasterVolumeCallCount = 0
+        override fun setMasterVolume(volumeDb: Float) {
+            setMasterVolumeCallCount++
+            lastMasterVolume = volumeDb
+        }
+
+        var lastIsMuted: Boolean = false
+        var setMutedCallCount = 0
+        override fun setMuted(isMuted: Boolean) {
+            setMutedCallCount++
+            lastIsMuted = isMuted
+        }
     }
 
     private lateinit var fakeBridge: FakeAudioEngineBridge
@@ -386,5 +407,56 @@ class NativeAudioEngineTest {
         val dummyData = byteArrayOf(1, 2, 3, 4)
         assertFalse(defaultHostEngine.pushAudioChunk(101L, 202020L, dummyData))
         assertFalse(NativeAudioEngine.pushAudioChunk(101L, 202020L, dummyData))
+    }
+
+    @Test
+    fun setChannelVolume_delegatesToBridgeAndUpdatesState() {
+        engineWithBridge.setChannelVolume(-6.0f)
+        assertEquals(-6.0f, engineWithBridge.channelVolumeDb, 0.001f)
+        assertEquals(1, fakeBridge.setChannelVolumeCallCount)
+        assertEquals(-6.0f, fakeBridge.lastChannelVolume, 0.001f)
+
+        // Test without bridge (headless JVM)
+        defaultHostEngine.setChannelVolume(3.0f)
+        assertEquals(3.0f, defaultHostEngine.channelVolumeDb, 0.001f)
+    }
+
+    @Test
+    fun setMasterVolume_delegatesToBridgeAndUpdatesState() {
+        engineWithBridge.setMasterVolume(2.5f)
+        assertEquals(2.5f, engineWithBridge.masterVolumeDb, 0.001f)
+        assertEquals(1, fakeBridge.setMasterVolumeCallCount)
+        assertEquals(2.5f, fakeBridge.lastMasterVolume, 0.001f)
+
+        defaultHostEngine.setMasterVolume(-12.0f)
+        assertEquals(-12.0f, defaultHostEngine.masterVolumeDb, 0.001f)
+    }
+
+    @Test
+    fun setMuted_delegatesToBridgeAndUpdatesState() {
+        assertFalse(engineWithBridge.isMuted)
+        engineWithBridge.setMuted(true)
+        assertTrue(engineWithBridge.isMuted)
+        assertEquals(1, fakeBridge.setMutedCallCount)
+        assertTrue(fakeBridge.lastIsMuted)
+
+        engineWithBridge.setMuted(false)
+        assertFalse(engineWithBridge.isMuted)
+        assertEquals(2, fakeBridge.setMutedCallCount)
+        assertFalse(fakeBridge.lastIsMuted)
+    }
+
+    @Test
+    fun companion_volumeMethods_delegateToDefaultInstance() {
+        NativeAudioEngine.setChannelVolume(-3.0f)
+        assertEquals(-3.0f, NativeAudioEngine.channelVolumeDb, 0.001f)
+
+        NativeAudioEngine.setMasterVolume(1.0f)
+        assertEquals(1.0f, NativeAudioEngine.masterVolumeDb, 0.001f)
+
+        NativeAudioEngine.setMuted(true)
+        assertTrue(NativeAudioEngine.isMuted)
+        NativeAudioEngine.setMuted(false)
+        assertFalse(NativeAudioEngine.isMuted)
     }
 }

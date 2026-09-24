@@ -48,6 +48,9 @@ interface AudioEngineBridge {
         offset: Int = 0,
         length: Int = opusData.size
     ): Boolean = false
+    fun setChannelVolume(volumeDb: Float) {}
+    fun setMasterVolume(volumeDb: Float) {}
+    fun setMuted(isMuted: Boolean) {}
 }
 
 /**
@@ -144,6 +147,14 @@ open class NativeAudioEngine(
             offset: Int = 0,
             length: Int = opusData.size
         ): Boolean = defaultInstance.pushAudioChunk(seq, presentationTimeUs, opusData, offset, length)
+
+        val channelVolumeDb: Float get() = defaultInstance.channelVolumeDb
+        val masterVolumeDb: Float get() = defaultInstance.masterVolumeDb
+        val isMuted: Boolean get() = defaultInstance.isMuted
+
+        fun setChannelVolume(volumeDb: Float) = defaultInstance.setChannelVolume(volumeDb)
+        fun setMasterVolume(volumeDb: Float) = defaultInstance.setMasterVolume(volumeDb)
+        fun setMuted(isMuted: Boolean) = defaultInstance.setMuted(isMuted)
     }
 
     private val lock = Any()
@@ -154,11 +165,59 @@ open class NativeAudioEngine(
     @Volatile
     private var _lastError: String? = null
 
+    @Volatile
+    private var _channelVolumeDb: Float = 0.0f
+
+    @Volatile
+    private var _masterVolumeDb: Float = 0.0f
+
+    @Volatile
+    private var _isMuted: Boolean = false
+
     val state: AudioEngineState
         get() = _state
 
     val lastError: String?
         get() = _lastError
+
+    val channelVolumeDb: Float
+        get() = _channelVolumeDb
+
+    val masterVolumeDb: Float
+        get() = _masterVolumeDb
+
+    val isMuted: Boolean
+        get() = _isMuted
+
+    fun setChannelVolume(volumeDb: Float) {
+        _channelVolumeDb = volumeDb
+        val bridge = resolveBridge() ?: return
+        try {
+            bridge.setChannelVolume(volumeDb)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error setting channel volume: ${e.message}")
+        }
+    }
+
+    fun setMasterVolume(volumeDb: Float) {
+        _masterVolumeDb = volumeDb
+        val bridge = resolveBridge() ?: return
+        try {
+            bridge.setMasterVolume(volumeDb)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error setting master volume: ${e.message}")
+        }
+    }
+
+    fun setMuted(isMuted: Boolean) {
+        _isMuted = isMuted
+        val bridge = resolveBridge() ?: return
+        try {
+            bridge.setMuted(isMuted)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error setting muted state: ${e.message}")
+        }
+    }
 
     val isLibraryAvailable: Boolean
         get() = customBridge != null || isLibraryLoaded
@@ -485,6 +544,10 @@ open class NativeAudioEngine(
             length: Int
         ): Boolean = nativePushAudioChunk(seq, presentationTimeUs, opusData, offset, length)
 
+        override fun setChannelVolume(volumeDb: Float) = nativeSetChannelVolume(volumeDb)
+        override fun setMasterVolume(volumeDb: Float) = nativeSetMasterVolume(volumeDb)
+        override fun setMuted(isMuted: Boolean) = nativeSetMuted(isMuted)
+
         @JvmStatic
         private external fun nativeInitEngine(): Int
 
@@ -526,5 +589,14 @@ open class NativeAudioEngine(
             offset: Int,
             length: Int
         ): Boolean
+
+        @JvmStatic
+        private external fun nativeSetChannelVolume(volumeDb: Float)
+
+        @JvmStatic
+        private external fun nativeSetMasterVolume(volumeDb: Float)
+
+        @JvmStatic
+        private external fun nativeSetMuted(isMuted: Boolean)
     }
 }

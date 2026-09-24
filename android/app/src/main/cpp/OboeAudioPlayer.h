@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include "audio/GainProcessor.h"
 
 namespace roombeat {
 
@@ -168,6 +169,18 @@ public:
     void setAudioSource(std::shared_ptr<AudioSource> source);
     void setAutoReconnect(bool autoReconnect);
 
+    // Volume & Digital Gain Control
+    void setChannelVolume(float volumeDb);
+    void setMasterVolume(float volumeDb);
+    void setMuted(bool isMuted);
+    void setChannelGain(float linearGain);
+    void setMasterGain(float linearGain);
+    float getChannelVolume() const;
+    float getMasterVolume() const;
+    bool isMuted() const;
+    float getEffectiveGain() const;
+    audio::GainProcessor& getGainProcessor() { return gainProcessor_; }
+
     // oboe::AudioStreamDataCallback
     oboe::DataCallbackResult onAudioReady(
         oboe::AudioStream* stream,
@@ -198,6 +211,7 @@ private:
 
     AudioRingBuffer ringBuffer_;
     std::shared_ptr<AudioSource> audioSource_;
+    audio::GainProcessor gainProcessor_;
 };
 
 } // namespace roombeat
