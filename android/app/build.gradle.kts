@@ -109,6 +109,10 @@ dependencies {
 
     implementation(libs.oboe)
 
+    // Spotify App Remote SDK & JSON Deserializer
+    implementation(files("libs/spotify-app-remote-release-0.8.0.aar"))
+    implementation("com.google.code.gson:gson:2.10.1")
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.test.ext.junit)

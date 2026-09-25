@@ -392,8 +392,10 @@ class PlaybackCoordinator(
         countdownJob?.cancel()
         countdownJob = scope.launch {
             scheduler.awaitTarget(targetTimeUs) {
-                updateState(PlaybackState.PLAYING)
-                listener?.onPlaybackStarted(targetTimeUs)
+                if (_state.value == PlaybackState.BUFFERING || _state.value == PlaybackState.SCHEDULING) {
+                    updateState(PlaybackState.PLAYING)
+                    listener?.onPlaybackStarted(targetTimeUs)
+                }
             }
         }
     }

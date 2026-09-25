@@ -9,6 +9,9 @@ import com.roombeat.app.session.PeerNode
 import com.roombeat.app.sync.CalibrationProbeEngine
 import com.roombeat.app.sync.CalibrationTransport
 import com.roombeat.app.sync.FakeMonotonicClock
+import com.roombeat.app.source.spotify.FakeSpotifyConnector
+import com.roombeat.app.source.spotify.SpotifyAuthState
+import com.roombeat.app.source.spotify.SpotifyRemoteManager
 import com.roombeat.app.sync.ProbeSample
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -350,5 +353,55 @@ class CalibrationViewModelTest {
 
         viewModel.showRouterWarning(false)
         assertFalse(viewModel.uiState.value.isRouterWarningVisible)
+    }
+
+    @Test
+    fun testSpotifyPreWarmInitiatedDuringCalibrationWhenSourceIsSpotify() = runTest(testDispatcher) {
+        val fakeConnector = FakeSpotifyConnector(isInstalled = true, autoRespondConnected = true)
+        val spotifyManager = SpotifyRemoteManager(
+            clientId = "test-client",
+            connector = fakeConnector,
+            dispatcher = testDispatcher
+        )
+
+        viewModel.initAsHost("sess-spotify-test")
+        viewModel.bindSpotifyRemote(spotifyManager, isSpotifySource = true)
+
+        assertTrue(viewModel.isSpotifySource)
+        assertFalse(spotifyManager.isConnected)
+        assertFalse(viewModel.uiState.value.isSpotifyWarmed)
+
+        viewModel.startCalibration()
+        advanceUntilIdle()
+
+        assertTrue(spotifyManager.isConnected)
+        assertTrue(viewModel.uiState.value.isSpotifyWarmed)
+        assertEquals(1, fakeConnector.connectCallCount)
+
+        spotifyManager.close()
+    }
+
+    @Test
+    fun testSpotifyPreWarmNotInitiatedWhenSourceIsNotSpotify() = runTest(testDispatcher) {
+        val fakeConnector = FakeSpotifyConnector(isInstalled = true, autoRespondConnected = true)
+        val spotifyManager = SpotifyRemoteManager(
+            clientId = "test-client",
+            connector = fakeConnector,
+            dispatcher = testDispatcher
+        )
+
+        viewModel.initAsHost("sess-no-spotify")
+        viewModel.bindSpotifyRemote(spotifyManager, isSpotifySource = false)
+
+        assertFalse(viewModel.isSpotifySource)
+
+        viewModel.startCalibration()
+        advanceUntilIdle()
+
+        assertFalse(spotifyManager.isConnected)
+        assertFalse(viewModel.uiState.value.isSpotifyWarmed)
+        assertEquals(0, fakeConnector.connectCallCount)
+
+        spotifyManager.close()
     }
 }

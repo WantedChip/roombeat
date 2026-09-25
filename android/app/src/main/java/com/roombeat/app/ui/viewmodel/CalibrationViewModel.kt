@@ -12,6 +12,9 @@ import com.roombeat.app.sync.CalibrationProbeListener
 import com.roombeat.app.sync.MonotonicClock
 import com.roombeat.app.sync.ProbeSample
 import com.roombeat.app.sync.SystemMonotonicClock
+import com.roombeat.app.source.spotify.SpotifyAuthState
+import com.roombeat.app.source.spotify.SpotifyRemoteManager
+import com.roombeat.app.source.spotify.isConnected
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -86,7 +89,8 @@ data class CalibrationUiState(
     val isRouterWarningVisible: Boolean = false,
     val statusMessage: String = "STANDBY · READY TO CALIBRATE",
     val lastPulseTimestamp: Long = 0L,
-    val sessionId: String = ""
+    val sessionId: String = "",
+    val isSpotifyWarmed: Boolean = false
 ) {
     val formattedAverageOffset: String
         get() = String.format(Locale.US, "%+.2fms", averageOffsetMs)
@@ -134,6 +138,14 @@ class CalibrationViewModel(
     var sessionManager: PeerSessionManager? = initialSessionManager
         private set
 
+    var isSpotifySource: Boolean = false
+        private set
+
+    var spotifyRemoteManager: SpotifyRemoteManager? = null
+        private set
+
+    private var spotifyCollectorJob: Job? = null
+
     private val _uiState = MutableStateFlow(
         CalibrationUiState(
             totalDurationSeconds = totalDurationSeconds,
@@ -150,6 +162,24 @@ class CalibrationViewModel(
         initialEngine?.let { bindEngine(it) }
         initialMulticastProbe?.let { bindMulticastProbe(it) }
         initialSessionManager?.let { bindSessionManager(it) }
+    }
+
+    /**
+     * Binds [SpotifyRemoteManager] and flags whether the active audio source is Spotify,
+     * enabling the SPOTIFY_WARM handshake during the calibration phase (Roadmap §8, §10).
+     */
+    fun bindSpotifyRemote(manager: SpotifyRemoteManager, isSpotifySource: Boolean = true) {
+        this.spotifyRemoteManager = manager
+        this.isSpotifySource = isSpotifySource
+
+        spotifyCollectorJob?.cancel()
+        spotifyCollectorJob = viewModelScope.launch(defaultDispatcher) {
+            manager.authState.collect { authState ->
+                _uiState.update { current ->
+                    current.copy(isSpotifyWarmed = authState is SpotifyAuthState.Connected)
+                }
+            }
+        }
     }
 
     /**
@@ -371,7 +401,23 @@ class CalibrationViewModel(
                 }
             }
 
-            // 3. Run Countdown Timer
+            // 3. Launch Spotify pre-warm handshake if Spotify source is active (Roadmap §8, §10, v0.7.0)
+            if (isSpotifySource) {
+                spotifyRemoteManager?.let { manager ->
+                    launch(defaultDispatcher) {
+                        try {
+                            if (!manager.isConnected) {
+                                manager.initiateWarmUp(null, showAuthView = false)
+                            }
+                            if (_uiState.value.isHost) {
+                                sessionManager?.broadcast(manager.createSpotifyWarmPacket())
+                            }
+                        } catch (_: Exception) {}
+                    }
+                }
+            }
+
+            // 4. Run Countdown Timer
             for (sec in totalDurationSeconds downTo 1) {
                 _uiState.update { it.copy(countdownRemainingSeconds = sec) }
                 delay(1000L)
@@ -380,7 +426,7 @@ class CalibrationViewModel(
 
             probeBurstJob.join()
 
-            // 4. Determine Sync-Lock and Update Navigation State
+            // 5. Determine Sync-Lock and Update Navigation State
             evaluateSyncQuality()
         }
     }

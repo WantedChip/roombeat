@@ -74,6 +74,22 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
+        <!-- Spotify App Remote Auth Redirect Activity -->
+        <activity
+            android:name=".source.spotify.SpotifyAuthCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="roombeat"
+                    android:host="spotify-callback" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

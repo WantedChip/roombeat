@@ -466,6 +466,13 @@ class PeerSessionManager(
     }
 
     /**
+     * Broadcasts a protocol packet to all connected peers in the session.
+     */
+    fun broadcast(packet: RoomBeatPacket): Int {
+        return transport?.broadcastToAll(packet) ?: 0
+    }
+
+    /**
      * Sets master volume across all nodes and broadcasts [RoomBeatPacket.SessionMasterVolume].
      */
     fun setMasterVolume(volume: Float) {

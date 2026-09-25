@@ -65,6 +65,14 @@ import com.roombeat.app.ui.theme.SyncGreen
 import com.roombeat.app.ui.theme.TextBone
 import com.roombeat.app.ui.theme.TextDim
 import com.roombeat.app.ui.theme.TextMuted
+import androidx.compose.runtime.collectAsState
+import com.roombeat.app.source.spotify.SpotifyAuthState
+import com.roombeat.app.source.spotify.SpotifyRemoteManager
+import com.roombeat.app.source.spotify.isConnected
+import com.roombeat.app.source.spotify.isConnecting
+import com.roombeat.app.source.spotify.isError
+import com.roombeat.app.ui.components.SpotifyGuidanceDialog
+import com.roombeat.app.ui.theme.SpotifyGreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -89,13 +97,18 @@ fun SourceMethodScreen(
     onProceedToPlayback: (AudioTrackInfo) -> Unit,
     modifier: Modifier = Modifier,
     initialTrackInfo: AudioTrackInfo? = null,
-    metadataExtractor: AudioMetadataExtractor = remember { AudioMetadataExtractor.DEFAULT }
+    metadataExtractor: AudioMetadataExtractor = remember { AudioMetadataExtractor.DEFAULT },
+    spotifyRemoteManager: SpotifyRemoteManager = remember { SpotifyRemoteManager.DEFAULT },
+    onProceedToSpotify: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     var selectedTrack by remember { mutableStateOf(initialTrackInfo) }
     var isExtracting by remember { mutableStateOf(false) }
+
+    val spotifyAuthState by spotifyRemoteManager.authState.collectAsState()
+    var guidanceError by remember { mutableStateOf<SpotifyAuthState.Error?>(null) }
 
     val filePicker = rememberLocalAudioFilePicker(
         onAudioFileSelected = { uri ->
@@ -113,11 +126,26 @@ fun SourceMethodScreen(
     SourceMethodContent(
         selectedTrack = selectedTrack,
         isExtracting = isExtracting,
+        spotifyAuthState = spotifyAuthState,
         onNavigateBack = onNavigateBack,
         onLaunchFilePicker = { filePicker.launch() },
         onProceedToPlayback = onProceedToPlayback,
+        onConnectSpotify = { spotifyRemoteManager.initiateWarmUp(context) },
+        onProceedToSpotify = onProceedToSpotify ?: {},
+        onShowSpotifyGuidance = { error -> guidanceError = error },
         modifier = modifier
     )
+
+    guidanceError?.let { error ->
+        SpotifyGuidanceDialog(
+            error = error,
+            onDismiss = { guidanceError = null },
+            onRetry = {
+                guidanceError = null
+                spotifyRemoteManager.initiateWarmUp(context)
+            }
+        )
+    }
 }
 
 /**
@@ -130,7 +158,11 @@ fun SourceMethodContent(
     onNavigateBack: () -> Unit,
     onLaunchFilePicker: () -> Unit,
     onProceedToPlayback: (AudioTrackInfo) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    spotifyAuthState: SpotifyAuthState = SpotifyAuthState.Disconnected,
+    onConnectSpotify: () -> Unit = {},
+    onProceedToSpotify: () -> Unit = {},
+    onShowSpotifyGuidance: (SpotifyAuthState.Error) -> Unit = {}
 ) {
     Surface(
         modifier = modifier
@@ -206,9 +238,14 @@ fun SourceMethodContent(
                     SystemAppCaptureModule()
                 }
 
-                // MODULE 03: SPOTIFY APP REMOTE (STANDBY - PHASE v0.7)
+                // MODULE 03: SPOTIFY APP REMOTE (ACTIVE - PHASE v0.7)
                 item {
-                    SpotifyAppRemoteModule()
+                    SpotifyAppRemoteModule(
+                        authState = spotifyAuthState,
+                        onConnectSpotify = onConnectSpotify,
+                        onProceedToSpotify = onProceedToSpotify,
+                        onShowGuidance = onShowSpotifyGuidance
+                    )
                 }
             }
 
@@ -225,7 +262,7 @@ fun SourceMethodContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "CHANNELS: 1 ACTIVE · 2 STANDBY",
+                        text = "CHANNELS: 2 ACTIVE · 1 STANDBY",
                         style = RoomBeatTheme.typography.codeXs,
                         color = TextDim
                     )
@@ -613,18 +650,27 @@ private fun SystemAppCaptureModule(modifier: Modifier = Modifier) {
 }
 
 /**
- * Module 03: [ SPOTIFY APP REMOTE ] (Standby - Phase v0.7)
+ * Module 03: [ SPOTIFY APP REMOTE ] (Active - Phase v0.7)
  */
 @Composable
-private fun SpotifyAppRemoteModule(modifier: Modifier = Modifier) {
+private fun SpotifyAppRemoteModule(
+    authState: SpotifyAuthState,
+    onConnectSpotify: () -> Unit,
+    onProceedToSpotify: () -> Unit,
+    onShowGuidance: (SpotifyAuthState.Error) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isConnected = authState.isConnected
+    val isConnecting = authState.isConnecting
+    val isError = authState.isError
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .testTag("module_03_card")
-            .alpha(0.6f),
+            .testTag("module_03_card"),
         shape = RoundedCornerShape(8.dp),
         color = SurfacePanel,
-        border = BorderStroke(1.dp, BorderMilled)
+        border = BorderStroke(1.dp, if (isConnected) SpotifyGreen else if (isConnecting) BorderActive else BorderMilled)
     ) {
         Column(
             modifier = Modifier
@@ -655,8 +701,18 @@ private fun SpotifyAppRemoteModule(modifier: Modifier = Modifier) {
                 }
 
                 StatusBeacon(
-                    status = BeaconStatus.IDLE,
-                    label = "STANDBY"
+                    status = when {
+                        isConnected -> BeaconStatus.LOCKED
+                        isConnecting -> BeaconStatus.CALIBRATING
+                        isError -> BeaconStatus.ERROR
+                        else -> BeaconStatus.IDLE
+                    },
+                    label = when {
+                        isConnected -> "PRE-WARMED"
+                        isConnecting -> "WARMING..."
+                        isError -> "FAULT"
+                        else -> "READY"
+                    }
                 )
             }
 
@@ -668,7 +724,7 @@ private fun SpotifyAppRemoteModule(modifier: Modifier = Modifier) {
             )
 
             Text(
-                text = "Direct remote playback & command sync with Spotify client via Spotify App Remote SDK.",
+                text = "Synchronized Spotify playback via App Remote SDK IPC connection. Pre-warms session handshake to eliminate cold-start latency.",
                 style = RoomBeatTheme.typography.bodyMd,
                 color = TextMuted
             )
@@ -679,25 +735,74 @@ private fun SpotifyAppRemoteModule(modifier: Modifier = Modifier) {
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = "SYNC PROTOCOL: SPOTIFY_CMD & PlaybackState Tracker",
+                        text = "SYNC PROTOCOL: SPOTIFY_CMD & SPOTIFY_WARM (§10)",
                         style = RoomBeatTheme.typography.codeXs,
                         color = TextDim
                     )
                     Text(
-                        text = "STANDBY STATUS: SCHEDULED FOR SUB-PHASE v0.7",
+                        text = when (authState) {
+                            is SpotifyAuthState.Connected -> "IPC STATUS: PRE-WARMED · READY FOR CALIBRATION / SYNC"
+                            is SpotifyAuthState.Connecting -> "IPC STATUS: CONNECTING & AUTHENTICATING..."
+                            is SpotifyAuthState.Error -> "IPC ERROR: ${authState.errorType.name} · TAP TO VIEW DETAILS"
+                            is SpotifyAuthState.Disconnected -> "IPC STATUS: DISCONNECTED · READY TO PRE-WARM"
+                        },
                         style = RoomBeatTheme.typography.codeXs,
-                        color = SyncAmber
+                        color = when (authState) {
+                            is SpotifyAuthState.Connected -> SpotifyGreen
+                            is SpotifyAuthState.Connecting -> SyncAmber
+                            is SpotifyAuthState.Error -> SyncAmber
+                            is SpotifyAuthState.Disconnected -> TextDim
+                        }
                     )
                 }
             }
 
-            TactileKeycapButton(
-                onClick = {},
-                enabled = false,
-                variant = TactileButtonVariant.SURFACE,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "[ STANDBY · PHASE v0.7 ]")
+            when {
+                isConnected -> {
+                    TactileKeycapButton(
+                        onClick = onProceedToSpotify,
+                        variant = TactileButtonVariant.PRIMARY,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("module_03_proceed_button")
+                    ) {
+                        Text(text = "[ PROCEED WITH SPOTIFY (MODULE 03) ]")
+                    }
+                }
+                isConnecting -> {
+                    TactileKeycapButton(
+                        onClick = {},
+                        enabled = false,
+                        variant = TactileButtonVariant.SURFACE,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("module_03_warming_button")
+                    ) {
+                        Text(text = "PRE-WARMING IPC CONNECTION...")
+                    }
+                }
+                isError -> {
+                    TactileKeycapButton(
+                        onClick = { onShowGuidance(authState as SpotifyAuthState.Error) },
+                        variant = TactileButtonVariant.SURFACE,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("module_03_error_button")
+                    ) {
+                        Text(text = "[ VIEW GUIDANCE / RETRY ]")
+                    }
+                }
+                else -> {
+                    TactileKeycapButton(
+                        onClick = onConnectSpotify,
+                        variant = TactileButtonVariant.PRIMARY,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("module_03_connect_button")
+                    ) {
+                        Text(text = "[ CONNECT & PRE-WARM SPOTIFY ]")
+                    }
+                }
             }
         }
     }
