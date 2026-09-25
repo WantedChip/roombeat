@@ -87,6 +87,7 @@ AudioJitterBuffer::AudioJitterBuffer(
     capacityFrames_(capacityFrames > 0 ? capacityFrames : kDefaultCapacityFrames),
     decoder_(std::move(decoder)),
     clockFunc_(defaultMonotonicClockUs),
+    resampler_(kJitterChannelCount, kJitterSampleRate, roombeat::audio::InterpolationMethod::CubicCatmullRom),
     slots_(capacityFrames_),
     activeFrameBuffer_(kInterleavedSamples, 0.0f) {
     if (!decoder_) {
@@ -115,6 +116,7 @@ void AudioJitterBuffer::reset() {
     activeFrameRemaining_ = 0;
     targetStartTimeUs_ = 0;
     std::fill(activeFrameBuffer_.begin(), activeFrameBuffer_.end(), 0.0f);
+    resampler_.reset();
     if (decoder_) {
         decoder_->resetState();
     }
@@ -139,6 +141,7 @@ void AudioJitterBuffer::flushAndSeek(uint64_t newInitialSeq, int64_t newTargetSt
     activeFrameRemaining_ = 0;
     targetStartTimeUs_ = newTargetStartTimeUs;
     std::fill(activeFrameBuffer_.begin(), activeFrameBuffer_.end(), 0.0f);
+    resampler_.reset();
     if (decoder_) {
         decoder_->resetState();
     }
@@ -378,7 +381,7 @@ bool AudioJitterBuffer::fetchNext20msFrame(float* outFrame) {
     return false;
 }
 
-int32_t AudioJitterBuffer::renderAudio(float* output, int32_t numFrames) {
+int32_t AudioJitterBuffer::pullRawFrames(float* output, int32_t numFrames) {
     if (!output || numFrames <= 0) return 0;
 
     int32_t framesRendered = 0;
@@ -408,6 +411,37 @@ int32_t AudioJitterBuffer::renderAudio(float* output, int32_t numFrames) {
         }
     }
     return framesRendered;
+}
+
+int32_t AudioJitterBuffer::renderAudio(float* output, int32_t numFrames) {
+    if (!output || numFrames <= 0) return 0;
+    return resampler_.renderAudio(output, numFrames, [this](float* buf, int32_t requested) -> int32_t {
+        return pullRawFrames(buf, requested);
+    });
+}
+
+void AudioJitterBuffer::setSpeedPpm(int32_t ppm) {
+    resampler_.setSpeedPpm(ppm);
+}
+
+int32_t AudioJitterBuffer::getSpeedPpm() const {
+    return resampler_.getSpeedPpm();
+}
+
+void AudioJitterBuffer::setSpeedRatio(double ratio) {
+    resampler_.setSpeedRatio(ratio);
+}
+
+double AudioJitterBuffer::getSpeedRatio() const {
+    return resampler_.getSpeedRatio();
+}
+
+double AudioJitterBuffer::getEffectiveSpeedRatio() const {
+    return resampler_.getEffectiveSpeedRatio();
+}
+
+bool AudioJitterBuffer::isResamplerRamping() const {
+    return resampler_.isRamping();
 }
 
 void AudioJitterBuffer::setTargetDepthMs(int32_t depthMs) {

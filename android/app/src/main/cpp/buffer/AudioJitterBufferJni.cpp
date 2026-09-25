@@ -267,6 +267,29 @@ Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeFlushAndSeek(
     }
 }
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeSetSpeedPpm(
+    JNIEnv* /*env*/,
+    jclass /*clazz*/,
+    jlong handle,
+    jint ppm
+) {
+    auto* buffer = getJitterBuffer(handle);
+    if (buffer) {
+        buffer->setSpeedPpm(static_cast<int32_t>(ppm));
+    }
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeGetSpeedPpm(
+    JNIEnv* /*env*/,
+    jclass /*clazz*/,
+    jlong handle
+) {
+    auto* buffer = getJitterBuffer(handle);
+    return buffer ? buffer->getSpeedPpm() : 0;
+}
+
 /*
  * DefaultAudioJitterBufferBridge instance method aliases
  */
@@ -364,6 +387,20 @@ Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeFlushAnd
     JNIEnv* env, jobject /*thiz*/, jlong handle, jlong newInitialSeq, jlong newTargetStartTimeUs) {
     Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeFlushAndSeek(
         env, nullptr, handle, newInitialSeq, newTargetStartTimeUs);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeSetSpeedPpm(
+    JNIEnv* env, jobject /*thiz*/, jlong handle, jint ppm) {
+    Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeSetSpeedPpm(
+        env, nullptr, handle, ppm);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeGetSpeedPpm(
+    JNIEnv* env, jobject /*thiz*/, jlong handle) {
+    return Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeGetSpeedPpm(
+        env, nullptr, handle);
 }
 
 } // extern "C"

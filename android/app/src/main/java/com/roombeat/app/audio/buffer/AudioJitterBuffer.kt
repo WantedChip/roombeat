@@ -57,6 +57,8 @@ interface AudioJitterBufferBridge {
     fun setTargetStartTimeUs(handle: Long, targetTimeUs: Long)
     fun getTargetStartTimeUs(handle: Long): Long = 0L
     fun flushAndSeek(handle: Long, newInitialSeq: Long, newTargetStartTimeUs: Long)
+    fun setSpeedPpm(handle: Long, ppm: Int) {}
+    fun getSpeedPpm(handle: Long): Int = 0
 }
 
 /**
@@ -102,6 +104,20 @@ class AudioJitterBuffer(
         set(value) {
             check(!isClosed) { "AudioJitterBuffer is closed" }
             bridge.setTargetStartTimeUs(handle, value)
+        }
+
+    /**
+     * Micro-speed modulation in parts-per-million (+/-500 ppm = +/-0.05%).
+     * Modulates the fractional resampler to correct clock drift pitch-neutrally.
+     */
+    var speedPpm: Int
+        get() {
+            check(!isClosed) { "AudioJitterBuffer is closed" }
+            return bridge.getSpeedPpm(handle)
+        }
+        set(value) {
+            check(!isClosed) { "AudioJitterBuffer is closed" }
+            bridge.setSpeedPpm(handle, value)
         }
 
     fun setClockFunction(clockFunc: () -> Long) {
@@ -349,6 +365,22 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
         }
     }
 
+    override fun setSpeedPpm(handle: Long, ppm: Int) {
+        if (isNative) {
+            nativeSetSpeedPpm(handle, ppm)
+        } else {
+            buffers[handle]?.speedPpm = ppm
+        }
+    }
+
+    override fun getSpeedPpm(handle: Long): Int {
+        return if (isNative) {
+            nativeGetSpeedPpm(handle)
+        } else {
+            buffers[handle]?.speedPpm ?: 0
+        }
+    }
+
     fun setClockFunction(handle: Long, clockFunc: () -> Long) {
         buffers[handle]?.clockFunc = clockFunc
     }
@@ -384,6 +416,8 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
     private external fun nativeSetTargetStartTimeUs(handle: Long, targetTimeUs: Long)
     private external fun nativeGetTargetStartTimeUs(handle: Long): Long
     private external fun nativeFlushAndSeek(handle: Long, newInitialSeq: Long, newTargetStartTimeUs: Long)
+    private external fun nativeSetSpeedPpm(handle: Long, ppm: Int)
+    private external fun nativeGetSpeedPpm(handle: Long): Int
 
     // ========================================================================
     // Deterministic Software Mock for Host-Side JVM Unit Tests
@@ -408,6 +442,16 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
 
         var targetStartTimeUs: Long = 0L
         var clockFunc: () -> Long = { System.nanoTime() / 1000L }
+
+        var speedPpm: Int = 0
+            get() = synchronized(lock) { field }
+            set(value) {
+                synchronized(lock) {
+                    field = value.coerceIn(-2000, 2000)
+                }
+            }
+
+        private var fractionalPhase = 0.0
 
         private val slots = HashMap<Long, StoredFrame>()
         private var playbackStarted = false
@@ -441,6 +485,8 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
                 activeRemainder = null
                 activeRemainderOffset = 0
                 targetStartTimeUs = 0L
+                speedPpm = 0
+                fractionalPhase = 0.0
             }
         }
 
@@ -455,6 +501,7 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
                 activeRemainder = null
                 activeRemainderOffset = 0
                 targetStartTimeUs = newTargetStartTimeUs
+                fractionalPhase = 0.0
             }
         }
 
@@ -519,29 +566,54 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
 
             var framesRendered = 0
             val channels = JitterBufferConstants.CHANNELS
+            val currentPpm = speedPpm
 
+            if (currentPpm == 0 && fractionalPhase == 0.0) {
+                while (framesRendered < numFrames) {
+                    val remainder = activeRemainder
+                    if (remainder != null && activeRemainderOffset < (remainder.size / channels)) {
+                        val remainingInFrame = (remainder.size / channels) - activeRemainderOffset
+                        val toCopy = min(numFrames - framesRendered, remainingInFrame)
+
+                        System.arraycopy(
+                            remainder,
+                            activeRemainderOffset * channels,
+                            outputBuffer,
+                            framesRendered * channels,
+                            toCopy * channels
+                        )
+                        activeRemainderOffset += toCopy
+                        framesRendered += toCopy
+                    } else {
+                        val next20ms = fetchNext20msFrame()
+                        if (next20ms != null) {
+                            activeRemainder = next20ms
+                            activeRemainderOffset = 0
+                        } else {
+                            // Silence
+                            val silence = numFrames - framesRendered
+                            for (i in (framesRendered * channels) until (numFrames * channels)) {
+                                outputBuffer[i] = 0.0f
+                            }
+                            framesRendered += silence
+                            break
+                        }
+                    }
+                }
+                return framesRendered
+            }
+
+            // Fractional resampling when speed modulation is active
+            val ratio = 1.0 + (currentPpm.toDouble() / 1_000_000.0)
             while (framesRendered < numFrames) {
-                val remainder = activeRemainder
-                if (remainder != null && activeRemainderOffset < (remainder.size / channels)) {
-                    val remainingInFrame = (remainder.size / channels) - activeRemainderOffset
-                    val toCopy = min(numFrames - framesRendered, remainingInFrame)
-
-                    System.arraycopy(
-                        remainder,
-                        activeRemainderOffset * channels,
-                        outputBuffer,
-                        framesRendered * channels,
-                        toCopy * channels
-                    )
-                    activeRemainderOffset += toCopy
-                    framesRendered += toCopy
-                } else {
+                var remainder = activeRemainder
+                if (remainder == null || activeRemainderOffset >= (remainder.size / channels)) {
                     val next20ms = fetchNext20msFrame()
                     if (next20ms != null) {
                         activeRemainder = next20ms
                         activeRemainderOffset = 0
+                        remainder = next20ms
                     } else {
-                        // Silence
                         val silence = numFrames - framesRendered
                         for (i in (framesRendered * channels) until (numFrames * channels)) {
                             outputBuffer[i] = 0.0f
@@ -550,6 +622,22 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
                         break
                     }
                 }
+
+                val totalInFrame = remainder.size / channels
+                val alpha = fractionalPhase.toFloat()
+                val offset = activeRemainderOffset
+
+                for (c in 0 until channels) {
+                    val y0 = remainder[offset * channels + c]
+                    val y1 = if (offset + 1 < totalInFrame) remainder[(offset + 1) * channels + c] else y0
+                    outputBuffer[framesRendered * channels + c] = y0 + alpha * (y1 - y0)
+                }
+                framesRendered++
+
+                fractionalPhase += ratio
+                val step = fractionalPhase.toInt()
+                fractionalPhase -= step
+                activeRemainderOffset += step
             }
             return framesRendered
         }

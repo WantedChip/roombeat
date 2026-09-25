@@ -1,6 +1,7 @@
 package com.roombeat.app.audio
 
 import android.util.Log
+import kotlin.math.roundToInt
 
 /**
  * Lifecycle states of the RoomBeat audio engine.
@@ -54,6 +55,8 @@ interface AudioEngineBridge {
     fun setTargetStartTimeUs(targetTimeUs: Long) {}
     fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) {}
     fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int = 0
+    fun setSpeedPpm(ppm: Int) {}
+    fun getSpeedPpm(): Int = 0
 }
 
 /**
@@ -162,6 +165,12 @@ open class NativeAudioEngine(
         fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) = defaultInstance.flushAndSeek(newInitialSeq, newTargetStartTimeUs)
         fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int = defaultInstance.encodeFrame(pcmData, outputBuffer)
         fun encodeFrame(pcmData: ShortArray): ByteArray? = defaultInstance.encodeFrame(pcmData)
+
+        val speedPpm: Int get() = defaultInstance.speedPpm
+        val playbackRate: Double get() = defaultInstance.playbackRate
+
+        fun setSpeedPpm(ppm: Int) = defaultInstance.setSpeedPpm(ppm)
+        fun setPlaybackRate(ratio: Double) = defaultInstance.setPlaybackRate(ratio)
     }
 
     private val lock = Any()
@@ -545,6 +554,51 @@ open class NativeAudioEngine(
         }
     }
 
+    @Volatile
+    private var _speedPpm: Int = 0
+
+    val speedPpm: Int
+        get() {
+            val bridge = resolveBridge()
+            if (bridge != null) {
+                try {
+                    _speedPpm = bridge.getSpeedPpm()
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error getting speed PPM from audio engine: ${e.message}")
+                }
+            }
+            return _speedPpm
+        }
+
+    val playbackRate: Double
+        get() = 1.0 + (speedPpm.toDouble() / 1_000_000.0)
+
+    /**
+     * Sets target micro-speed adjustment in parts-per-million (e.g. +/-500 ppm = +/-0.05%).
+     * Smoothly modulated by the NDK fractional resampler.
+     */
+    fun setSpeedPpm(ppm: Int) {
+        _speedPpm = ppm
+        val currentBuffer = attachedJitterBuffer
+        if (currentBuffer != null) {
+            currentBuffer.speedPpm = ppm
+        }
+        val bridge = resolveBridge() ?: return
+        try {
+            bridge.setSpeedPpm(ppm)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error setting speed PPM on audio engine: ${e.message}")
+        }
+    }
+
+    /**
+     * Sets playback rate as a multiplier (e.g. 1.0005 for +500 ppm, 0.9995 for -500 ppm).
+     */
+    fun setPlaybackRate(ratio: Double) {
+        val ppm = ((ratio - 1.0) * 1_000_000.0).roundToInt()
+        setSpeedPpm(ppm)
+    }
+
     private val fallbackEncoderHandle: Long by lazy {
         com.roombeat.app.audio.codec.DefaultOpusCodecBridge.INSTANCE.encoderCreate(
             com.roombeat.app.audio.codec.OpusConstants.SAMPLE_RATE,
@@ -630,6 +684,8 @@ open class NativeAudioEngine(
         override fun setTargetStartTimeUs(targetTimeUs: Long) = nativeSetTargetStartTimeUs(targetTimeUs)
         override fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) = nativeFlushAndSeek(newInitialSeq, newTargetStartTimeUs)
         override fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int = nativeEncodeFrame(pcmData, outputBuffer)
+        override fun setSpeedPpm(ppm: Int) = nativeSetSpeedPpm(ppm)
+        override fun getSpeedPpm(): Int = nativeGetSpeedPpm()
 
         @JvmStatic
         private external fun nativeInitEngine(): Int
@@ -690,5 +746,11 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeEncodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int
+
+        @JvmStatic
+        private external fun nativeSetSpeedPpm(ppm: Int)
+
+        @JvmStatic
+        private external fun nativeGetSpeedPpm(): Int
     }
 }

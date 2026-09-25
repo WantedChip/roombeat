@@ -11,6 +11,7 @@
 #include "RingBuffer.h"
 #include "OboeAudioPlayer.h"
 #include "codec/OpusDecoderWrapper.h"
+#include "audio/FractionalResampler.h"
 
 namespace roombeat {
 namespace buffer {
@@ -168,7 +169,19 @@ public:
     static void applyFadeOut(float* frame, int32_t numFrames);
     static void applyFadeIn(float* frame, int32_t numFrames);
 
+    /**
+     * Fractional resampler & micro-speed adjustment.
+     */
+    void setSpeedPpm(int32_t ppm);
+    int32_t getSpeedPpm() const;
+    void setSpeedRatio(double ratio);
+    double getSpeedRatio() const;
+    double getEffectiveSpeedRatio() const;
+    bool isResamplerRamping() const;
+    roombeat::audio::FractionalResampler& getResampler() { return resampler_; }
+
 private:
+    int32_t pullRawFrames(float* output, int32_t numFrames);
     bool fetchNext20msFrame(float* outFrame);
     uint64_t findLowestBufferedSeq() const;
 
@@ -179,6 +192,8 @@ private:
 
     ClockFunction clockFunc_;
     int64_t targetStartTimeUs_{0};
+
+    roombeat::audio::FractionalResampler resampler_;
 
     std::vector<FrameSlot> slots_;
     mutable std::mutex bufferMutex_;

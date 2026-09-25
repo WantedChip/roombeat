@@ -105,6 +105,22 @@ public:
         player_.setMuted(isMuted);
     }
 
+    void setSpeedPpm(int32_t ppm) {
+        speedPpm_ = ppm;
+        auto* jitter = getAttachedJitterBuffer();
+        if (jitter) {
+            jitter->setSpeedPpm(ppm);
+        }
+    }
+
+    int32_t getSpeedPpm() const {
+        auto* jitter = getAttachedJitterBuffer();
+        if (jitter) {
+            return jitter->getSpeedPpm();
+        }
+        return speedPpm_;
+    }
+
     OboeAudioPlayer& getPlayer() {
         return player_;
     }
@@ -113,6 +129,7 @@ private:
     std::mutex engineMutex_;
     OboeAudioPlayer player_;
     bool isInitialized_{false};
+    int32_t speedPpm_{0};
 };
 
 // Global singleton instance managed safely with a mutex
@@ -509,6 +526,12 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeAttachJitterBuffer(
     }
     auto* jitterBuffer = reinterpret_cast<roombeat::buffer::AudioJitterBuffer*>(jitterBufferHandle);
     roombeat::setAttachedJitterBuffer(jitterBuffer);
+    if (jitterBuffer) {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (engine) {
+            jitterBuffer->setSpeedPpm(engine->getSpeedPpm());
+        }
+    }
     std::shared_ptr<roombeat::AudioSource> sharedSource(jitterBuffer, [](roombeat::AudioSource*){});
     roombeat::setEngineAudioSource(sharedSource);
     return JNI_TRUE;
@@ -839,6 +862,71 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeEncode
     jbyteArray outputBuffer
 ) {
     return Java_com_roombeat_app_audio_NativeAudioEngine_nativeEncodeFrame(env, thiz, pcmBuffer, outputBuffer);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetSpeedPpm(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/,
+    jint ppm
+) {
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (engine) {
+            engine->setSpeedPpm(static_cast<int32_t>(ppm));
+        }
+    } catch (const std::exception& ex) {
+        LOGE("Exception in nativeSetSpeedPpm: %s", ex.what());
+    } catch (...) {
+        LOGE("Unknown exception in nativeSetSpeedPpm");
+    }
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetSpeedPpm(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/
+) {
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        return engine ? engine->getSpeedPpm() : 0;
+    } catch (...) {
+        return 0;
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setSpeedPpm(
+    JNIEnv* env,
+    jobject thiz,
+    jint ppm
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetSpeedPpm(env, thiz, ppm);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_getSpeedPpm(
+    JNIEnv* env,
+    jobject thiz
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetSpeedPpm(env, thiz);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetSpeedPpm(
+    JNIEnv* env,
+    jobject thiz,
+    jint ppm
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetSpeedPpm(env, thiz, ppm);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetSpeedPpm(
+    JNIEnv* env,
+    jobject thiz
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetSpeedPpm(env, thiz);
 }
 
 } // extern "C"

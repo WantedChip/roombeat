@@ -20,6 +20,7 @@ find_package(oboe REQUIRED CONFIG)
 add_library(roombeat_audio SHARED
     OboeAudioPlayer.cpp
     audio/GainProcessor.cpp
+    audio/FractionalResampler.cpp
     codec/OpusEncoderWrapper.cpp
     codec/OpusDecoderWrapper.cpp
     codec/OpusCodecJni.cpp

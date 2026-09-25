@@ -151,6 +151,19 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeEncodeFrame(
     jbyteArray outputBuffer
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetSpeedPpm(
+    JNIEnv* env,
+    jobject thiz,
+    jint ppm
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetSpeedPpm(
+    JNIEnv* env,
+    jobject thiz
+);
+
 /*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
@@ -281,6 +294,19 @@ Java_com_roombeat_app_audio_NativeAudioEngine_encodeFrame(
     jbyteArray outputBuffer
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setSpeedPpm(
+    JNIEnv* env,
+    jobject thiz,
+    jint ppm
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_getSpeedPpm(
+    JNIEnv* env,
+    jobject thiz
+);
+
 /*
  * JNI methods for nested DefaultJniBridge
  */
@@ -409,6 +435,19 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeEncode
     jobject thiz,
     jshortArray pcmBuffer,
     jbyteArray outputBuffer
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetSpeedPpm(
+    JNIEnv* env,
+    jobject thiz,
+    jint ppm
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetSpeedPpm(
+    JNIEnv* env,
+    jobject thiz
 );
 
 #ifdef __cplusplus
