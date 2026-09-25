@@ -6,6 +6,11 @@ import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.PlayerApi
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -31,6 +36,22 @@ interface SpotifyAppRemoteFacade {
 }
 
 /**
+ * Decoupled data model capturing a snapshot of Spotify player state.
+ * Contains no dependencies on Spotify App Remote SDK classes, enabling deterministic headless testing.
+ */
+data class SpotifyPlayerStateSnapshot(
+    val trackUri: String = "",
+    val trackDurationMs: Long = 0L,
+    val playbackPositionMs: Long = 0L,
+    val playbackSpeed: Float = 1.0f,
+    val isPaused: Boolean = true,
+    val isBuffering: Boolean = false,
+    val trackName: String = "",
+    val artistName: String = "",
+    val sampledAtMs: Long = System.currentTimeMillis()
+)
+
+/**
  * Abstraction over Spotify App Remote's PlayerApi.
  * Enables deterministic testing on headless JVM environments without physical Spotify IPC.
  */
@@ -41,6 +62,17 @@ interface SpotifyPlayerApiFacade {
     suspend fun seekTo(positionMs: Long): Result<Unit>
     suspend fun skipNext(): Result<Unit>
     suspend fun skipPrevious(): Result<Unit>
+
+    /**
+     * Subscribes to Spotify player state updates, emitting [SpotifyPlayerStateSnapshot] events reactively.
+     */
+    fun subscribeToPlayerState(): Flow<SpotifyPlayerStateSnapshot>
+
+    /**
+     * Queries the current player state snapshot.
+     */
+    suspend fun getPlayerState(): Result<SpotifyPlayerStateSnapshot> =
+        Result.failure(UnsupportedOperationException("getPlayerState not implemented"))
 }
 
 /**
@@ -217,6 +249,63 @@ class DefaultSpotifyPlayerApi(
             if (cont.isActive) cont.resume(Result.failure(t))
         }
     }
+
+    override fun subscribeToPlayerState(): Flow<SpotifyPlayerStateSnapshot> = callbackFlow {
+        try {
+            val subscription = nativePlayerApi.subscribeToPlayerState()
+            subscription.setEventCallback { playerState ->
+                val snapshot = SpotifyPlayerStateSnapshot(
+                    trackUri = playerState.track?.uri ?: "",
+                    trackDurationMs = playerState.track?.duration ?: 0L,
+                    playbackPositionMs = playerState.playbackPosition,
+                    playbackSpeed = playerState.playbackSpeed,
+                    isPaused = playerState.isPaused,
+                    isBuffering = false,
+                    trackName = playerState.track?.name ?: "",
+                    artistName = playerState.track?.artist?.name ?: "",
+                    sampledAtMs = System.currentTimeMillis()
+                )
+                trySend(snapshot)
+            }
+            subscription.setErrorCallback { error ->
+                // Error containment in event stream
+            }
+            awaitClose {
+                try {
+                    subscription.cancel()
+                } catch (_: Throwable) {
+                    // Safe cleanup on cancellation
+                }
+            }
+        } catch (t: Throwable) {
+            close(t)
+        }
+    }
+
+    override suspend fun getPlayerState(): Result<SpotifyPlayerStateSnapshot> = suspendCancellableCoroutine { cont ->
+        try {
+            nativePlayerApi.playerState
+                .setResultCallback { playerState ->
+                    val snapshot = SpotifyPlayerStateSnapshot(
+                        trackUri = playerState.track?.uri ?: "",
+                        trackDurationMs = playerState.track?.duration ?: 0L,
+                        playbackPositionMs = playerState.playbackPosition,
+                        playbackSpeed = playerState.playbackSpeed,
+                        isPaused = playerState.isPaused,
+                        isBuffering = false,
+                        trackName = playerState.track?.name ?: "",
+                        artistName = playerState.track?.artist?.name ?: "",
+                        sampledAtMs = System.currentTimeMillis()
+                    )
+                    if (cont.isActive) cont.resume(Result.success(snapshot))
+                }
+                .setErrorCallback { error ->
+                    if (cont.isActive) cont.resume(Result.failure(error))
+                }
+        } catch (t: Throwable) {
+            if (cont.isActive) cont.resume(Result.failure(t))
+        }
+    }
 }
 
 /**
@@ -317,17 +406,40 @@ open class DefaultSpotifyConnector : SpotifyConnector {
 class FakeSpotifyPlayerApi(
     var isPremium: Boolean = true,
     var shouldFailWithPremium: Boolean = false,
-    var failureToEmit: Throwable? = null
+    var failureToEmit: Throwable? = null,
+    initialState: SpotifyPlayerStateSnapshot = SpotifyPlayerStateSnapshot()
 ) : SpotifyPlayerApiFacade {
 
+    private val _playerStateFlow = MutableStateFlow(initialState)
+    val playerStateFlow: StateFlow<SpotifyPlayerStateSnapshot> get() = _playerStateFlow
+
     val callHistory = mutableListOf<String>()
-    var lastPlayedUri: String? = null
+    var lastPlayedUri: String? = initialState.trackUri.ifEmpty { null }
     var lastSeekPositionMs: Long? = null
-    var isPlaying: Boolean = false
-    var currentPositionMs: Long = 0L
+    var isPlaying: Boolean = !initialState.isPaused
+    var currentPositionMs: Long = initialState.playbackPositionMs
 
     fun recordCall(call: String) {
         callHistory.add(call)
+    }
+
+    fun emitPlayerState(snapshot: SpotifyPlayerStateSnapshot) {
+        _playerStateFlow.value = snapshot
+        currentPositionMs = snapshot.playbackPositionMs
+        isPlaying = !snapshot.isPaused
+        if (snapshot.trackUri.isNotEmpty()) {
+            lastPlayedUri = snapshot.trackUri
+        }
+    }
+
+    override fun subscribeToPlayerState(): Flow<SpotifyPlayerStateSnapshot> = _playerStateFlow
+
+    override suspend fun getPlayerState(): Result<SpotifyPlayerStateSnapshot> {
+        val failure = failureToEmit
+        if (failure != null) {
+            return Result.failure(failure)
+        }
+        return Result.success(_playerStateFlow.value)
     }
 
     override suspend fun play(uri: String): Result<Unit> {
@@ -342,6 +454,12 @@ class FakeSpotifyPlayerApi(
         }
         lastPlayedUri = uri
         isPlaying = true
+        currentPositionMs = 0L
+        _playerStateFlow.value = _playerStateFlow.value.copy(
+            trackUri = uri,
+            isPaused = false,
+            playbackPositionMs = 0L
+        )
         return Result.success(Unit)
     }
 
@@ -352,6 +470,7 @@ class FakeSpotifyPlayerApi(
             return Result.failure(failure)
         }
         isPlaying = false
+        _playerStateFlow.value = _playerStateFlow.value.copy(isPaused = true)
         return Result.success(Unit)
     }
 
@@ -366,6 +485,7 @@ class FakeSpotifyPlayerApi(
             return Result.failure(failure)
         }
         isPlaying = true
+        _playerStateFlow.value = _playerStateFlow.value.copy(isPaused = false)
         return Result.success(Unit)
     }
 
@@ -381,6 +501,7 @@ class FakeSpotifyPlayerApi(
         }
         lastSeekPositionMs = positionMs
         currentPositionMs = positionMs
+        _playerStateFlow.value = _playerStateFlow.value.copy(playbackPositionMs = positionMs)
         return Result.success(Unit)
     }
 
@@ -394,6 +515,8 @@ class FakeSpotifyPlayerApi(
         if (failure != null) {
             return Result.failure(failure)
         }
+        currentPositionMs = 0L
+        _playerStateFlow.value = _playerStateFlow.value.copy(playbackPositionMs = 0L)
         return Result.success(Unit)
     }
 
@@ -407,6 +530,8 @@ class FakeSpotifyPlayerApi(
         if (failure != null) {
             return Result.failure(failure)
         }
+        currentPositionMs = 0L
+        _playerStateFlow.value = _playerStateFlow.value.copy(playbackPositionMs = 0L)
         return Result.success(Unit)
     }
 }
