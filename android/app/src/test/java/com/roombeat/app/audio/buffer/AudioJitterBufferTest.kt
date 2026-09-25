@@ -367,4 +367,59 @@ class AudioJitterBufferTest {
         assertTrue("attachJitterBuffer with bridge should succeed", engineWithBridge.attachJitterBuffer(buffer))
         buffer.close()
     }
+
+    @Test
+    fun testTargetStartTimeUsReleaseLockBlocksUntilDeadline() {
+        var mockClockUs = 1_000_000L
+        val buffer = AudioJitterBuffer(targetDepthMs = 120)
+        buffer.setClockFunction { mockClockUs }
+
+        val targetStartUs = 1_350_000L // 350ms in future
+        buffer.targetStartTimeUs = targetStartUs
+        assertEquals(targetStartUs, buffer.targetStartTimeUs)
+
+        // Push 6 frames (120ms target depth fully accumulated)
+        for (i in 0L until 6L) {
+            val pushed = buffer.pushDecodedFrame(i, targetStartUs + i * 20_000L, createSyntheticFrame(i, 0.5f))
+            assertTrue(pushed)
+        }
+        assertEquals(6, buffer.queuedFrames)
+
+        // Try pulling audio: target timestamp has NOT arrived -> must output silence!
+        val out = FloatArray(JitterBufferConstants.INTERLEAVED_SAMPLES)
+        buffer.pullFrames(out, JitterBufferConstants.SAMPLES_PER_CHANNEL)
+        for (sample in out) {
+            assertEquals("Silence must be rendered while awaiting release lock", 0.0f, sample, 0.0001f)
+        }
+        assertEquals(0L, buffer.getStats().packetsPlayed)
+
+        // Advance clock to target timestamp
+        mockClockUs = targetStartUs
+
+        // Now pull frames: release lock opens and audio renders!
+        val rendered = buffer.pullFrames(out, JitterBufferConstants.SAMPLES_PER_CHANNEL)
+        assertEquals(JitterBufferConstants.SAMPLES_PER_CHANNEL, rendered)
+        assertEquals(1L, buffer.getStats().packetsPlayed)
+
+        buffer.close()
+    }
+
+    @Test
+    fun testTargetStartTimeUsResetOnBufferReset() {
+        val buffer = AudioJitterBuffer(targetDepthMs = 20)
+        buffer.targetStartTimeUs = 2_000_000L
+        assertEquals(2_000_000L, buffer.targetStartTimeUs)
+
+        buffer.reset()
+        assertEquals(0L, buffer.targetStartTimeUs)
+
+        // With targetStartTimeUs = 0, once target depth is reached, playback begins immediately
+        buffer.pushDecodedFrame(0L, 0L, createSyntheticFrame(0L, 0.4f))
+        val out = FloatArray(JitterBufferConstants.INTERLEAVED_SAMPLES)
+        val rendered = buffer.pullFrames(out, JitterBufferConstants.SAMPLES_PER_CHANNEL)
+        assertEquals(JitterBufferConstants.SAMPLES_PER_CHANNEL, rendered)
+        assertEquals(1L, buffer.getStats().packetsPlayed)
+
+        buffer.close()
+    }
 }

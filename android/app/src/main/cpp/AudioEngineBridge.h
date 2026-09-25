@@ -128,6 +128,13 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMuted(
     jboolean isMuted
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetTargetStartTimeUs(
+    JNIEnv* env,
+    jobject thiz,
+    jlong targetTimeUs
+);
+
 /*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
@@ -235,6 +242,13 @@ Java_com_roombeat_app_audio_NativeAudioEngine_setMuted(
     jboolean isMuted
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setTargetStartTimeUs(
+    JNIEnv* env,
+    jobject thiz,
+    jlong targetTimeUs
+);
+
 /*
  * JNI methods for nested DefaultJniBridge
  */
@@ -340,6 +354,13 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetMut
     JNIEnv* env,
     jobject thiz,
     jboolean isMuted
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetTargetStartTimeUs(
+    JNIEnv* env,
+    jobject thiz,
+    jlong targetTimeUs
 );
 
 #ifdef __cplusplus

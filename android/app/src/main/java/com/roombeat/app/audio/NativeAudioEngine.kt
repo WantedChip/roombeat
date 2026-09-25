@@ -51,6 +51,7 @@ interface AudioEngineBridge {
     fun setChannelVolume(volumeDb: Float) {}
     fun setMasterVolume(volumeDb: Float) {}
     fun setMuted(isMuted: Boolean) {}
+    fun setTargetStartTimeUs(targetTimeUs: Long) {}
 }
 
 /**
@@ -155,6 +156,7 @@ open class NativeAudioEngine(
         fun setChannelVolume(volumeDb: Float) = defaultInstance.setChannelVolume(volumeDb)
         fun setMasterVolume(volumeDb: Float) = defaultInstance.setMasterVolume(volumeDb)
         fun setMuted(isMuted: Boolean) = defaultInstance.setMuted(isMuted)
+        fun setTargetStartTimeUs(targetTimeUs: Long) = defaultInstance.setTargetStartTimeUs(targetTimeUs)
     }
 
     private val lock = Any()
@@ -506,6 +508,22 @@ open class NativeAudioEngine(
         }
     }
 
+    /**
+     * Arms the attached jitter buffer and native engine with a target presentation start timestamp.
+     */
+    fun setTargetStartTimeUs(targetTimeUs: Long) {
+        val currentBuffer = attachedJitterBuffer
+        if (currentBuffer != null) {
+            currentBuffer.targetStartTimeUs = targetTimeUs
+        }
+        val bridge = resolveBridge() ?: return
+        try {
+            bridge.setTargetStartTimeUs(targetTimeUs)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error setting target start time: ${e.message}")
+        }
+    }
+
     private fun resolveBridge(): AudioEngineBridge? {
         if (customBridge != null) return customBridge
         if (isLibraryLoaded) return DefaultJniBridge
@@ -547,6 +565,7 @@ open class NativeAudioEngine(
         override fun setChannelVolume(volumeDb: Float) = nativeSetChannelVolume(volumeDb)
         override fun setMasterVolume(volumeDb: Float) = nativeSetMasterVolume(volumeDb)
         override fun setMuted(isMuted: Boolean) = nativeSetMuted(isMuted)
+        override fun setTargetStartTimeUs(targetTimeUs: Long) = nativeSetTargetStartTimeUs(targetTimeUs)
 
         @JvmStatic
         private external fun nativeInitEngine(): Int
@@ -598,5 +617,8 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeSetMuted(isMuted: Boolean)
+
+        @JvmStatic
+        private external fun nativeSetTargetStartTimeUs(targetTimeUs: Long)
     }
 }

@@ -54,6 +54,8 @@ interface AudioJitterBufferBridge {
     fun getStats(handle: Long): JitterBufferStats
     fun reset(handle: Long)
     fun attachToEngine(handle: Long): Boolean
+    fun setTargetStartTimeUs(handle: Long, targetTimeUs: Long)
+    fun getTargetStartTimeUs(handle: Long): Long = 0L
 }
 
 /**
@@ -90,6 +92,23 @@ class AudioJitterBuffer(
             check(!isClosed) { "AudioJitterBuffer is closed" }
             return bridge.getQueuedFrames(handle)
         }
+
+    var targetStartTimeUs: Long
+        get() {
+            check(!isClosed) { "AudioJitterBuffer is closed" }
+            return bridge.getTargetStartTimeUs(handle)
+        }
+        set(value) {
+            check(!isClosed) { "AudioJitterBuffer is closed" }
+            bridge.setTargetStartTimeUs(handle, value)
+        }
+
+    fun setClockFunction(clockFunc: () -> Long) {
+        check(!isClosed) { "AudioJitterBuffer is closed" }
+        if (bridge is DefaultAudioJitterBufferBridge) {
+            bridge.setClockFunction(handle, clockFunc)
+        }
+    }
 
     /**
      * Ingest an Opus-compressed packet.
@@ -297,6 +316,26 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
         }
     }
 
+    override fun setTargetStartTimeUs(handle: Long, targetTimeUs: Long) {
+        if (isNative) {
+            nativeSetTargetStartTimeUs(handle, targetTimeUs)
+        } else {
+            buffers[handle]?.targetStartTimeUs = targetTimeUs
+        }
+    }
+
+    override fun getTargetStartTimeUs(handle: Long): Long {
+        return if (isNative) {
+            nativeGetTargetStartTimeUs(handle)
+        } else {
+            buffers[handle]?.targetStartTimeUs ?: 0L
+        }
+    }
+
+    fun setClockFunction(handle: Long, clockFunc: () -> Long) {
+        buffers[handle]?.clockFunc = clockFunc
+    }
+
     // ========================================================================
     // Native JNI Declarations
     // ========================================================================
@@ -325,6 +364,8 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
     private external fun nativeGetStats(handle: Long): LongArray?
     private external fun nativeReset(handle: Long)
     private external fun nativeAttachToEngine(handle: Long): Boolean
+    private external fun nativeSetTargetStartTimeUs(handle: Long, targetTimeUs: Long)
+    private external fun nativeGetTargetStartTimeUs(handle: Long): Long
 
     // ========================================================================
     // Deterministic Software Mock for Host-Side JVM Unit Tests
@@ -346,6 +387,9 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
         var targetDepthMs: Int
             get() = synchronized(lock) { _targetDepthMs }
             set(value) = synchronized(lock) { _targetDepthMs = max(20, value) }
+
+        var targetStartTimeUs: Long = 0L
+        var clockFunc: () -> Long = { System.nanoTime() / 1000L }
 
         private val slots = HashMap<Long, StoredFrame>()
         private var playbackStarted = false
@@ -378,6 +422,7 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
                 isMuted = true
                 activeRemainder = null
                 activeRemainderOffset = 0
+                targetStartTimeUs = 0L
             }
         }
 
@@ -415,6 +460,13 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
                 if (playbackStarted && seq < nextPlaySeq) {
                     latePacketsDropped++
                     return false
+                }
+                if (presentationTimeUs > 0 && playbackStarted) {
+                    val nowUs = clockFunc()
+                    if (nowUs > (presentationTimeUs + 40_000L)) {
+                        latePacketsDropped++
+                        return false
+                    }
                 }
                 if (slots.containsKey(seq)) {
                     duplicatePacketsDropped++
@@ -477,13 +529,28 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
                     if (slots.size < targetFrames) {
                         return null
                     }
+                    if (targetStartTimeUs > 0) {
+                        val nowUs = clockFunc()
+                        if (nowUs < (targetStartTimeUs - 5_000L)) {
+                            // Target start time not yet reached -> output silence
+                            return null
+                        }
+                    }
                     isBuffering = false
                     playbackStarted = true
                     nextPlaySeq = slots.keys.minOrNull() ?: 0L
                 }
 
-                val frame = slots.remove(nextPlaySeq)
+                val frame = slots[nextPlaySeq]
                 if (frame != null) {
+                    if (frame.presentationTimeUs > 0) {
+                        val nowUs = clockFunc()
+                        if (nowUs < (frame.presentationTimeUs - 5_000L)) {
+                            // Scheduled presentation time is in future -> wait
+                            return null
+                        }
+                    }
+                    slots.remove(nextPlaySeq)
                     consecutiveLostFrames = 0
                     nextPlaySeq++
                     packetsPlayed++

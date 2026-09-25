@@ -113,6 +113,7 @@ void AudioJitterBuffer::reset() {
     consecutiveLostFrames_ = 0;
     activeFrameOffset_ = 0;
     activeFrameRemaining_ = 0;
+    targetStartTimeUs_ = 0;
     std::fill(activeFrameBuffer_.begin(), activeFrameBuffer_.end(), 0.0f);
     if (decoder_) {
         decoder_->resetState();
@@ -253,7 +254,16 @@ bool AudioJitterBuffer::fetchNext20msFrame(float* outFrame) {
             return false;
         }
 
-        // Target depth reached! Transition to PLAYING
+        // Target presentation start timestamp / release lock check
+        if (targetStartTimeUs_ > 0) {
+            const int64_t nowUs = clockFunc_();
+            if (nowUs < (targetStartTimeUs_ - kEarlyToleranceUs)) {
+                // Scheduled presentation start time is in future -> wait (output silence)
+                return false;
+            }
+        }
+
+        // Target depth reached and targetStartTime reached! Transition to PLAYING
         state_ = BufferState::PLAYING;
         playbackStarted_.store(true, std::memory_order_release);
         nextPlaySeq_ = findLowestBufferedSeq();
@@ -412,6 +422,16 @@ void AudioJitterBuffer::setClockFunction(ClockFunction clockFunc) {
 
 int64_t AudioJitterBuffer::getCurrentTimeUs() const {
     return clockFunc_();
+}
+
+void AudioJitterBuffer::setTargetStartTimeUs(int64_t targetTimeUs) {
+    std::lock_guard<std::mutex> lock(bufferMutex_);
+    targetStartTimeUs_ = targetTimeUs;
+}
+
+int64_t AudioJitterBuffer::getTargetStartTimeUs() const {
+    std::lock_guard<std::mutex> lock(bufferMutex_);
+    return targetStartTimeUs_;
 }
 
 } // namespace buffer

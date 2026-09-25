@@ -147,6 +147,12 @@ public:
     void setClockFunction(ClockFunction clockFunc);
 
     /**
+     * Presentation start timestamp / release lock.
+     */
+    void setTargetStartTimeUs(int64_t targetTimeUs);
+    int64_t getTargetStartTimeUs() const;
+
+    /**
      * Get current monotonic time in microseconds.
      */
     int64_t getCurrentTimeUs() const;
@@ -167,6 +173,7 @@ private:
     bool ownsDecoder_{false};
 
     ClockFunction clockFunc_;
+    int64_t targetStartTimeUs_{0};
 
     std::vector<FrameSlot> slots_;
     mutable std::mutex bufferMutex_;

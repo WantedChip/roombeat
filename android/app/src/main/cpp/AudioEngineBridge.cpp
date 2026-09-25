@@ -688,4 +688,34 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetMut
     Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetMuted(env, thiz, isMuted);
 }
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetTargetStartTimeUs(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/,
+    jlong targetTimeUs
+) {
+    auto* jitterBuffer = roombeat::getAttachedJitterBuffer();
+    if (jitterBuffer) {
+        jitterBuffer->setTargetStartTimeUs(static_cast<int64_t>(targetTimeUs));
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_setTargetStartTimeUs(
+    JNIEnv* env,
+    jobject thiz,
+    jlong targetTimeUs
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetTargetStartTimeUs(env, thiz, targetTimeUs);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetTargetStartTimeUs(
+    JNIEnv* env,
+    jobject thiz,
+    jlong targetTimeUs
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetTargetStartTimeUs(env, thiz, targetTimeUs);
+}
+
 } // extern "C"
