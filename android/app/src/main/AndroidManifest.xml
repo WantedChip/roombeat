@@ -25,6 +25,43 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- Queries for third-party media players (Android 11+ / API 30+ package visibility) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="audio/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="video/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.APP_MUSIC" />
+        </intent>
+        <intent>
+            <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MUSIC_PLAYER" />
+        </intent>
+
+        <package android:name="com.google.android.youtube" />
+        <package android:name="com.google.android.apps.youtube.music" />
+        <package android:name="org.videolan.vlc" />
+        <package android:name="com.soundcloud.android" />
+        <package android:name="com.spotify.music" />
+        <package android:name="com.apple.android.music" />
+        <package android:name="com.mxtech.videoplayer.ad" />
+        <package android:name="com.mxtech.videoplayer.pro" />
+        <package android:name="com.aspiro.tidal" />
+        <package android:name="deezer.android.app" />
+        <package android:name="com.bandcamp.android" />
+        <package android:name="com.amazon.mp3" />
+        <package android:name="com.maxmpz.audioplayer" />
+        <package android:name="org.schabi.newpipe" />
+    </queries>
+
     <application
         android:allowBackup="true"
         android:label="RoomBeat"

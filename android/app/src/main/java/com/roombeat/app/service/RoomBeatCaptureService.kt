@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -383,7 +384,19 @@ class RoomBeatCaptureService : Service() {
     fun buildPersistentNotification(): Notification {
         notificationProvider?.let { return it.invoke() }
         return try {
-            NotificationCompat.Builder(this, CHANNEL_ID)
+            val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+            val contentPendingIntent = if (launchIntent != null) {
+                PendingIntent.getActivity(
+                    this,
+                    0,
+                    launchIntent.apply {
+                        flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    },
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            } else null
+
+            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("RoomBeat — Sync Stream Active")
                 .setContentText("Broadcasting synchronized low-latency audio")
                 .setSmallIcon(android.R.drawable.ic_media_play)
@@ -391,7 +404,11 @@ class RoomBeatCaptureService : Service() {
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .build()
+
+            if (contentPendingIntent != null) {
+                builder.setContentIntent(contentPendingIntent)
+            }
+            builder.build()
         } catch (_: Exception) {
             Notification()
         }
