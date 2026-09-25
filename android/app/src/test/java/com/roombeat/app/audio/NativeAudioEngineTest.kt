@@ -126,6 +126,19 @@ class NativeAudioEngineTest {
             setMutedCallCount++
             lastIsMuted = isMuted
         }
+
+        var encodeFrameCallCount = 0
+        var lastEncodedPcmSize = 0
+        var encodeFrameReturnValue = 100
+        override fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int {
+            encodeFrameCallCount++
+            lastEncodedPcmSize = pcmData.size
+            if (outputBuffer.size >= 2) {
+                outputBuffer[0] = 0x4F
+                outputBuffer[1] = 0x50
+            }
+            return encodeFrameReturnValue
+        }
     }
 
     private lateinit var fakeBridge: FakeAudioEngineBridge
@@ -458,5 +471,54 @@ class NativeAudioEngineTest {
         assertTrue(NativeAudioEngine.isMuted)
         NativeAudioEngine.setMuted(false)
         assertFalse(NativeAudioEngine.isMuted)
+    }
+
+    @Test
+    fun encodeFrame_delegatesToBridgeWhenPresent() {
+        val pcm = ShortArray(1920) { (it % 100).toShort() }
+        val out = ByteArray(4000)
+
+        val bytes = engineWithBridge.encodeFrame(pcm, out)
+        assertEquals(100, bytes)
+        assertEquals(1, fakeBridge.encodeFrameCallCount)
+        assertEquals(1920, fakeBridge.lastEncodedPcmSize)
+        assertEquals(0x4F.toByte(), out[0])
+        assertEquals(0x50.toByte(), out[1])
+
+        val allocatedBytes = engineWithBridge.encodeFrame(pcm)
+        assertNotNull(allocatedBytes)
+        assertEquals(100, allocatedBytes!!.size)
+    }
+
+    @Test
+    fun encodeFrame_fallbackToJvmMockWhenNoBridge() {
+        val pcm = ShortArray(1920) { (it % 100).toShort() }
+        val out = ByteArray(4000)
+
+        val bytes = defaultHostEngine.encodeFrame(pcm, out)
+        assertTrue(bytes > 0)
+        // Verify mock opus header 'OPUS'
+        assertEquals(0x4F.toByte(), out[0]) // 'O'
+        assertEquals(0x50.toByte(), out[1]) // 'P'
+        assertEquals(0x55.toByte(), out[2]) // 'U'
+        assertEquals(0x53.toByte(), out[3]) // 'S'
+
+        val allocatedBytes = defaultHostEngine.encodeFrame(pcm)
+        assertNotNull(allocatedBytes)
+        assertTrue(allocatedBytes!!.size > 0)
+        assertEquals(0x4F.toByte(), allocatedBytes[0])
+    }
+
+    @Test
+    fun companion_encodeFrame_delegatesToDefaultInstance() {
+        val pcm = ShortArray(1920) { (it % 100).toShort() }
+        val out = ByteArray(4000)
+
+        val bytes = NativeAudioEngine.encodeFrame(pcm, out)
+        assertTrue(bytes > 0)
+
+        val allocated = NativeAudioEngine.encodeFrame(pcm)
+        assertNotNull(allocated)
+        assertTrue(allocated!!.size > 0)
     }
 }

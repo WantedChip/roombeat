@@ -143,6 +143,14 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeFlushAndSeek(
     jlong newTargetStartTimeUs
 );
 
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeEncodeFrame(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray pcmBuffer,
+    jbyteArray outputBuffer
+);
+
 /*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
@@ -265,6 +273,14 @@ Java_com_roombeat_app_audio_NativeAudioEngine_flushAndSeek(
     jlong newTargetStartTimeUs
 );
 
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_encodeFrame(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray pcmBuffer,
+    jbyteArray outputBuffer
+);
+
 /*
  * JNI methods for nested DefaultJniBridge
  */
@@ -385,6 +401,14 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeFlushA
     jobject thiz,
     jlong newInitialSeq,
     jlong newTargetStartTimeUs
+);
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeEncodeFrame(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray pcmBuffer,
+    jbyteArray outputBuffer
 );
 
 #ifdef __cplusplus

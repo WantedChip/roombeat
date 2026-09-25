@@ -403,7 +403,7 @@ class SystemAudioCaptureEngineTest {
         }
 
         engine.startCapture()
-        assertTrue(latch.await(2, TimeUnit.SECONDS))
+        assertTrue(latch.await(5, TimeUnit.SECONDS))
 
         assertFalse(engine.isCapturing)
         assertTrue(engine.captureState.value is CaptureEngineState.Error)

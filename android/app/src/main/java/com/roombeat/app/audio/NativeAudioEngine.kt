@@ -53,6 +53,7 @@ interface AudioEngineBridge {
     fun setMuted(isMuted: Boolean) {}
     fun setTargetStartTimeUs(targetTimeUs: Long) {}
     fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) {}
+    fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int = 0
 }
 
 /**
@@ -159,6 +160,8 @@ open class NativeAudioEngine(
         fun setMuted(isMuted: Boolean) = defaultInstance.setMuted(isMuted)
         fun setTargetStartTimeUs(targetTimeUs: Long) = defaultInstance.setTargetStartTimeUs(targetTimeUs)
         fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) = defaultInstance.flushAndSeek(newInitialSeq, newTargetStartTimeUs)
+        fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int = defaultInstance.encodeFrame(pcmData, outputBuffer)
+        fun encodeFrame(pcmData: ShortArray): ByteArray? = defaultInstance.encodeFrame(pcmData)
     }
 
     private val lock = Any()
@@ -542,6 +545,47 @@ open class NativeAudioEngine(
         }
     }
 
+    private val fallbackEncoderHandle: Long by lazy {
+        com.roombeat.app.audio.codec.DefaultOpusCodecBridge.INSTANCE.encoderCreate(
+            com.roombeat.app.audio.codec.OpusConstants.SAMPLE_RATE,
+            com.roombeat.app.audio.codec.OpusConstants.CHANNELS,
+            com.roombeat.app.audio.codec.OpusConstants.DEFAULT_BITRATE,
+            com.roombeat.app.audio.codec.OpusConstants.DEFAULT_COMPLEXITY
+        )
+    }
+
+    /**
+     * Encodes a 20ms PCM16 buffer (1920 short samples) into the provided output byte buffer.
+     * Returns the number of compressed bytes written, or a negative error code.
+     */
+    fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int {
+        val bridge = resolveBridge()
+        if (bridge != null) {
+            return try {
+                bridge.encodeFrame(pcmData, outputBuffer)
+            } catch (e: Exception) {
+                Log.w(TAG, "Error encoding frame: ${e.message}")
+                -1
+            }
+        }
+        return com.roombeat.app.audio.codec.DefaultOpusCodecBridge.INSTANCE.encoderEncodeShort(
+            fallbackEncoderHandle,
+            pcmData,
+            com.roombeat.app.audio.codec.OpusConstants.FRAME_SIZE_SAMPLES,
+            outputBuffer,
+            outputBuffer.size
+        )
+    }
+
+    /**
+     * Convenience method encoding a 20ms PCM16 buffer to a freshly allocated ByteArray.
+     */
+    fun encodeFrame(pcmData: ShortArray): ByteArray? {
+        val outBuffer = ByteArray(com.roombeat.app.audio.codec.OpusConstants.MAX_PACKET_BYTES)
+        val bytes = encodeFrame(pcmData, outBuffer)
+        return if (bytes > 0) outBuffer.copyOf(bytes) else null
+    }
+
     private fun resolveBridge(): AudioEngineBridge? {
         if (customBridge != null) return customBridge
         if (isLibraryLoaded) return DefaultJniBridge
@@ -585,6 +629,7 @@ open class NativeAudioEngine(
         override fun setMuted(isMuted: Boolean) = nativeSetMuted(isMuted)
         override fun setTargetStartTimeUs(targetTimeUs: Long) = nativeSetTargetStartTimeUs(targetTimeUs)
         override fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) = nativeFlushAndSeek(newInitialSeq, newTargetStartTimeUs)
+        override fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int = nativeEncodeFrame(pcmData, outputBuffer)
 
         @JvmStatic
         private external fun nativeInitEngine(): Int
@@ -642,5 +687,8 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeFlushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long)
+
+        @JvmStatic
+        private external fun nativeEncodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int
     }
 }

@@ -1,6 +1,7 @@
 #include "AudioEngineBridge.h"
 #include "OboeAudioPlayer.h"
 #include "buffer/AudioJitterBuffer.h"
+#include "codec/OpusEncoderWrapper.h"
 
 #include <android/log.h>
 #include <atomic>
@@ -136,9 +137,31 @@ roombeat::buffer::AudioJitterBuffer* getAttachedJitterBuffer() {
     return gAttachedJitterBuffer.load(std::memory_order_acquire);
 }
 
+static std::unique_ptr<roombeat::audio::OpusEncoderWrapper> gCaptureEncoder = nullptr;
+static std::mutex gCaptureEncoderMutex;
+
+static roombeat::audio::OpusEncoderWrapper* getOrCreateCaptureEncoder() {
+    std::lock_guard<std::mutex> lock(gCaptureEncoderMutex);
+    if (!gCaptureEncoder) {
+        gCaptureEncoder = std::make_unique<roombeat::audio::OpusEncoderWrapper>(
+            roombeat::audio::OpusEncoderWrapper::DEFAULT_SAMPLE_RATE,
+            roombeat::audio::OpusEncoderWrapper::DEFAULT_CHANNELS,
+            roombeat::audio::OpusEncoderWrapper::DEFAULT_BITRATE,
+            roombeat::audio::OpusEncoderWrapper::DEFAULT_COMPLEXITY
+        );
+    }
+    return gCaptureEncoder.get();
+}
+
 static jint destroyEngine() {
     std::lock_guard<std::mutex> lock(gEngineMutex);
     setAttachedJitterBuffer(nullptr);
+    {
+        std::lock_guard<std::mutex> lockEnc(gCaptureEncoderMutex);
+        if (gCaptureEncoder) {
+            gCaptureEncoder->resetState();
+        }
+    }
     if (gAudioEngine) {
         const jint result = gAudioEngine->teardown();
         gAudioEngine.reset();
@@ -749,6 +772,73 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeFlushA
     jlong newTargetStartTimeUs
 ) {
     Java_com_roombeat_app_audio_NativeAudioEngine_nativeFlushAndSeek(env, thiz, newInitialSeq, newTargetStartTimeUs);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeEncodeFrame(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jshortArray pcmBuffer,
+    jbyteArray outputBuffer
+) {
+    if (!pcmBuffer || !outputBuffer) return -1;
+    try {
+        auto* encoder = roombeat::getOrCreateCaptureEncoder();
+        if (!encoder || !encoder->isValid()) return -1;
+
+        const jsize pcmLen = env->GetArrayLength(pcmBuffer);
+        const jsize outCap = env->GetArrayLength(outputBuffer);
+        if (pcmLen < roombeat::audio::OpusEncoderWrapper::DEFAULT_INTERLEAVED_SAMPLES || outCap <= 0) {
+            return -2;
+        }
+
+        jshort* pcmData = env->GetShortArrayElements(pcmBuffer, nullptr);
+        if (!pcmData) return -1;
+
+        jbyte* outData = env->GetByteArrayElements(outputBuffer, nullptr);
+        if (!outData) {
+            env->ReleaseShortArrayElements(pcmBuffer, pcmData, JNI_ABORT);
+            return -1;
+        }
+
+        const int encodedBytes = encoder->encode(
+            reinterpret_cast<const int16_t*>(pcmData),
+            roombeat::audio::OpusEncoderWrapper::DEFAULT_FRAME_SIZE,
+            reinterpret_cast<uint8_t*>(outData),
+            outCap
+        );
+
+        env->ReleaseShortArrayElements(pcmBuffer, pcmData, JNI_ABORT);
+        env->ReleaseByteArrayElements(outputBuffer, outData, 0);
+
+        return encodedBytes;
+    } catch (const std::exception& ex) {
+        LOGE("Unhandled exception in nativeEncodeFrame: %s", ex.what());
+        return -100;
+    } catch (...) {
+        LOGE("Unknown exception in nativeEncodeFrame");
+        return -100;
+    }
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_encodeFrame(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray pcmBuffer,
+    jbyteArray outputBuffer
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeEncodeFrame(env, thiz, pcmBuffer, outputBuffer);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeEncodeFrame(
+    JNIEnv* env,
+    jobject thiz,
+    jshortArray pcmBuffer,
+    jbyteArray outputBuffer
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeEncodeFrame(env, thiz, pcmBuffer, outputBuffer);
 }
 
 } // extern "C"
