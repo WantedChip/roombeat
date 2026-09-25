@@ -435,10 +435,10 @@ class SystemAudioCaptureEngine(
                     if (result == AudioRecordFacade.ERROR_DEAD_OBJECT || consecutiveErrors >= MAX_CONSECUTIVE_READ_ERRORS) {
                         val errorMsg = "AudioRecord read failed with fatal error code $result"
                         Log.e(TAG, errorMsg)
-                        _captureState.value = CaptureEngineState.Error(errorMsg)
-                        onError?.invoke(errorMsg, null)
                         fatalError = true
                         isCapturing = false
+                        _captureState.value = CaptureEngineState.Error(errorMsg)
+                        onError?.invoke(errorMsg, null)
                     }
                     break
                 }

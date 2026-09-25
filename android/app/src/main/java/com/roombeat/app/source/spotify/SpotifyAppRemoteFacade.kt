@@ -4,7 +4,10 @@ import android.content.Context
 import android.os.Build
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
+import com.spotify.android.appremote.api.PlayerApi
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * Abstraction over a connected Spotify App Remote instance.
@@ -17,9 +20,63 @@ interface SpotifyAppRemoteFacade {
     val isConnected: Boolean
 
     /**
+     * Access to Spotify player transport controls.
+     */
+    val playerApi: SpotifyPlayerApiFacade
+
+    /**
      * Closes the active IPC service connection and releases resources.
      */
     fun disconnect()
+}
+
+/**
+ * Abstraction over Spotify App Remote's PlayerApi.
+ * Enables deterministic testing on headless JVM environments without physical Spotify IPC.
+ */
+interface SpotifyPlayerApiFacade {
+    suspend fun play(uri: String): Result<Unit>
+    suspend fun pause(): Result<Unit>
+    suspend fun resume(): Result<Unit>
+    suspend fun seekTo(positionMs: Long): Result<Unit>
+    suspend fun skipNext(): Result<Unit>
+    suspend fun skipPrevious(): Result<Unit>
+}
+
+/**
+ * Exception indicating that a requested Spotify playback operation requires a Spotify Premium subscription.
+ */
+class SpotifyPremiumRequiredException(
+    message: String = "Spotify Premium is required for on-demand playback, seeking, and multi-device synchronization.",
+    cause: Throwable? = null
+) : Exception(message, cause)
+
+/**
+ * Classifier for Spotify errors detecting Premium subscription limitations and restrictions.
+ */
+object SpotifyErrorClassifier {
+    fun isPremiumRequired(throwable: Throwable): Boolean {
+        if (throwable is SpotifyPremiumRequiredException) return true
+        val className = throwable.javaClass.simpleName
+        if (className.contains("Premium", ignoreCase = true)) return true
+
+        val msg = throwable.message?.lowercase() ?: ""
+        if (msg.contains("premium") ||
+            msg.contains("free tier") ||
+            msg.contains("subscription") ||
+            msg.contains("not supported for free") ||
+            msg.contains("playback_restrictions") ||
+            msg.contains("commercial")
+        ) {
+            return true
+        }
+
+        val cause = throwable.cause
+        if (cause != null && cause !== throwable) {
+            return isPremiumRequired(cause)
+        }
+        return false
+    }
 }
 
 /**
@@ -71,6 +128,98 @@ interface SpotifyConnector {
 }
 
 /**
+ * Production implementation of [SpotifyPlayerApiFacade] delegating to Spotify SDK's [PlayerApi].
+ */
+class DefaultSpotifyPlayerApi(
+    private val nativePlayerApi: PlayerApi
+) : SpotifyPlayerApiFacade {
+
+    override suspend fun play(uri: String): Result<Unit> = suspendCancellableCoroutine { cont ->
+        try {
+            nativePlayerApi.play(uri)
+                .setResultCallback {
+                    if (cont.isActive) cont.resume(Result.success(Unit))
+                }
+                .setErrorCallback { error ->
+                    if (cont.isActive) cont.resume(Result.failure(error))
+                }
+        } catch (t: Throwable) {
+            if (cont.isActive) cont.resume(Result.failure(t))
+        }
+    }
+
+    override suspend fun pause(): Result<Unit> = suspendCancellableCoroutine { cont ->
+        try {
+            nativePlayerApi.pause()
+                .setResultCallback {
+                    if (cont.isActive) cont.resume(Result.success(Unit))
+                }
+                .setErrorCallback { error ->
+                    if (cont.isActive) cont.resume(Result.failure(error))
+                }
+        } catch (t: Throwable) {
+            if (cont.isActive) cont.resume(Result.failure(t))
+        }
+    }
+
+    override suspend fun resume(): Result<Unit> = suspendCancellableCoroutine { cont ->
+        try {
+            nativePlayerApi.resume()
+                .setResultCallback {
+                    if (cont.isActive) cont.resume(Result.success(Unit))
+                }
+                .setErrorCallback { error ->
+                    if (cont.isActive) cont.resume(Result.failure(error))
+                }
+        } catch (t: Throwable) {
+            if (cont.isActive) cont.resume(Result.failure(t))
+        }
+    }
+
+    override suspend fun seekTo(positionMs: Long): Result<Unit> = suspendCancellableCoroutine { cont ->
+        try {
+            nativePlayerApi.seekTo(positionMs)
+                .setResultCallback {
+                    if (cont.isActive) cont.resume(Result.success(Unit))
+                }
+                .setErrorCallback { error ->
+                    if (cont.isActive) cont.resume(Result.failure(error))
+                }
+        } catch (t: Throwable) {
+            if (cont.isActive) cont.resume(Result.failure(t))
+        }
+    }
+
+    override suspend fun skipNext(): Result<Unit> = suspendCancellableCoroutine { cont ->
+        try {
+            nativePlayerApi.skipNext()
+                .setResultCallback {
+                    if (cont.isActive) cont.resume(Result.success(Unit))
+                }
+                .setErrorCallback { error ->
+                    if (cont.isActive) cont.resume(Result.failure(error))
+                }
+        } catch (t: Throwable) {
+            if (cont.isActive) cont.resume(Result.failure(t))
+        }
+    }
+
+    override suspend fun skipPrevious(): Result<Unit> = suspendCancellableCoroutine { cont ->
+        try {
+            nativePlayerApi.skipPrevious()
+                .setResultCallback {
+                    if (cont.isActive) cont.resume(Result.success(Unit))
+                }
+                .setErrorCallback { error ->
+                    if (cont.isActive) cont.resume(Result.failure(error))
+                }
+        } catch (t: Throwable) {
+            if (cont.isActive) cont.resume(Result.failure(t))
+        }
+    }
+}
+
+/**
  * Production implementation of [SpotifyAppRemoteFacade] wrapping real [SpotifyAppRemote].
  */
 class SpotifyAppRemoteWrapper(
@@ -79,6 +228,8 @@ class SpotifyAppRemoteWrapper(
 
     override val isConnected: Boolean
         get() = nativeRemote.isConnected
+
+    override val playerApi: SpotifyPlayerApiFacade = DefaultSpotifyPlayerApi(nativeRemote.playerApi)
 
     override fun disconnect() {
         SpotifyAppRemote.disconnect(nativeRemote)
@@ -161,10 +312,111 @@ open class DefaultSpotifyConnector : SpotifyConnector {
 }
 
 /**
+ * Fake implementation of [SpotifyPlayerApiFacade] for deterministic, headless JVM testing.
+ */
+class FakeSpotifyPlayerApi(
+    var isPremium: Boolean = true,
+    var shouldFailWithPremium: Boolean = false,
+    var failureToEmit: Throwable? = null
+) : SpotifyPlayerApiFacade {
+
+    val callHistory = mutableListOf<String>()
+    var lastPlayedUri: String? = null
+    var lastSeekPositionMs: Long? = null
+    var isPlaying: Boolean = false
+    var currentPositionMs: Long = 0L
+
+    fun recordCall(call: String) {
+        callHistory.add(call)
+    }
+
+    override suspend fun play(uri: String): Result<Unit> {
+        recordCall("play:$uri")
+        if (!isPremium || shouldFailWithPremium) {
+            val ex = SpotifyPremiumRequiredException("Spotify Premium required for playback of $uri")
+            return Result.failure(ex)
+        }
+        val failure = failureToEmit
+        if (failure != null) {
+            return Result.failure(failure)
+        }
+        lastPlayedUri = uri
+        isPlaying = true
+        return Result.success(Unit)
+    }
+
+    override suspend fun pause(): Result<Unit> {
+        recordCall("pause")
+        val failure = failureToEmit
+        if (failure != null) {
+            return Result.failure(failure)
+        }
+        isPlaying = false
+        return Result.success(Unit)
+    }
+
+    override suspend fun resume(): Result<Unit> {
+        recordCall("resume")
+        if (!isPremium || shouldFailWithPremium) {
+            val ex = SpotifyPremiumRequiredException("Spotify Premium required to resume playback")
+            return Result.failure(ex)
+        }
+        val failure = failureToEmit
+        if (failure != null) {
+            return Result.failure(failure)
+        }
+        isPlaying = true
+        return Result.success(Unit)
+    }
+
+    override suspend fun seekTo(positionMs: Long): Result<Unit> {
+        recordCall("seekTo:$positionMs")
+        if (!isPremium || shouldFailWithPremium) {
+            val ex = SpotifyPremiumRequiredException("Spotify Premium required for seekTo($positionMs)")
+            return Result.failure(ex)
+        }
+        val failure = failureToEmit
+        if (failure != null) {
+            return Result.failure(failure)
+        }
+        lastSeekPositionMs = positionMs
+        currentPositionMs = positionMs
+        return Result.success(Unit)
+    }
+
+    override suspend fun skipNext(): Result<Unit> {
+        recordCall("skipNext")
+        if (!isPremium || shouldFailWithPremium) {
+            val ex = SpotifyPremiumRequiredException("Spotify Premium required for skipNext")
+            return Result.failure(ex)
+        }
+        val failure = failureToEmit
+        if (failure != null) {
+            return Result.failure(failure)
+        }
+        return Result.success(Unit)
+    }
+
+    override suspend fun skipPrevious(): Result<Unit> {
+        recordCall("skipPrevious")
+        if (!isPremium || shouldFailWithPremium) {
+            val ex = SpotifyPremiumRequiredException("Spotify Premium required for skipPrevious")
+            return Result.failure(ex)
+        }
+        val failure = failureToEmit
+        if (failure != null) {
+            return Result.failure(failure)
+        }
+        return Result.success(Unit)
+    }
+}
+
+/**
  * Fake implementation of [SpotifyAppRemoteFacade] for deterministic testing.
  */
 class FakeSpotifyAppRemoteFacade(
-    override var isConnected: Boolean = true
+    override var isConnected: Boolean = true,
+    override val playerApi: FakeSpotifyPlayerApi = FakeSpotifyPlayerApi()
 ) : SpotifyAppRemoteFacade {
 
     var disconnectCallCount: Int = 0

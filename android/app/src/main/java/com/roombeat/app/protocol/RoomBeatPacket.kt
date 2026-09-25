@@ -225,9 +225,19 @@ sealed interface RoomBeatPacket {
     data class SpotifyCmd(
         @SerialName("track_uri") val trackUri: String,
         @SerialName("target_position_ms") val targetPositionMs: Long,
-        @SerialName("target_presentation_time") val targetPresentationTime: Long
+        @SerialName("target_presentation_time") val targetPresentationTime: Long,
+        @SerialName("command") val command: String = CMD_PLAY
     ) : RoomBeatPacket {
         override val packetType: String get() = TYPE_SPOTIFY_CMD
+
+        companion object {
+            const val CMD_PLAY = "PLAY"
+            const val CMD_PAUSE = "PAUSE"
+            const val CMD_RESUME = "RESUME"
+            const val CMD_SEEK = "SEEK"
+            const val CMD_NEXT = "NEXT"
+            const val CMD_PREVIOUS = "PREVIOUS"
+        }
     }
 
     @Serializable
