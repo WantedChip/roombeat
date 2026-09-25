@@ -718,4 +718,37 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetTar
     Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetTargetStartTimeUs(env, thiz, targetTimeUs);
 }
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeFlushAndSeek(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
+) {
+    auto* jitterBuffer = roombeat::getAttachedJitterBuffer();
+    if (jitterBuffer) {
+        jitterBuffer->flushAndSeek(static_cast<uint64_t>(newInitialSeq), static_cast<int64_t>(newTargetStartTimeUs));
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_flushAndSeek(
+    JNIEnv* env,
+    jobject thiz,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeFlushAndSeek(env, thiz, newInitialSeq, newTargetStartTimeUs);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeFlushAndSeek(
+    JNIEnv* env,
+    jobject thiz,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
+) {
+    Java_com_roombeat_app_audio_NativeAudioEngine_nativeFlushAndSeek(env, thiz, newInitialSeq, newTargetStartTimeUs);
+}
+
 } // extern "C"

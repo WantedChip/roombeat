@@ -56,6 +56,7 @@ interface AudioJitterBufferBridge {
     fun attachToEngine(handle: Long): Boolean
     fun setTargetStartTimeUs(handle: Long, targetTimeUs: Long)
     fun getTargetStartTimeUs(handle: Long): Long = 0L
+    fun flushAndSeek(handle: Long, newInitialSeq: Long, newTargetStartTimeUs: Long)
 }
 
 /**
@@ -162,6 +163,14 @@ class AudioJitterBuffer(
     fun reset() {
         check(!isClosed) { "AudioJitterBuffer is closed" }
         bridge.reset(handle)
+    }
+
+    /**
+     * Flushes queued packets and realigns playback to a new initial sequence and presentation timestamp.
+     */
+    fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) {
+        check(!isClosed) { "AudioJitterBuffer is closed" }
+        bridge.flushAndSeek(handle, newInitialSeq, newTargetStartTimeUs)
     }
 
     /**
@@ -332,6 +341,14 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
         }
     }
 
+    override fun flushAndSeek(handle: Long, newInitialSeq: Long, newTargetStartTimeUs: Long) {
+        if (isNative) {
+            nativeFlushAndSeek(handle, newInitialSeq, newTargetStartTimeUs)
+        } else {
+            buffers[handle]?.flushAndSeek(newInitialSeq, newTargetStartTimeUs)
+        }
+    }
+
     fun setClockFunction(handle: Long, clockFunc: () -> Long) {
         buffers[handle]?.clockFunc = clockFunc
     }
@@ -366,6 +383,7 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
     private external fun nativeAttachToEngine(handle: Long): Boolean
     private external fun nativeSetTargetStartTimeUs(handle: Long, targetTimeUs: Long)
     private external fun nativeGetTargetStartTimeUs(handle: Long): Long
+    private external fun nativeFlushAndSeek(handle: Long, newInitialSeq: Long, newTargetStartTimeUs: Long)
 
     // ========================================================================
     // Deterministic Software Mock for Host-Side JVM Unit Tests
@@ -423,6 +441,20 @@ open class DefaultAudioJitterBufferBridge : AudioJitterBufferBridge {
                 activeRemainder = null
                 activeRemainderOffset = 0
                 targetStartTimeUs = 0L
+            }
+        }
+
+        fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) {
+            synchronized(lock) {
+                slots.clear()
+                playbackStarted = false
+                nextPlaySeq = newInitialSeq
+                consecutiveLostFrames = 0
+                isBuffering = true
+                isMuted = true
+                activeRemainder = null
+                activeRemainderOffset = 0
+                targetStartTimeUs = newTargetStartTimeUs
             }
         }
 

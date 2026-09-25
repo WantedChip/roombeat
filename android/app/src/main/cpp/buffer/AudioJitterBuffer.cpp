@@ -120,6 +120,30 @@ void AudioJitterBuffer::reset() {
     }
 }
 
+void AudioJitterBuffer::flushAndSeek(uint64_t newInitialSeq, int64_t newTargetStartTimeUs) {
+    std::lock_guard<std::mutex> lock(bufferMutex_);
+    for (auto& slot : slots_) {
+        slot.occupied.store(false, std::memory_order_relaxed);
+        slot.sequenceNumber = 0;
+        slot.presentationTimeUs = 0;
+        slot.opusDataSize = 0;
+        slot.isPreDecoded = false;
+    }
+    queuedFrames_.store(0, std::memory_order_release);
+    playbackStarted_.store(false, std::memory_order_release);
+    state_ = BufferState::BUFFERING;
+    fadeState_ = FadeState::MUTED;
+    nextPlaySeq_ = newInitialSeq;
+    consecutiveLostFrames_ = 0;
+    activeFrameOffset_ = 0;
+    activeFrameRemaining_ = 0;
+    targetStartTimeUs_ = newTargetStartTimeUs;
+    std::fill(activeFrameBuffer_.begin(), activeFrameBuffer_.end(), 0.0f);
+    if (decoder_) {
+        decoder_->resetState();
+    }
+}
+
 bool AudioJitterBuffer::pushPacket(
     uint64_t sequenceNumber,
     int64_t presentationTimeUs,

@@ -116,6 +116,15 @@ Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeGetTargetStartTimeUs(
     jlong handle
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeFlushAndSeek(
+    JNIEnv* env,
+    jclass clazz,
+    jlong handle,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
+);
+
 /*
  * DefaultAudioJitterBufferBridge instance method aliases
  */
@@ -171,6 +180,10 @@ Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeSetTarge
 JNIEXPORT jlong JNICALL
 Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeGetTargetStartTimeUs(
     JNIEnv* env, jobject thiz, jlong handle);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeFlushAndSeek(
+    JNIEnv* env, jobject thiz, jlong handle, jlong newInitialSeq, jlong newTargetStartTimeUs);
 
 #ifdef __cplusplus
 }

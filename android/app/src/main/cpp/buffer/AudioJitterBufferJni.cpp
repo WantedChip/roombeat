@@ -253,6 +253,20 @@ Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeGetTargetStartTimeUs(
     return buffer ? static_cast<jlong>(buffer->getTargetStartTimeUs()) : 0L;
 }
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeFlushAndSeek(
+    JNIEnv* /*env*/,
+    jclass /*clazz*/,
+    jlong handle,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
+) {
+    auto* buffer = getJitterBuffer(handle);
+    if (buffer) {
+        buffer->flushAndSeek(static_cast<uint64_t>(newInitialSeq), static_cast<int64_t>(newTargetStartTimeUs));
+    }
+}
+
 /*
  * DefaultAudioJitterBufferBridge instance method aliases
  */
@@ -343,6 +357,13 @@ Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeGetTarge
     JNIEnv* env, jobject /*thiz*/, jlong handle) {
     return Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeGetTargetStartTimeUs(
         env, nullptr, handle);
+}
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_buffer_DefaultAudioJitterBufferBridge_nativeFlushAndSeek(
+    JNIEnv* env, jobject /*thiz*/, jlong handle, jlong newInitialSeq, jlong newTargetStartTimeUs) {
+    Java_com_roombeat_app_audio_buffer_AudioJitterBuffer_nativeFlushAndSeek(
+        env, nullptr, handle, newInitialSeq, newTargetStartTimeUs);
 }
 
 } // extern "C"

@@ -142,6 +142,11 @@ public:
     void reset();
 
     /**
+     * Flushes queued packets and realigns playback to a new initial sequence and presentation timestamp.
+     */
+    void flushAndSeek(uint64_t newInitialSeq, int64_t newTargetStartTimeUs);
+
+    /**
      * Set a custom clock function for deterministic testing.
      */
     void setClockFunction(ClockFunction clockFunc);

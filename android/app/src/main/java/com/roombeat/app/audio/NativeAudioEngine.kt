@@ -52,6 +52,7 @@ interface AudioEngineBridge {
     fun setMasterVolume(volumeDb: Float) {}
     fun setMuted(isMuted: Boolean) {}
     fun setTargetStartTimeUs(targetTimeUs: Long) {}
+    fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) {}
 }
 
 /**
@@ -157,6 +158,7 @@ open class NativeAudioEngine(
         fun setMasterVolume(volumeDb: Float) = defaultInstance.setMasterVolume(volumeDb)
         fun setMuted(isMuted: Boolean) = defaultInstance.setMuted(isMuted)
         fun setTargetStartTimeUs(targetTimeUs: Long) = defaultInstance.setTargetStartTimeUs(targetTimeUs)
+        fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) = defaultInstance.flushAndSeek(newInitialSeq, newTargetStartTimeUs)
     }
 
     private val lock = Any()
@@ -524,6 +526,22 @@ open class NativeAudioEngine(
         }
     }
 
+    /**
+     * Flushes the attached jitter buffer and realigns presentation timing.
+     */
+    fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) {
+        val currentBuffer = attachedJitterBuffer
+        if (currentBuffer != null) {
+            currentBuffer.flushAndSeek(newInitialSeq, newTargetStartTimeUs)
+        }
+        val bridge = resolveBridge() ?: return
+        try {
+            bridge.flushAndSeek(newInitialSeq, newTargetStartTimeUs)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error flushing and seeking audio engine: ${e.message}")
+        }
+    }
+
     private fun resolveBridge(): AudioEngineBridge? {
         if (customBridge != null) return customBridge
         if (isLibraryLoaded) return DefaultJniBridge
@@ -566,6 +584,7 @@ open class NativeAudioEngine(
         override fun setMasterVolume(volumeDb: Float) = nativeSetMasterVolume(volumeDb)
         override fun setMuted(isMuted: Boolean) = nativeSetMuted(isMuted)
         override fun setTargetStartTimeUs(targetTimeUs: Long) = nativeSetTargetStartTimeUs(targetTimeUs)
+        override fun flushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long) = nativeFlushAndSeek(newInitialSeq, newTargetStartTimeUs)
 
         @JvmStatic
         private external fun nativeInitEngine(): Int
@@ -620,5 +639,8 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeSetTargetStartTimeUs(targetTimeUs: Long)
+
+        @JvmStatic
+        private external fun nativeFlushAndSeek(newInitialSeq: Long, newTargetStartTimeUs: Long)
     }
 }

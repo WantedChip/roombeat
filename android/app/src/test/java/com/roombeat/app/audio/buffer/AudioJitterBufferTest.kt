@@ -417,8 +417,55 @@ class AudioJitterBufferTest {
         buffer.pushDecodedFrame(0L, 0L, createSyntheticFrame(0L, 0.4f))
         val out = FloatArray(JitterBufferConstants.INTERLEAVED_SAMPLES)
         val rendered = buffer.pullFrames(out, JitterBufferConstants.SAMPLES_PER_CHANNEL)
-        assertEquals(JitterBufferConstants.SAMPLES_PER_CHANNEL, rendered)
+        buffer.close()
+    }
+
+    @Test
+    fun testFlushAndSeekRealignment() {
+        var mockClockUs = 1_000_000L
+        val buffer = AudioJitterBuffer(targetDepthMs = 120)
+        buffer.setClockFunction { mockClockUs }
+
+        // 1. Initial playback: push 6 frames (seq 0..5)
+        for (i in 0L until 6L) {
+            val pushed = buffer.pushDecodedFrame(i, mockClockUs + i * 20_000L, createSyntheticFrame(i, 0.5f))
+            assertTrue(pushed)
+        }
+        assertEquals(6, buffer.queuedFrames)
+
+        val out = FloatArray(JitterBufferConstants.INTERLEAVED_SAMPLES)
+        val rendered1 = buffer.pullFrames(out, JitterBufferConstants.SAMPLES_PER_CHANNEL)
+        assertEquals(JitterBufferConstants.SAMPLES_PER_CHANNEL, rendered1)
         assertEquals(1L, buffer.getStats().packetsPlayed)
+
+        // 2. Perform flushAndSeek to new initial seq 100L and new target start time 5,000,000us
+        val newTargetStartUs = 5_000_000L
+        buffer.flushAndSeek(newInitialSeq = 100L, newTargetStartTimeUs = newTargetStartUs)
+
+        // 3. Verify buffer cleared and armed with new target timestamp
+        assertEquals(0, buffer.queuedFrames)
+        assertEquals(newTargetStartUs, buffer.targetStartTimeUs)
+
+        // 4. Push fresh frames starting from new seek sequence 100L
+        for (i in 0L until 6L) {
+            val seq = 100L + i
+            val pts = newTargetStartUs + i * 20_000L
+            val pushed = buffer.pushDecodedFrame(seq, pts, createSyntheticFrame(seq, 0.7f))
+            assertTrue("Fresh seek frame $seq should be accepted", pushed)
+        }
+        assertEquals(6, buffer.queuedFrames)
+
+        // 5. Clock is still at 1,000,000us (< 5,000,000us): must render silence while waiting
+        buffer.pullFrames(out, JitterBufferConstants.SAMPLES_PER_CHANNEL)
+        for (sample in out) {
+            assertEquals("Must render silence before seek target presentation time", 0.0f, sample, 0.0001f)
+        }
+
+        // 6. Advance clock to newTargetStartUs: playback starts seamlessly from seq 100L
+        mockClockUs = newTargetStartUs
+        val rendered2 = buffer.pullFrames(out, JitterBufferConstants.SAMPLES_PER_CHANNEL)
+        assertEquals(JitterBufferConstants.SAMPLES_PER_CHANNEL, rendered2)
+        assertEquals(2L, buffer.getStats().packetsPlayed)
 
         buffer.close()
     }

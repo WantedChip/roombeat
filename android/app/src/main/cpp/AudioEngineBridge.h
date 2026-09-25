@@ -135,6 +135,14 @@ Java_com_roombeat_app_audio_NativeAudioEngine_nativeSetTargetStartTimeUs(
     jlong targetTimeUs
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeFlushAndSeek(
+    JNIEnv* env,
+    jobject thiz,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
+);
+
 /*
  * Direct alias methods without 'native' prefix for JNI flexibility
  */
@@ -249,6 +257,14 @@ Java_com_roombeat_app_audio_NativeAudioEngine_setTargetStartTimeUs(
     jlong targetTimeUs
 );
 
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_flushAndSeek(
+    JNIEnv* env,
+    jobject thiz,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
+);
+
 /*
  * JNI methods for nested DefaultJniBridge
  */
@@ -361,6 +377,14 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeSetTar
     JNIEnv* env,
     jobject thiz,
     jlong targetTimeUs
+);
+
+JNIEXPORT void JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeFlushAndSeek(
+    JNIEnv* env,
+    jobject thiz,
+    jlong newInitialSeq,
+    jlong newTargetStartTimeUs
 );
 
 #ifdef __cplusplus
