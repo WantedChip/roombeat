@@ -181,6 +181,9 @@ public:
     float getEffectiveGain() const;
     audio::GainProcessor& getGainProcessor() { return gainProcessor_; }
 
+    // Audio Level Telemetry (RMS and Peak per 20ms frame)
+    void getAudioLevels(float* out4) const;
+
     // oboe::AudioStreamDataCallback
     oboe::DataCallbackResult onAudioReady(
         oboe::AudioStream* stream,
@@ -212,6 +215,23 @@ private:
     AudioRingBuffer ringBuffer_;
     std::shared_ptr<AudioSource> audioSource_;
     audio::GainProcessor gainProcessor_;
+
+    void updateAudioLevels(const float* stereoSamples, int32_t numFrames);
+    void resetAudioLevels();
+
+    struct AudioLevels {
+        std::atomic<float> leftRms{0.0f};
+        std::atomic<float> rightRms{0.0f};
+        std::atomic<float> leftPeak{0.0f};
+        std::atomic<float> rightPeak{0.0f};
+    };
+
+    AudioLevels audioLevels_;
+    int32_t levelAccumulatedFrames_{0};
+    float levelSumSqLeft_{0.0f};
+    float levelSumSqRight_{0.0f};
+    float levelPeakLeft_{0.0f};
+    float levelPeakRight_{0.0f};
 };
 
 } // namespace roombeat

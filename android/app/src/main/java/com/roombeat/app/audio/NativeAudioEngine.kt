@@ -57,6 +57,7 @@ interface AudioEngineBridge {
     fun encodeFrame(pcmData: ShortArray, outputBuffer: ByteArray): Int = 0
     fun setSpeedPpm(ppm: Int) {}
     fun getSpeedPpm(): Int = 0
+    fun getAudioLevels(outLevels: FloatArray): Boolean = false
 }
 
 /**
@@ -171,6 +172,12 @@ open class NativeAudioEngine(
 
         fun setSpeedPpm(ppm: Int) = defaultInstance.setSpeedPpm(ppm)
         fun setPlaybackRate(ratio: Double) = defaultInstance.setPlaybackRate(ratio)
+
+        fun getAudioLevels(outLevels: FloatArray): Boolean = defaultInstance.getAudioLevels(outLevels)
+        fun getAudioLevels(): FloatArray = defaultInstance.getAudioLevels()
+        var mockAudioLevels: FloatArray?
+            get() = defaultInstance.mockAudioLevels
+            set(value) { defaultInstance.mockAudioLevels = value }
     }
 
     private val lock = Any()
@@ -640,6 +647,48 @@ open class NativeAudioEngine(
         return if (bytes > 0) outBuffer.copyOf(bytes) else null
     }
 
+    @Volatile
+    var mockAudioLevels: FloatArray? = null
+
+    /**
+     * Reads the real-time audio levels (left RMS, right RMS, left Peak, right Peak)
+     * computed per 20ms audio frame in native C++ engine.
+     *
+     * @param outLevels A FloatArray of at least 4 elements:
+     *   [0] -> Left RMS
+     *   [1] -> Right RMS
+     *   [2] -> Left Peak
+     *   [3] -> Right Peak
+     * @return True if levels were successfully populated, false otherwise.
+     */
+    fun getAudioLevels(outLevels: FloatArray): Boolean {
+        if (outLevels.size < 4) return false
+        val bridge = resolveBridge()
+        if (bridge != null) {
+            return try {
+                bridge.getAudioLevels(outLevels)
+            } catch (e: Exception) {
+                Log.w(TAG, "Error getting audio levels: ${e.message}")
+                false
+            }
+        }
+        mockAudioLevels?.let { mock ->
+            val count = minOf(outLevels.size, mock.size)
+            System.arraycopy(mock, 0, outLevels, 0, count)
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Reads the real-time audio levels into a newly allocated FloatArray of size 4.
+     */
+    fun getAudioLevels(): FloatArray {
+        val levels = FloatArray(4)
+        getAudioLevels(levels)
+        return levels
+    }
+
     private fun resolveBridge(): AudioEngineBridge? {
         if (customBridge != null) return customBridge
         if (isLibraryLoaded) return DefaultJniBridge
@@ -655,6 +704,7 @@ open class NativeAudioEngine(
         override fun stopStream(): Int = nativeStopStream()
         override fun getAudioLatencyMillis(): Int = nativeGetAudioLatencyMillis()
         override fun teardownEngine(): Int = nativeTeardownEngine()
+        override fun getAudioLevels(outLevels: FloatArray): Boolean = nativeGetAudioLevels(outLevels)
 
         override fun writeAudioFrames(audioData: FloatArray, numFrames: Int): Int =
             nativeWriteAudioFrames(audioData, numFrames)
@@ -752,5 +802,8 @@ open class NativeAudioEngine(
 
         @JvmStatic
         private external fun nativeGetSpeedPpm(): Int
+
+        @JvmStatic
+        private external fun nativeGetAudioLevels(outLevels: FloatArray): Boolean
     }
 }

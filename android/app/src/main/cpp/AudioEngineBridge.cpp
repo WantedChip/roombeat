@@ -125,6 +125,12 @@ public:
         return player_;
     }
 
+    bool getAudioLevels(float* outLevels, int32_t size) const {
+        if (!outLevels || size < 4) return false;
+        player_.getAudioLevels(outLevels);
+        return true;
+    }
+
 private:
     std::mutex engineMutex_;
     OboeAudioPlayer player_;
@@ -927,6 +933,49 @@ Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetSpe
     jobject thiz
 ) {
     return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetSpeedPpm(env, thiz);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetAudioLevels(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jfloatArray outLevels
+) {
+    if (!outLevels) return JNI_FALSE;
+    jsize len = env->GetArrayLength(outLevels);
+    if (len < 4) return JNI_FALSE;
+
+    try {
+        auto* engine = roombeat::getOrCreateEngine();
+        if (!engine) return JNI_FALSE;
+
+        float levels[4];
+        if (engine->getAudioLevels(levels, 4)) {
+            env->SetFloatArrayRegion(outLevels, 0, 4, levels);
+            return JNI_TRUE;
+        }
+        return JNI_FALSE;
+    } catch (...) {
+        return JNI_FALSE;
+    }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_getAudioLevels(
+    JNIEnv* env,
+    jobject thiz,
+    jfloatArray outLevels
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetAudioLevels(env, thiz, outLevels);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_roombeat_app_audio_NativeAudioEngine_00024DefaultJniBridge_nativeGetAudioLevels(
+    JNIEnv* env,
+    jobject thiz,
+    jfloatArray outLevels
+) {
+    return Java_com_roombeat_app_audio_NativeAudioEngine_nativeGetAudioLevels(env, thiz, outLevels);
 }
 
 } // extern "C"

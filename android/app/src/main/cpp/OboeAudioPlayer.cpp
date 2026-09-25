@@ -259,6 +259,7 @@ oboe::Result OboeAudioPlayer::start() {
 oboe::Result OboeAudioPlayer::pause() {
     std::lock_guard<std::mutex> lock(streamMutex_);
     isPlaying_.store(false, std::memory_order_release);
+    resetAudioLevels();
     if (!stream_) return oboe::Result::OK;
 
     const oboe::Result result = stream_->requestPause();
@@ -272,6 +273,7 @@ oboe::Result OboeAudioPlayer::pause() {
 oboe::Result OboeAudioPlayer::stop() {
     std::lock_guard<std::mutex> lock(streamMutex_);
     isPlaying_.store(false, std::memory_order_release);
+    resetAudioLevels();
     if (!stream_) return oboe::Result::OK;
 
     const oboe::Result result = stream_->requestStop();
@@ -290,6 +292,7 @@ oboe::Result OboeAudioPlayer::close() {
 
 void OboeAudioPlayer::closeInternal() {
     isPlaying_.store(false, std::memory_order_release);
+    resetAudioLevels();
     if (stream_) {
         stream_->stop();
         stream_->close();
@@ -394,6 +397,7 @@ int32_t OboeAudioPlayer::getBufferCapacityFrames() const {
 
 void OboeAudioPlayer::clearBuffer() {
     ringBuffer_.clear();
+    resetAudioLevels();
 }
 
 int64_t OboeAudioPlayer::getUnderrunCount() const {
@@ -463,6 +467,7 @@ oboe::DataCallbackResult OboeAudioPlayer::onAudioReady(
 ) {
     if (!isPlaying_.load(std::memory_order_acquire)) {
         std::memset(audioData, 0, numFrames * stream->getBytesPerFrame());
+        resetAudioLevels();
         return oboe::DataCallbackResult::Continue;
     }
 
@@ -495,6 +500,9 @@ oboe::DataCallbackResult OboeAudioPlayer::onAudioReady(
 
         // 4. Apply click-free per-channel and master digital gain scaling
         gainProcessor_.process(floatOut, numFrames, kDefaultChannelCount);
+
+        // 5. Update real-time RMS and Peak audio levels
+        updateAudioLevels(floatOut, numFrames);
     } else if (format == oboe::AudioFormat::I16) {
         int16_t* i16Out = static_cast<int16_t*>(audioData);
         constexpr int32_t kStackFrames = 1024;
@@ -527,6 +535,9 @@ oboe::DataCallbackResult OboeAudioPlayer::onAudioReady(
             // Apply click-free digital gain scaling on the Float32 chunk
             gainProcessor_.process(tempFloat, chunkFrames, kDefaultChannelCount);
 
+            // Update real-time RMS and Peak audio levels
+            updateAudioLevels(tempFloat, chunkFrames);
+
             int16_t* chunkOut = i16Out + (framesProcessed * kDefaultChannelCount);
             for (int32_t s = 0; s < chunkFrames * kDefaultChannelCount; ++s) {
                 const float sample = std::clamp(tempFloat[s], -1.0f, 1.0f);
@@ -537,6 +548,7 @@ oboe::DataCallbackResult OboeAudioPlayer::onAudioReady(
         }
     } else {
         std::memset(audioData, 0, numFrames * stream->getBytesPerFrame());
+        resetAudioLevels();
     }
 
     return oboe::DataCallbackResult::Continue;
@@ -582,6 +594,61 @@ void OboeAudioPlayer::onErrorAfterClose(oboe::AudioStream* /*stream*/, oboe::Res
 
     LOGE("Failed to recover Oboe audio stream after %d attempts", kMaxRetries);
     isPlaying_.store(false, std::memory_order_release);
+}
+
+void OboeAudioPlayer::updateAudioLevels(const float* stereoSamples, int32_t numFrames) {
+    if (!stereoSamples || numFrames <= 0) return;
+
+    for (int32_t i = 0; i < numFrames; ++i) {
+        const float l = stereoSamples[i * 2];
+        const float r = stereoSamples[i * 2 + 1];
+        const float absL = std::abs(l);
+        const float absR = std::abs(r);
+        if (absL > levelPeakLeft_) levelPeakLeft_ = absL;
+        if (absR > levelPeakRight_) levelPeakRight_ = absR;
+        levelSumSqLeft_ += l * l;
+        levelSumSqRight_ += r * r;
+    }
+    levelAccumulatedFrames_ += numFrames;
+
+    // 20ms at 48kHz = 960 frames
+    constexpr int32_t kFramesPer20Ms = 960;
+    if (levelAccumulatedFrames_ >= kFramesPer20Ms) {
+        const float invFrames = 1.0f / static_cast<float>(levelAccumulatedFrames_);
+        const float rmsL = std::sqrt(levelSumSqLeft_ * invFrames);
+        const float rmsR = std::sqrt(levelSumSqRight_ * invFrames);
+
+        audioLevels_.leftRms.store(rmsL, std::memory_order_relaxed);
+        audioLevels_.rightRms.store(rmsR, std::memory_order_relaxed);
+        audioLevels_.leftPeak.store(levelPeakLeft_, std::memory_order_relaxed);
+        audioLevels_.rightPeak.store(levelPeakRight_, std::memory_order_relaxed);
+
+        levelAccumulatedFrames_ = 0;
+        levelSumSqLeft_ = 0.0f;
+        levelSumSqRight_ = 0.0f;
+        levelPeakLeft_ = 0.0f;
+        levelPeakRight_ = 0.0f;
+    }
+}
+
+void OboeAudioPlayer::resetAudioLevels() {
+    audioLevels_.leftRms.store(0.0f, std::memory_order_relaxed);
+    audioLevels_.rightRms.store(0.0f, std::memory_order_relaxed);
+    audioLevels_.leftPeak.store(0.0f, std::memory_order_relaxed);
+    audioLevels_.rightPeak.store(0.0f, std::memory_order_relaxed);
+    levelAccumulatedFrames_ = 0;
+    levelSumSqLeft_ = 0.0f;
+    levelSumSqRight_ = 0.0f;
+    levelPeakLeft_ = 0.0f;
+    levelPeakRight_ = 0.0f;
+}
+
+void OboeAudioPlayer::getAudioLevels(float* out4) const {
+    if (!out4) return;
+    out4[0] = audioLevels_.leftRms.load(std::memory_order_relaxed);
+    out4[1] = audioLevels_.rightRms.load(std::memory_order_relaxed);
+    out4[2] = audioLevels_.leftPeak.load(std::memory_order_relaxed);
+    out4[3] = audioLevels_.rightPeak.load(std::memory_order_relaxed);
 }
 
 } // namespace roombeat
