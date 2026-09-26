@@ -8,6 +8,8 @@ import com.roombeat.app.session.PeerConnectionState
 import com.roombeat.app.session.PeerNode
 import com.roombeat.app.session.PeerSessionManager
 import com.roombeat.app.session.PlaybackCoordinator
+import com.roombeat.app.session.RecoveryState
+import com.roombeat.app.session.SessionTeardownManager
 import com.roombeat.app.session.TransportController
 import com.roombeat.app.session.TransportState
 import com.roombeat.app.session.TransportStatus
@@ -40,7 +42,8 @@ data class ActivePlaybackHudUiState(
     val transportState: TransportState = TransportState(),
     val channelLevels: List<ChannelLevels> = emptyList(),
     val isEndSessionDialogVisible: Boolean = false,
-    val isReducedMotion: Boolean = false
+    val isReducedMotion: Boolean = false,
+    val recoveryState: RecoveryState = RecoveryState.Idle
 ) {
     val totalDeviceCount: Int
         get() = (if (isHost) 1 else 0) + peers.count { !it.isDisconnectedOrReconnecting }
@@ -60,6 +63,7 @@ class ActivePlaybackHudViewModel(
     var transportController: TransportController? = null,
     var playbackCoordinator: PlaybackCoordinator? = null,
     val driftController: DriftCorrectionController? = null,
+    var teardownManager: SessionTeardownManager? = null,
     val autoStartTelemetry: Boolean = true
 ) : ViewModel() {
 
@@ -74,6 +78,13 @@ class ActivePlaybackHudViewModel(
 
     init {
         sessionManager?.let { bindSessionManager(it) }
+        teardownManager?.let { tm ->
+            viewModelScope.launch {
+                tm.recoveryState.collect { recState ->
+                    _uiState.update { it.copy(recoveryState = recState) }
+                }
+            }
+        }
         initFlowSubscriptions()
         if (autoStartTelemetry) {
             startTelemetryLoop()
@@ -275,11 +286,42 @@ class ActivePlaybackHudViewModel(
         sessionManager?.kickPeer(peerId)
     }
 
+    fun setTeardownCoordinator(manager: SessionTeardownManager) {
+        this.teardownManager = manager
+        viewModelScope.launch {
+            manager.recoveryState.collect { recState ->
+                _uiState.update { it.copy(recoveryState = recState) }
+            }
+        }
+    }
+
+    fun retryHostReconnect() {
+        viewModelScope.launch {
+            teardownManager?.retryReconnect()
+        }
+    }
+
+    fun returnToLobbyFromRecovery() {
+        viewModelScope.launch {
+            teardownManager?.returnToLobby()
+            _uiState.update { it.copy(recoveryState = RecoveryState.ReturnedToLobby) }
+        }
+    }
+
     fun endSession() {
         telemetryLoopJob?.cancel()
         sessionManager?.leaveRoom()
         transportController?.close()
         playbackCoordinator?.close()
+        teardownManager?.let { tm ->
+            viewModelScope.launch {
+                if (_uiState.value.isHost) {
+                    tm.teardownHostSession()
+                } else {
+                    tm.leaveSessionAsPeer()
+                }
+            }
+        }
         _uiState.update { it.copy(isEndSessionDialogVisible = false) }
     }
 

@@ -167,6 +167,7 @@ class PeerSessionManager(
             is RoomBeatPacket.SessionVolume -> handleSessionVolume(packet)
             is RoomBeatPacket.SessionMasterVolume -> handleSessionMasterVolume(packet)
             is RoomBeatPacket.RoomLeave -> handleRoomLeave(packet)
+            is RoomBeatPacket.SessionEnd -> handleSessionEnd(packet)
             is RoomBeatPacket.CalibResult -> handleCalibResult(packet, senderId)
             else -> null
         }
@@ -346,6 +347,11 @@ class PeerSessionManager(
 
     private fun handleRoomLeave(packet: RoomBeatPacket.RoomLeave): RoomBeatPacket? {
         removePeer(packet.deviceId, reason = "Graceful departure via ROOM_LEAVE")
+        return null
+    }
+
+    private fun handleSessionEnd(packet: RoomBeatPacket.SessionEnd): RoomBeatPacket? {
+        leaveRoom()
         return null
     }
 

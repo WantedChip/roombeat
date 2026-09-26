@@ -39,9 +39,12 @@ import androidx.compose.ui.window.Dialog
 import com.roombeat.app.audio.ChannelLevels
 import com.roombeat.app.session.PeerConnectionState
 import com.roombeat.app.session.PeerNode
+import com.roombeat.app.session.RecoveryState
 import com.roombeat.app.session.TransportState
 import com.roombeat.app.session.TransportStatus
 import com.roombeat.app.ui.components.BeaconStatus
+import com.roombeat.app.ui.components.DisconnectConfirmationDialog
+import com.roombeat.app.ui.components.HostLossRecoveryBanner
 import com.roombeat.app.ui.components.MultiChannelVuMeter
 import com.roombeat.app.ui.components.StatusBeacon
 import com.roombeat.app.ui.components.StreamTelemetry
@@ -126,6 +129,11 @@ fun ActivePlaybackHudScreen(
             viewModel.endSession()
             onSessionEnded()
         },
+        onRetryHostReconnect = { viewModel.retryHostReconnect() },
+        onReturnToLobbyFromRecovery = {
+            viewModel.returnToLobbyFromRecovery()
+            onSessionEnded()
+        },
         modifier = modifier
     )
 }
@@ -148,6 +156,8 @@ fun ActivePlaybackHudContent(
     onShowEndSessionDialog: () -> Unit = {},
     onDismissEndSessionDialog: () -> Unit = {},
     onConfirmEndSession: () -> Unit = {},
+    onRetryHostReconnect: () -> Unit = {},
+    onReturnToLobbyFromRecovery: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -172,6 +182,27 @@ fun ActivePlaybackHudContent(
             ) {
                 TelemetryHeaderBadge(
                     telemetry = uiState.streamTelemetry
+                )
+            }
+
+            // Unexpected Host Loss Recovery Banner
+            AnimatedVisibility(
+                visible = uiState.recoveryState is RecoveryState.HostLost ||
+                    uiState.recoveryState is RecoveryState.Reconnecting ||
+                    uiState.recoveryState is RecoveryState.RecoveryFailed,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                val lost = uiState.recoveryState as? RecoveryState.HostLost
+                val reconnecting = uiState.recoveryState is RecoveryState.Reconnecting
+                val failed = uiState.recoveryState as? RecoveryState.RecoveryFailed
+                HostLossRecoveryBanner(
+                    attemptCount = lost?.attemptCount ?: (uiState.recoveryState as? RecoveryState.Reconnecting)?.attemptCount ?: 1,
+                    maxAttempts = lost?.maxAttempts ?: (uiState.recoveryState as? RecoveryState.Reconnecting)?.maxAttempts ?: 3,
+                    isReconnecting = reconnecting,
+                    errorMessage = failed?.reason,
+                    onRetry = onRetryHostReconnect,
+                    onReturnToLobby = onReturnToLobbyFromRecovery
                 )
             }
 
@@ -380,69 +411,15 @@ fun ActivePlaybackHudContent(
         // Confirmation Modal: End Active Session
         // ====================================================================
         if (uiState.isEndSessionDialogVisible) {
-            Dialog(onDismissRequest = onDismissEndSessionDialog) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = SurfacePanel,
-                    border = BorderStroke(1.dp, BorderActive),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(ActivePlaybackHudTags.END_SESSION_DIALOG)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        Text(
-                            text = if (uiState.isHost) "END ACTIVE SESSION?" else "LEAVE SESSION?",
-                            fontFamily = CabinetGroteskFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
-                            color = TextBone
-                        )
-
-                        Text(
-                            text = if (uiState.isHost) {
-                                "This will immediately terminate playback, stop audio streaming, and disconnect all ${uiState.totalDeviceCount} participating phone nodes."
-                            } else {
-                                "This will disconnect your device from the room and return to mode selection."
-                            },
-                            fontFamily = GeneralSansFontFamily,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp,
-                            color = TextMuted,
-                            lineHeight = 20.sp
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            TactileKeycapButton(
-                                onClick = onDismissEndSessionDialog,
-                                variant = TactileButtonVariant.SURFACE,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .testTag(ActivePlaybackHudTags.CANCEL_END_BUTTON)
-                            ) {
-                                Text("[ CANCEL ]")
-                            }
-
-                            TactileKeycapButton(
-                                onClick = onConfirmEndSession,
-                                variant = TactileButtonVariant.DESTRUCTIVE,
-                                modifier = Modifier
-                                    .weight(1.3f)
-                                    .testTag(ActivePlaybackHudTags.CONFIRM_END_BUTTON)
-                            ) {
-                                Text(if (uiState.isHost) "[ CONFIRM END ]" else "[ CONFIRM LEAVE ]")
-                            }
-                        }
-                    }
-                }
-            }
+            DisconnectConfirmationDialog(
+                isHost = uiState.isHost,
+                nodeCount = uiState.totalDeviceCount,
+                onConfirm = onConfirmEndSession,
+                onDismiss = onDismissEndSessionDialog,
+                dialogTag = ActivePlaybackHudTags.END_SESSION_DIALOG,
+                confirmTag = ActivePlaybackHudTags.CONFIRM_END_BUTTON,
+                cancelTag = ActivePlaybackHudTags.CANCEL_END_BUTTON
+            )
         }
     }
 }
