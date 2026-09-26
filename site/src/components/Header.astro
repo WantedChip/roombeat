@@ -4,9 +4,9 @@ import GithubIcon from './icons/GithubIcon.astro';
 ---
 
 <header class="sticky top-0 z-50 w-full bg-[#0B0C0E] border-b border-border-milled">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
     <!-- Brand Wordmark & LAN Beacon -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3">
       <a href="/" class="flex items-center gap-2 group" aria-label="RoomBeat Home">
         <div class="w-8 h-8 rounded-[6px] bg-surface-panel border border-border-milled flex items-center justify-center text-signal-orange group-hover:border-signal-orange/60 transition-colors">
           <Radio class="w-4 h-4" />
@@ -76,7 +76,7 @@ import GithubIcon from './icons/GithubIcon.astro';
         role="button"
       >
         <Download class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.25]" />
-        <span>Download APK</span>
+        <span class="hidden sm:inline">Download </span><span>APK</span>
       </a>
     </div>
   </div>

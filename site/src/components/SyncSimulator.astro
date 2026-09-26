@@ -1,0 +1,793 @@
+---
+import {
+  Play,
+  Square,
+  Volume2,
+  VolumeX,
+  Activity,
+  Zap,
+  Radio,
+  Sliders,
+  RefreshCw,
+  CheckCircle2,
+  AlertTriangle,
+} from 'lucide-astro';
+---
+
+<section
+  id="sync-simulator"
+  class="relative py-16 md:py-24 border-t border-border-milled bg-chassis-base overflow-hidden"
+  aria-labelledby="simulator-heading"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Section Header Stencil -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-surface-panel border border-border-milled mb-3">
+          <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
+          <span class="font-mono text-xs font-semibold tracking-wider uppercase text-sync-green">
+            Interactive Multi-Node Soundboard
+          </span>
+          <span class="text-text-dim text-xs font-mono">•</span>
+          <span class="font-mono text-xs text-text-muted">Pure WebAudio &amp; Canvas</span>
+        </div>
+        <h2
+          id="simulator-heading"
+          class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[42px] leading-tight tracking-tight text-bone"
+        >
+          Simulate 4 Phones in Acoustic Sync.
+        </h2>
+      </div>
+      <p class="font-sans text-sm sm:text-base text-text-muted max-w-lg leading-relaxed">
+        Experience real acoustic comb filtering caused by Wi-Fi packet jitter, then engage
+        RoomBeat’s NDK fractional resampler to witness sub-0.5ms phase-lock convergence.
+      </p>
+    </div>
+
+    <!-- Main Industrial Soundboard Chassis -->
+    <div class="hardware-panel rounded-[10px] p-4 sm:p-6 lg:p-8 top-edge-lighting relative">
+      
+      <!-- Corner Decorative Hardware Screws -->
+      <div class="absolute top-3 left-3 w-2 h-2 rounded-full border border-border-milled/80 bg-surface-recessed opacity-60"></div>
+      <div class="absolute top-3 right-3 w-2 h-2 rounded-full border border-border-milled/80 bg-surface-recessed opacity-60"></div>
+      <div class="absolute bottom-3 left-3 w-2 h-2 rounded-full border border-border-milled/80 bg-surface-recessed opacity-60"></div>
+      <div class="absolute bottom-3 right-3 w-2 h-2 rounded-full border border-border-milled/80 bg-surface-recessed opacity-60"></div>
+
+      <!-- Rack Top Status Beacon Strip -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-border-milled">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-[2px] bg-signal-orange"></span>
+          <span class="font-mono text-xs font-bold uppercase tracking-wider text-bone">
+            RACK MODULE: M-02 // 4-CHANNEL ACOUSTIC CONSOLE
+          </span>
+        </div>
+
+        <!-- Telemetry Status Beacons -->
+        <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+          <span
+            id="sim-engine-beacon"
+            class="px-2 py-0.5 rounded-[3px] bg-surface-recessed border border-border-milled text-text-dim flex items-center gap-1.5 transition-colors"
+          >
+            <span id="sim-engine-dot" class="w-1.5 h-1.5 rounded-full bg-text-dim"></span>
+            <span id="sim-engine-text">ENGINE: IDLE</span>
+          </span>
+
+          <span class="hidden sm:inline-block px-2 py-0.5 rounded-[3px] bg-surface-recessed border border-border-milled text-text-muted">
+            CLOCK: 48,000 HZ
+          </span>
+
+          <span class="hidden md:inline-block px-2 py-0.5 rounded-[3px] bg-surface-recessed border border-border-milled text-text-muted">
+            CODEC: 20ms OPUS
+          </span>
+
+          <span
+            id="sim-sync-beacon"
+            class="px-2 py-0.5 rounded-[3px] bg-sync-green/10 border border-sync-green/30 text-sync-green flex items-center gap-1.5"
+          >
+            <span id="sim-sync-dot" class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
+            <span id="sim-sync-text">SYNC: LOCKED (&lt;0.5ms)</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Upper Deck: Radar Display & Interactive Master Controls -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch mb-8">
+        
+        <!-- Center Left: Acoustic Phase Radar Oscilloscope Canvas -->
+        <div class="lg:col-span-7 flex flex-col">
+          <div class="flex items-center justify-between text-[11px] font-mono text-text-dim uppercase tracking-wider mb-2 px-1">
+            <span>POLAR PHASE RADAR // MULTI-NODE RETICLE</span>
+            <span class="text-sync-green">REF: HOST MONOTONIC CLOCK</span>
+          </div>
+          
+          <div class="recessed-cavity rounded-[8px] p-2 flex-1 flex flex-col justify-center min-h-[300px] sm:min-h-[340px] relative">
+            <canvas
+              id="radar-canvas"
+              class="w-full h-full min-h-[280px] sm:min-h-[320px] rounded-[4px] block"
+              aria-label="Acoustic Phase Radar Oscilloscope"
+            ></canvas>
+          </div>
+        </div>
+
+        <!-- Center Right: Interactive Command Deck -->
+        <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+          
+          <!-- Master Transport Trigger -->
+          <div class="hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting">
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-mono text-xs font-semibold uppercase tracking-wider text-text-muted">
+                1. AUDIO ENGINE TRANSPORT
+              </span>
+              <span id="transport-step-badge" class="font-mono text-[10px] text-text-dim">
+                STEP: 0/16
+              </span>
+            </div>
+
+            <button
+              id="btn-toggle-playback"
+              type="button"
+              class="w-full tactile-btn-primary py-3.5 px-4 flex items-center justify-center gap-2.5 text-sm uppercase tracking-wider font-display font-bold text-[#0B0C0E]"
+            >
+              <Play id="icon-play" class="w-4 h-4 fill-current stroke-[2.5]" />
+              <Square id="icon-stop" class="w-4 h-4 fill-current stroke-[2.5] hidden" />
+              <span id="transport-btn-text">START MULTI-PHONE RIG</span>
+            </button>
+            <p class="font-mono text-[11px] text-text-dim mt-2 text-center">
+              Synthesizes 4-channel synchronized groove (Kick, Snare, Bass, Stabs)
+            </p>
+          </div>
+
+          <!-- Jitter Controller Module -->
+          <div class="hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <AlertTriangle class="w-3.5 h-3.5 text-sync-amber" />
+                <span class="font-mono text-xs font-semibold uppercase tracking-wider text-text-muted">
+                  2. WI-FI JITTER INJECTION
+                </span>
+              </div>
+              <span id="jitter-readout-badge" class="font-mono text-xs font-bold text-sync-green px-1.5 py-0.5 rounded bg-surface-recessed border border-border-milled">
+                0.0 ms
+              </span>
+            </div>
+
+            <p class="text-xs text-text-muted leading-relaxed">
+              Modulate peer delay nodes by 5–40ms to induce severe comb filtering and hollow acoustic phase cancellation.
+            </p>
+
+            <div class="flex items-center gap-3">
+              <input
+                id="slider-jitter"
+                type="range"
+                min="0"
+                max="40"
+                step="1"
+                value="0"
+                class="flex-1 h-2 bg-surface-recessed rounded-lg appearance-none cursor-pointer accent-signal-orange border border-border-milled"
+                aria-label="Wi-Fi Jitter Depth Slider"
+              />
+              <button
+                id="btn-random-jitter"
+                type="button"
+                class="tactile-btn-secondary px-3 py-1.5 text-xs font-mono font-semibold uppercase tracking-wider text-bone whitespace-nowrap"
+              >
+                RANDOM DRIFT
+              </button>
+            </div>
+
+            <!-- Jitter Presets -->
+            <div class="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+              <button
+                type="button"
+                data-jitter-preset="8"
+                class="btn-preset py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors text-center"
+              >
+                MILD: 8ms
+              </button>
+              <button
+                type="button"
+                data-jitter-preset="22"
+                class="btn-preset py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors text-center"
+              >
+                MOD: 22ms
+              </button>
+              <button
+                type="button"
+                data-jitter-preset="38"
+                class="btn-preset py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors text-center"
+              >
+                HEAVY: 38ms
+              </button>
+            </div>
+          </div>
+
+          <!-- RoomBeat Phase-Lock Trigger -->
+          <div class="hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <CheckCircle2 class="w-3.5 h-3.5 text-sync-green" />
+                <span class="font-mono text-xs font-semibold uppercase tracking-wider text-sync-green">
+                  3. ROOMBEAT SYNC ENGINE
+                </span>
+              </div>
+              <span class="font-mono text-[10px] text-text-dim">NDK RESAMPLER</span>
+            </div>
+
+            <button
+              id="btn-engage-sync"
+              type="button"
+              class="w-full tactile-btn-primary bg-[#00E599] hover:bg-[#00FFAA] text-[#0B0C0E] border-[#33FFBB] py-3 px-4 flex items-center justify-center gap-2 text-sm uppercase tracking-wider font-display font-bold shadow-[0_2px_12px_rgba(0,229,153,0.3)] transition-all"
+            >
+              <Zap class="w-4 h-4 fill-current stroke-[2.5]" />
+              <span>ENGAGE ROOMBEAT SYNC</span>
+            </button>
+            <p class="font-mono text-[11px] text-text-dim mt-2 text-center">
+              Smoothly slews delay times back to 0.0ms phase-lock without pitch jumps
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Lower Deck: 4 Channel Strips (Host + 3 Peers) -->
+      <div>
+        <div class="flex items-center justify-between text-[11px] font-mono text-text-dim uppercase tracking-wider mb-3 px-1">
+          <span>SIMULATED PHONE CHANNEL STRIPS (4 PHYSICAL NODES)</span>
+          <span>SOLO / MUTE / FADER / PEAK VU</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Channel 01: Host -->
+          <div class="channel-strip hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting flex flex-col justify-between" data-channel="0">
+            <div>
+              <div class="flex items-center justify-between gap-1 mb-2">
+                <span class="font-mono text-[10px] font-bold text-signal-orange bg-signal-orange/10 border border-signal-orange/30 px-1.5 py-0.5 rounded-[3px]">
+                  CH 01 // HOST
+                </span>
+                <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green">
+                  0.0 ms [REF]
+                </span>
+              </div>
+              <div class="font-sans font-semibold text-sm text-bone">Google Pixel 8 Pro</div>
+              <div class="font-mono text-[10px] text-text-dim mb-3">Master Clock Reference</div>
+            </div>
+
+            <!-- VU Peak Meter Bar -->
+            <div class="mb-4">
+              <div class="flex items-center justify-between text-[10px] font-mono text-text-dim mb-1">
+                <span>LEVEL (VU)</span>
+                <span class="ch-db-readout">-inf dB</span>
+              </div>
+              <div class="h-3 w-full bg-surface-recessed rounded-[2px] border border-border-milled p-0.5 overflow-hidden flex items-center">
+                <div class="ch-vu-fill h-full bg-sync-green transition-all duration-75 rounded-[1px]" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Fader & Mute/Solo Controls -->
+            <div class="space-y-3 pt-2 border-t border-border-milled/70">
+              <div class="flex items-center justify-between gap-2">
+                <label class="text-[11px] font-mono text-text-muted">GAIN:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="80"
+                  class="ch-fader flex-1 h-1.5 bg-surface-recessed rounded appearance-none cursor-pointer accent-signal-orange border border-border-milled"
+                  aria-label="Channel 1 Gain Fader"
+                />
+                <span class="ch-gain-text font-mono text-[11px] text-text-bone w-9 text-right">80%</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                <button
+                  type="button"
+                  class="btn-mute py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  MUTE
+                </button>
+                <button
+                  type="button"
+                  class="btn-solo py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  SOLO
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Channel 02: Peer A -->
+          <div class="channel-strip hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting flex flex-col justify-between" data-channel="1">
+            <div>
+              <div class="flex items-center justify-between gap-1 mb-2">
+                <span class="font-mono text-[10px] font-bold text-network-cyan bg-network-cyan/10 border border-network-cyan/30 px-1.5 py-0.5 rounded-[3px]">
+                  CH 02 // P-01
+                </span>
+                <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green">
+                  0.0 ms
+                </span>
+              </div>
+              <div class="font-sans font-semibold text-sm text-bone">Samsung Galaxy S24</div>
+              <div class="font-mono text-[10px] text-text-dim mb-3">DelayNode Resampler</div>
+            </div>
+
+            <!-- VU Peak Meter Bar -->
+            <div class="mb-4">
+              <div class="flex items-center justify-between text-[10px] font-mono text-text-dim mb-1">
+                <span>LEVEL (VU)</span>
+                <span class="ch-db-readout">-inf dB</span>
+              </div>
+              <div class="h-3 w-full bg-surface-recessed rounded-[2px] border border-border-milled p-0.5 overflow-hidden flex items-center">
+                <div class="ch-vu-fill h-full bg-sync-green transition-all duration-75 rounded-[1px]" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Fader & Mute/Solo Controls -->
+            <div class="space-y-3 pt-2 border-t border-border-milled/70">
+              <div class="flex items-center justify-between gap-2">
+                <label class="text-[11px] font-mono text-text-muted">GAIN:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="80"
+                  class="ch-fader flex-1 h-1.5 bg-surface-recessed rounded appearance-none cursor-pointer accent-signal-orange border border-border-milled"
+                  aria-label="Channel 2 Gain Fader"
+                />
+                <span class="ch-gain-text font-mono text-[11px] text-text-bone w-9 text-right">80%</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                <button
+                  type="button"
+                  class="btn-mute py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  MUTE
+                </button>
+                <button
+                  type="button"
+                  class="btn-solo py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  SOLO
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Channel 03: Peer B -->
+          <div class="channel-strip hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting flex flex-col justify-between" data-channel="2">
+            <div>
+              <div class="flex items-center justify-between gap-1 mb-2">
+                <span class="font-mono text-[10px] font-bold text-network-cyan bg-network-cyan/10 border border-network-cyan/30 px-1.5 py-0.5 rounded-[3px]">
+                  CH 03 // P-02
+                </span>
+                <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green">
+                  0.0 ms
+                </span>
+              </div>
+              <div class="font-sans font-semibold text-sm text-bone">Sony Xperia 1 V</div>
+              <div class="font-mono text-[10px] text-text-dim mb-3">DelayNode Resampler</div>
+            </div>
+
+            <!-- VU Peak Meter Bar -->
+            <div class="mb-4">
+              <div class="flex items-center justify-between text-[10px] font-mono text-text-dim mb-1">
+                <span>LEVEL (VU)</span>
+                <span class="ch-db-readout">-inf dB</span>
+              </div>
+              <div class="h-3 w-full bg-surface-recessed rounded-[2px] border border-border-milled p-0.5 overflow-hidden flex items-center">
+                <div class="ch-vu-fill h-full bg-sync-green transition-all duration-75 rounded-[1px]" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Fader & Mute/Solo Controls -->
+            <div class="space-y-3 pt-2 border-t border-border-milled/70">
+              <div class="flex items-center justify-between gap-2">
+                <label class="text-[11px] font-mono text-text-muted">GAIN:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="80"
+                  class="ch-fader flex-1 h-1.5 bg-surface-recessed rounded appearance-none cursor-pointer accent-signal-orange border border-border-milled"
+                  aria-label="Channel 3 Gain Fader"
+                />
+                <span class="ch-gain-text font-mono text-[11px] text-text-bone w-9 text-right">80%</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                <button
+                  type="button"
+                  class="btn-mute py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  MUTE
+                </button>
+                <button
+                  type="button"
+                  class="btn-solo py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  SOLO
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Channel 04: Peer C -->
+          <div class="channel-strip hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting flex flex-col justify-between" data-channel="3">
+            <div>
+              <div class="flex items-center justify-between gap-1 mb-2">
+                <span class="font-mono text-[10px] font-bold text-network-cyan bg-network-cyan/10 border border-network-cyan/30 px-1.5 py-0.5 rounded-[3px]">
+                  CH 04 // P-03
+                </span>
+                <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green">
+                  0.0 ms
+                </span>
+              </div>
+              <div class="font-sans font-semibold text-sm text-bone">Nothing Phone (2)</div>
+              <div class="font-mono text-[10px] text-text-dim mb-3">DelayNode Resampler</div>
+            </div>
+
+            <!-- VU Peak Meter Bar -->
+            <div class="mb-4">
+              <div class="flex items-center justify-between text-[10px] font-mono text-text-dim mb-1">
+                <span>LEVEL (VU)</span>
+                <span class="ch-db-readout">-inf dB</span>
+              </div>
+              <div class="h-3 w-full bg-surface-recessed rounded-[2px] border border-border-milled p-0.5 overflow-hidden flex items-center">
+                <div class="ch-vu-fill h-full bg-sync-green transition-all duration-75 rounded-[1px]" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Fader & Mute/Solo Controls -->
+            <div class="space-y-3 pt-2 border-t border-border-milled/70">
+              <div class="flex items-center justify-between gap-2">
+                <label class="text-[11px] font-mono text-text-muted">GAIN:</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="80"
+                  class="ch-fader flex-1 h-1.5 bg-surface-recessed rounded appearance-none cursor-pointer accent-signal-orange border border-border-milled"
+                  aria-label="Channel 4 Gain Fader"
+                />
+                <span class="ch-gain-text font-mono text-[11px] text-text-bone w-9 text-right">80%</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                <button
+                  type="button"
+                  class="btn-mute py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  MUTE
+                </button>
+                <button
+                  type="button"
+                  class="btn-solo py-1 px-2 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors font-bold uppercase"
+                >
+                  SOLO
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Real-Time Acoustic Diagnostic Banner -->
+      <div class="mt-6 pt-4 border-t border-border-milled flex items-center gap-3">
+        <Activity class="w-4 h-4 text-signal-orange shrink-0" />
+        <div id="sim-diagnostic-text" class="font-mono text-xs text-text-muted flex-1 leading-snug">
+          [ STANDBY ] Click "START MULTI-PHONE RIG" to initialize the WebAudio synthesizer (48kHz Float32).
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<script>
+  import { AudioSimulator } from '../scripts/audioSimulator.js';
+  import { RadarCanvas } from '../scripts/radarCanvas.js';
+
+  let simulator = null;
+  let radar = null;
+
+  function initSimulatorIsland() {
+    const canvas = document.getElementById('radar-canvas');
+    if (!canvas) return;
+
+    simulator = new AudioSimulator();
+    radar = new RadarCanvas(canvas, simulator);
+    radar.init();
+
+    // DOM Element References
+    const btnToggle = document.getElementById('btn-toggle-playback');
+    const iconPlay = document.getElementById('icon-play');
+    const iconStop = document.getElementById('icon-stop');
+    const transportText = document.getElementById('transport-btn-text');
+    const transportStepBadge = document.getElementById('transport-step-badge');
+
+    const btnRandomJitter = document.getElementById('btn-random-jitter');
+    const sliderJitter = document.getElementById('slider-jitter');
+    const jitterReadoutBadge = document.getElementById('jitter-readout-badge');
+    const btnEngageSync = document.getElementById('btn-engage-sync');
+    const presetButtons = document.querySelectorAll('.btn-preset');
+
+    const engineBeacon = document.getElementById('sim-engine-beacon');
+    const engineDot = document.getElementById('sim-engine-dot');
+    const engineText = document.getElementById('sim-engine-text');
+    const syncBeacon = document.getElementById('sim-sync-beacon');
+    const syncDot = document.getElementById('sim-sync-dot');
+    const syncText = document.getElementById('sim-sync-text');
+    const diagnosticText = document.getElementById('sim-diagnostic-text');
+
+    const channelStrips = document.querySelectorAll('.channel-strip');
+
+    // 1. Play / Stop Toggle
+    btnToggle?.addEventListener('click', async () => {
+      await simulator.toggle();
+      updateTransportUI();
+    });
+
+    function updateTransportUI() {
+      if (simulator.isPlaying) {
+        iconPlay?.classList.add('hidden');
+        iconStop?.classList.remove('hidden');
+        if (transportText) transportText.textContent = 'STOP RIG';
+        
+        // Update beacon
+        engineBeacon?.classList.remove('text-text-dim');
+        engineBeacon?.classList.add('text-sync-green', 'border-sync-green/30', 'bg-sync-green/10');
+        engineDot?.classList.remove('bg-text-dim');
+        engineDot?.classList.add('bg-sync-green', 'animate-status-blink');
+        if (engineText) engineText.textContent = 'ENGINE: RUNNING';
+
+        updateDiagnostic();
+      } else {
+        iconPlay?.classList.remove('hidden');
+        iconStop?.classList.add('hidden');
+        if (transportText) transportText.textContent = 'START MULTI-PHONE RIG';
+
+        // Update beacon
+        engineBeacon?.classList.remove('text-sync-green', 'border-sync-green/30', 'bg-sync-green/10');
+        engineBeacon?.classList.add('text-text-dim');
+        engineDot?.classList.remove('bg-sync-green', 'animate-status-blink');
+        engineDot?.classList.add('bg-text-dim');
+        if (engineText) engineText.textContent = 'ENGINE: IDLE';
+
+        if (diagnosticText) {
+          diagnosticText.textContent = '[ STANDBY ] Click "START MULTI-PHONE RIG" to initialize the WebAudio synthesizer.';
+        }
+      }
+    }
+
+    // 2. Wi-Fi Jitter Actions
+    btnRandomJitter?.addEventListener('click', async () => {
+      if (!simulator.isPlaying) {
+        await simulator.start();
+        updateTransportUI();
+      }
+      simulator.injectJitter();
+      const avg = Math.round((simulator.channels[1].targetDelayMs + simulator.channels[2].targetDelayMs + simulator.channels[3].targetDelayMs) / 3);
+      if (sliderJitter) sliderJitter.value = avg;
+      updateSyncUI();
+    });
+
+    sliderJitter?.addEventListener('input', async (e) => {
+      const val = parseFloat(e.target.value);
+      if (val === 0) {
+        simulator.engageSync();
+      } else {
+        if (!simulator.isPlaying) {
+          await simulator.start();
+          updateTransportUI();
+        }
+        simulator.injectJitter(val);
+      }
+      updateSyncUI();
+    });
+
+    presetButtons.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const preset = parseFloat(btn.dataset.jitterPreset);
+        if (!simulator.isPlaying) {
+          await simulator.start();
+          updateTransportUI();
+        }
+        if (sliderJitter) sliderJitter.value = preset;
+        simulator.injectJitter(preset);
+        updateSyncUI();
+      });
+    });
+
+    // 3. Engage RoomBeat Sync
+    btnEngageSync?.addEventListener('click', () => {
+      simulator.engageSync();
+      if (sliderJitter) sliderJitter.value = 0;
+      updateSyncUI();
+    });
+
+    function updateSyncUI() {
+      const telemetry = simulator.getTelemetry();
+      const isLocked = telemetry.isLocked;
+      const maxDrift = telemetry.maxDriftMs;
+
+      if (jitterReadoutBadge) {
+        if (isLocked) {
+          jitterReadoutBadge.textContent = '0.0 ms';
+          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-green px-1.5 py-0.5 rounded bg-surface-recessed border border-border-milled';
+        } else {
+          jitterReadoutBadge.textContent = `+${maxDrift.toFixed(1)} ms`;
+          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-amber px-1.5 py-0.5 rounded bg-surface-recessed border border-sync-amber/40 animate-pulse';
+        }
+      }
+
+      if (syncBeacon && syncDot && syncText) {
+        if (isLocked) {
+          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-green/10 border border-sync-green/30 text-sync-green flex items-center gap-1.5';
+          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink';
+          syncText.textContent = 'SYNC: LOCKED (<0.5ms)';
+        } else {
+          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-amber/10 border border-sync-amber/30 text-sync-amber flex items-center gap-1.5';
+          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-amber animate-pulse';
+          syncText.textContent = `DRIFT: +${maxDrift.toFixed(1)}ms`;
+        }
+      }
+
+      updateDiagnostic();
+    }
+
+    function updateDiagnostic() {
+      if (!diagnosticText || !simulator.isPlaying) return;
+
+      const isLocked = simulator.isLocked;
+      if (isLocked) {
+        diagnosticText.innerHTML = '<span class="text-sync-green font-bold">[ ACOUSTIC PHASE LOCKED ]</span> All 4 phone nodes playing in sub-0.5ms phase alignment. Sound is cohesive, transient attacks are crisp, and output power is summed.';
+      } else {
+        const drift = simulator.channels[2]?.delayMs || 25;
+        diagnosticText.innerHTML = `<span class="text-sync-amber font-bold">[ COMB FILTERING ACTIVE: +${drift.toFixed(1)}ms DRIFT ]</span> Acoustic wave interference canceling frequencies across phone speakers. Notice the hollow timbre and flanging echo.`;
+      }
+    }
+
+    // 4. Wire Channel Strip Controls (Volume, Mute, Solo)
+    channelStrips.forEach((strip, chIndex) => {
+      const fader = strip.querySelector('.ch-fader');
+      const gainText = strip.querySelector('.ch-gain-text');
+      const btnMute = strip.querySelector('.btn-mute');
+      const btnSolo = strip.querySelector('.btn-solo');
+
+      fader?.addEventListener('input', (e) => {
+        const pct = parseInt(e.target.value, 10);
+        if (gainText) gainText.textContent = `${pct}%`;
+        simulator.setChannelVolume(chIndex, pct / 100.0);
+      });
+
+      btnMute?.addEventListener('click', () => {
+        simulator.toggleMute(chIndex);
+        const ch = simulator.channels[chIndex];
+        if (ch.muted) {
+          btnMute.classList.add('bg-sync-red/20', 'border-sync-red/50', 'text-sync-red');
+          btnMute.classList.remove('bg-surface-recessed', 'text-text-muted');
+        } else {
+          btnMute.classList.remove('bg-sync-red/20', 'border-sync-red/50', 'text-sync-red');
+          btnMute.classList.add('bg-surface-recessed', 'text-text-muted');
+        }
+      });
+
+      btnSolo?.addEventListener('click', () => {
+        simulator.toggleSolo(chIndex);
+        const ch = simulator.channels[chIndex];
+        if (ch.solo) {
+          btnSolo.classList.add('bg-sync-green/20', 'border-sync-green/50', 'text-sync-green');
+          btnSolo.classList.remove('bg-surface-recessed', 'text-text-muted');
+        } else {
+          btnSolo.classList.remove('bg-sync-green/20', 'border-sync-green/50', 'text-sync-green');
+          btnSolo.classList.add('bg-surface-recessed', 'text-text-muted');
+        }
+      });
+    });
+
+    // 5. High-Speed Telemetry Poller for UI Badges & VU Meters (60fps)
+    function telemetryLoop() {
+      requestAnimationFrame(telemetryLoop);
+
+      if (!simulator) return;
+      const tel = simulator.getTelemetry();
+
+      if (transportStepBadge && tel.isPlaying) {
+        transportStepBadge.textContent = `STEP: ${simulator.currentStep + 1}/16`;
+      }
+
+      // Keep Sync Beacon & Jitter Readout updated dynamically with actual delay transitions
+      const isLocked = tel.isLocked;
+      const maxDrift = tel.maxDriftMs;
+      if (jitterReadoutBadge) {
+        if (isLocked) {
+          jitterReadoutBadge.textContent = '0.0 ms';
+          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-green px-1.5 py-0.5 rounded bg-surface-recessed border border-border-milled';
+        } else {
+          jitterReadoutBadge.textContent = `+${maxDrift.toFixed(1)} ms`;
+          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-amber px-1.5 py-0.5 rounded bg-surface-recessed border border-sync-amber/40 animate-pulse';
+        }
+      }
+
+      if (syncBeacon && syncDot && syncText) {
+        if (isLocked) {
+          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-green/10 border border-sync-green/30 text-sync-green flex items-center gap-1.5';
+          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink';
+          syncText.textContent = 'SYNC: LOCKED (<0.5ms)';
+        } else {
+          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-amber/10 border border-sync-amber/30 text-sync-amber flex items-center gap-1.5';
+          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-amber animate-pulse';
+          syncText.textContent = `DRIFT: +${maxDrift.toFixed(1)}ms`;
+        }
+        updateDiagnostic();
+      }
+
+      // Update Channel VU Meters & Delay Readouts
+      channelStrips.forEach((strip, idx) => {
+        const ch = tel.channels[idx];
+        if (!ch) return;
+
+        // Delay badge update
+        const delayBadge = strip.querySelector('.ch-delay-badge');
+        if (delayBadge) {
+          if (idx === 0) {
+            delayBadge.textContent = '0.0 ms [REF]';
+            delayBadge.className = 'ch-delay-badge font-mono text-xs font-bold text-sync-green';
+          } else if (ch.delayMs < 0.5) {
+            delayBadge.textContent = '0.0 ms';
+            delayBadge.className = 'ch-delay-badge font-mono text-xs font-bold text-sync-green';
+          } else {
+            delayBadge.textContent = `+${ch.delayMs.toFixed(1)} ms`;
+            delayBadge.className = 'ch-delay-badge font-mono text-xs font-bold text-sync-amber';
+          }
+        }
+
+        // VU meter update
+        const vuFill = strip.querySelector('.ch-vu-fill');
+        const dbReadout = strip.querySelector('.ch-db-readout');
+
+        if (vuFill && dbReadout) {
+          if (!tel.isPlaying || ch.muted) {
+            vuFill.style.width = '0%';
+            dbReadout.textContent = '-inf dB';
+          } else {
+            // Normalized RMS mapped to [0..100%]
+            const rmsNormalized = Math.min(1.0, ch.rms * 3.5);
+            const pct = Math.round(rmsNormalized * 100);
+            vuFill.style.width = `${pct}%`;
+
+            if (pct > 85) {
+              vuFill.className = 'ch-vu-fill h-full bg-sync-red rounded-[1px] transition-all duration-75';
+            } else if (pct > 65) {
+              vuFill.className = 'ch-vu-fill h-full bg-sync-amber rounded-[1px] transition-all duration-75';
+            } else {
+              vuFill.className = 'ch-vu-fill h-full bg-sync-green rounded-[1px] transition-all duration-75';
+            }
+
+            // Approximate dB
+            if (ch.rms < 0.001) {
+              dbReadout.textContent = '-inf dB';
+            } else {
+              const db = (20 * Math.log10(ch.rms)).toFixed(1);
+              dbReadout.textContent = `${db} dB`;
+            }
+          }
+        }
+      });
+    }
+
+    requestAnimationFrame(telemetryLoop);
+  }
+
+  // Mount on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSimulatorIsland);
+  } else {
+    initSimulatorIsland();
+  }
+</script>
