@@ -58,11 +58,18 @@ const {
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap"
     />
+    <link rel="stylesheet" href="/global.css" />
   </head>
   <body class="min-h-screen bg-chassis-base text-bone font-sans antialiased overflow-x-hidden flex flex-col">
     <!-- Subtle technical grid backdrop -->
     <div
       class="fixed inset-0 bg-grid-pattern opacity-30 pointer-events-none z-0"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Micro-fine analog noise grain overlay (authentic powder-coated metal chassis finish) -->
+    <div
+      class="analog-noise-texture"
       aria-hidden="true"
     ></div>
 

@@ -5,15 +5,20 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build:css": "tailwindcss -i ./src/styles/global.css -o ./public/global.css --minify",
+    "build": "tailwindcss -i ./src/styles/global.css -o ./public/global.css --minify && astro build",
     "preview": "astro preview"
   },
   "dependencies": {
     "@lucide/astro": "^1.44.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.2",
+    "gsap": "^3.15.0",
     "lucide-astro": "npm:@lucide/astro@^1.44.0",
     "roombeat-monorepo": "file:..",
     "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3"
   }
 }
