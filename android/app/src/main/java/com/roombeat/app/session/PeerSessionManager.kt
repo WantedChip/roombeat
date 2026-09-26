@@ -36,6 +36,7 @@ data class PeerNode(
     val jitterMs: Double = 0.0,
     val volume: Float = 1.0f,
     val isMuted: Boolean = false,
+    val isSoloed: Boolean = false,
     val state: PeerConnectionState = PeerConnectionState.CONNECTED,
     val reconnectAttempt: Int = 0,
     val maxReconnectAttempts: Int = 3,
@@ -455,13 +456,39 @@ class PeerSessionManager(
      */
     fun togglePeerMute(peerId: String) {
         val peer = peerMap[peerId] ?: return
-        val newMuted = !peer.isMuted
-        val effectiveVolume = if (newMuted) 0.0f else peer.volume
-        val updated = peer.copy(isMuted = newMuted)
+        setPeerMuted(peerId, !peer.isMuted)
+    }
+
+    /**
+     * Explicitly sets mute state for an individual peer channel.
+     */
+    fun setPeerMuted(peerId: String, isMuted: Boolean) {
+        val peer = peerMap[peerId] ?: return
+        val effectiveVolume = if (isMuted) 0.0f else peer.volume
+        val updated = peer.copy(isMuted = isMuted)
         peerMap[peerId] = updated
         syncPeersFlow()
 
         transport?.sendToPeer(peerId, RoomBeatPacket.SessionVolume(deviceId = peerId, volumeLevel = effectiveVolume))
+        listener?.onPeerUpdated(updated)
+    }
+
+    /**
+     * Toggles solo state for an individual peer channel.
+     */
+    fun togglePeerSolo(peerId: String) {
+        val peer = peerMap[peerId] ?: return
+        setPeerSolo(peerId, !peer.isSoloed)
+    }
+
+    /**
+     * Explicitly sets solo state for an individual peer channel.
+     */
+    fun setPeerSolo(peerId: String, isSoloed: Boolean) {
+        val peer = peerMap[peerId] ?: return
+        val updated = peer.copy(isSoloed = isSoloed)
+        peerMap[peerId] = updated
+        syncPeersFlow()
         listener?.onPeerUpdated(updated)
     }
 

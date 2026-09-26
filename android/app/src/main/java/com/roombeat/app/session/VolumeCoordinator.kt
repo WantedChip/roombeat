@@ -79,6 +79,11 @@ class VolumeCoordinator(
     private val _effectiveVolumeDb = MutableStateFlow(UNITY_GAIN_DB)
     val effectiveVolumeDb: StateFlow<Float> = _effectiveVolumeDb.asStateFlow()
 
+    private val _soloedDevices = MutableStateFlow<Set<String>>(emptySet())
+    val soloedDevices: StateFlow<Set<String>> = _soloedDevices.asStateFlow()
+
+    private val preSoloMuteStates = mutableMapOf<String, Boolean>()
+
     init {
         sessionManager?.let { attachSessionManager(it) }
     }
@@ -229,6 +234,146 @@ class VolumeCoordinator(
      */
     fun toggleLocalMute() {
         setLocalMuted(!_isLocalMuted.value)
+    }
+
+    /**
+     * Sets volume for a specific device by device ID (local or peer).
+     */
+    fun setDeviceVolume(deviceId: String, linearGain: Float) {
+        if (deviceId.isEmpty() || deviceId == localDeviceId) {
+            setLocalGain(linearGain)
+        } else {
+            sessionManager?.setPeerVolume(deviceId, linearGain)
+        }
+    }
+
+    /**
+     * Sets volume in decibels for a specific device by device ID.
+     */
+    fun setDeviceVolumeDb(deviceId: String, volumeDb: Float) {
+        val linear = dbToLinear(volumeDb)
+        setDeviceVolume(deviceId, linear)
+    }
+
+    /**
+     * Sets master volume across all participating devices as linear gain factor.
+     */
+    fun setMasterVolume(linearGain: Float) {
+        setMasterGain(linearGain)
+    }
+
+    /**
+     * Explicitly sets mute state for a device (local or peer).
+     */
+    fun setDeviceMuted(deviceId: String, isMuted: Boolean) {
+        if (deviceId.isEmpty() || deviceId == localDeviceId) {
+            setLocalMuted(isMuted)
+        } else {
+            sessionManager?.setPeerMuted(deviceId, isMuted)
+        }
+    }
+
+    /**
+     * Toggles mute state for a device (local or peer).
+     */
+    fun toggleMute(deviceId: String) {
+        if (deviceId.isEmpty() || deviceId == localDeviceId) {
+            toggleLocalMute()
+        } else {
+            sessionManager?.togglePeerMute(deviceId)
+        }
+    }
+
+    /**
+     * Toggles solo state for a device (local or peer).
+     * When soloed, all non-soloed channels are muted and all soloed channels are unmuted.
+     * When the last solo is disengaged, previous mute states are restored.
+     */
+    fun toggleSolo(deviceId: String) {
+        val currentSolo = _soloedDevices.value.toMutableSet()
+        val manager = sessionManager
+
+        if (currentSolo.contains(deviceId)) {
+            currentSolo.remove(deviceId)
+            _soloedDevices.value = currentSolo
+
+            if (currentSolo.isEmpty()) {
+                // Restore pre-solo mute states
+                val localPre = preSoloMuteStates[localDeviceId] ?: false
+                setLocalMuted(localPre)
+                manager?.peers?.value?.forEach { peer ->
+                    val peerPre = preSoloMuteStates[peer.id] ?: false
+                    manager.setPeerMuted(peer.id, peerPre)
+                    manager.setPeerSolo(peer.id, false)
+                }
+                preSoloMuteStates.clear()
+            } else {
+                // Device is no longer soloed; mute it since other devices are still soloed
+                setDeviceMuted(deviceId, true)
+                if (deviceId != localDeviceId) {
+                    manager?.setPeerSolo(deviceId, false)
+                }
+            }
+        } else {
+            if (currentSolo.isEmpty()) {
+                // Save current mute states before entering solo
+                preSoloMuteStates[localDeviceId] = _isLocalMuted.value
+                manager?.peers?.value?.forEach { peer ->
+                    preSoloMuteStates[peer.id] = peer.isMuted
+                }
+            }
+
+            currentSolo.add(deviceId)
+            _soloedDevices.value = currentSolo
+
+            // Unmute soloed devices, mute non-soloed devices
+            val isLocalSolo = currentSolo.contains(localDeviceId)
+            setLocalMuted(!isLocalSolo)
+
+            manager?.peers?.value?.forEach { peer ->
+                val isPeerSolo = currentSolo.contains(peer.id)
+                manager.setPeerMuted(peer.id, !isPeerSolo)
+                manager.setPeerSolo(peer.id, isPeerSolo)
+            }
+        }
+    }
+
+    /**
+     * Returns whether the given device is currently soloed.
+     */
+    fun isSoloed(deviceId: String): Boolean = _soloedDevices.value.contains(deviceId)
+
+    /**
+     * Returns whether the given device is currently muted.
+     */
+    fun isDeviceMuted(deviceId: String): Boolean {
+        return if (deviceId.isEmpty() || deviceId == localDeviceId) {
+            _isLocalMuted.value
+        } else {
+            sessionManager?.getPeer(deviceId)?.isMuted ?: false
+        }
+    }
+
+    /**
+     * Returns the linear gain for the given device.
+     */
+    fun getDeviceVolume(deviceId: String): Float {
+        return if (deviceId.isEmpty() || deviceId == localDeviceId) {
+            _localGain.value
+        } else {
+            sessionManager?.getPeer(deviceId)?.volume ?: 1.0f
+        }
+    }
+
+    /**
+     * Returns the decibel gain for the given device.
+     */
+    fun getDeviceVolumeDb(deviceId: String): Float {
+        return if (deviceId.isEmpty() || deviceId == localDeviceId) {
+            _localVolumeDb.value
+        } else {
+            linearToDb(getDeviceVolume(deviceId))
+        }
     }
 
     /**
