@@ -1,20 +1,17 @@
 ---
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Footer from '../components/Footer.astro';
 ---
 
-<!doctype html>
-<html lang="en" class="bg-[#0B0C0E] text-[#E6E8EC]">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RoomBeat — Synchronized Multi-Phone Audio Rig</title>
-  </head>
-  <body class="min-h-screen flex flex-col items-center justify-center p-8">
-    <main class="text-center max-w-2xl">
-      <h1 class="text-4xl font-bold tracking-tight text-[#FF5500] mb-4">RoomBeat</h1>
-      <p class="text-lg text-[#8A8F9E]">
-        Perceptually-synchronized audio playback across a room full of Android phones on the same local network.
-      </p>
-    </main>
-  </body>
-</html>
+<BaseLayout
+  title="RoomBeat — Synchronized Multi-Phone Audio Rig"
+  description="Turn a room of phones into one massive speaker system. 100% offline local Wi-Fi multicast with sub-millisecond NDK Oboe clock synchronization."
+>
+  <Header />
+  <main id="main-content" class="flex-1">
+    <Hero />
+  </main>
+  <Footer />
+</BaseLayout>

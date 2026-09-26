@@ -1,0 +1,83 @@
+---
+import { Download, Radio } from 'lucide-astro';
+import GithubIcon from './icons/GithubIcon.astro';
+---
+
+<header class="sticky top-0 z-50 w-full bg-[#0B0C0E] border-b border-border-milled">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <!-- Brand Wordmark & LAN Beacon -->
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2 group" aria-label="RoomBeat Home">
+        <div class="w-8 h-8 rounded-[6px] bg-surface-panel border border-border-milled flex items-center justify-center text-signal-orange group-hover:border-signal-orange/60 transition-colors">
+          <Radio class="w-4 h-4" />
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-bone group-hover:text-white transition-colors">
+            ROOMBEAT
+          </span>
+          <span class="hidden sm:inline-flex items-center gap-1 font-mono text-[11px] font-semibold tracking-wider text-sync-green bg-[#00E599]/10 border border-[#00E599]/30 px-1.5 py-0.5 rounded-[3px]">
+            <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
+            v1.0-LAN
+          </span>
+        </div>
+      </a>
+
+      <!-- Mobile Beacon (Visible only on very small screens) -->
+      <span class="sm:hidden inline-flex items-center gap-1 font-mono text-[10px] font-medium text-sync-green bg-[#00E599]/10 border border-[#00E599]/20 px-1.5 py-0.5 rounded-[3px]">
+        <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
+        0.0ms
+      </span>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="hidden md:flex items-center gap-7" aria-label="Main Navigation">
+      <a
+        href="#features"
+        class="text-xs uppercase font-sans tracking-wider font-semibold text-text-muted hover:text-bone transition-colors"
+      >
+        Features
+      </a>
+      <a
+        href="#architecture"
+        class="text-xs uppercase font-sans tracking-wider font-semibold text-text-muted hover:text-bone transition-colors"
+      >
+        Architecture
+      </a>
+      <a
+        href="https://github.com/WantedChip/RoomBeat"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-1.5 text-xs uppercase font-sans tracking-wider font-semibold text-text-muted hover:text-bone transition-colors"
+      >
+        <GithubIcon class="w-3.5 h-3.5 text-text-dim" />
+        <span>GitHub</span>
+        <span class="text-[10px] font-mono text-text-dim bg-surface-panel border border-border-milled px-1 rounded-[3px]">
+          MIT
+        </span>
+      </a>
+    </nav>
+
+    <!-- Right Controls / Action Keycap -->
+    <div class="flex items-center gap-3">
+      <a
+        href="https://github.com/WantedChip/RoomBeat"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="md:hidden p-2 rounded-[6px] bg-surface-panel border border-border-milled text-text-muted hover:text-bone transition-colors"
+        aria-label="GitHub Repository"
+      >
+        <GithubIcon class="w-4 h-4" />
+      </a>
+
+      <!-- Machined Tactile APK Button (4px/6px radius, strictly non-pill) -->
+      <a
+        href="#download"
+        class="tactile-btn-primary inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-display font-bold uppercase tracking-wider"
+        role="button"
+      >
+        <Download class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.25]" />
+        <span>Download APK</span>
+      </a>
+    </div>
+  </div>
+</header>

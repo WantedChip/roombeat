@@ -1,0 +1,367 @@
+---
+import {
+  Download,
+  Radio,
+  Wifi,
+  Cpu,
+  Zap,
+  Activity,
+  RefreshCw,
+} from 'lucide-astro';
+import GithubIcon from './icons/GithubIcon.astro';
+---
+
+<section class="relative pt-8 pb-16 md:pt-14 md:pb-24 overflow-hidden" aria-labelledby="hero-title">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+      
+      <!-- ================= LEFT RAIL: VALUE & COMMAND ================= -->
+      <div class="lg:col-span-6 flex flex-col justify-center">
+        
+        <!-- Status / Architecture Chip -->
+        <div class="inline-flex items-center gap-2 self-start px-2.5 py-1 rounded-[4px] bg-surface-panel border border-border-milled mb-6">
+          <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
+          <span class="font-mono text-xs font-semibold tracking-wider uppercase text-sync-green">
+            UDP Multicast Control Plane
+          </span>
+          <span class="text-text-dim text-xs font-mono">•</span>
+          <span class="font-mono text-xs text-text-muted">Sub-ms Oboe Engine</span>
+        </div>
+
+        <!-- Authoritative Headline -->
+        <h1
+          id="hero-title"
+          class="font-display font-extrabold text-4xl sm:text-5xl lg:text-[56px] leading-[1.05] tracking-tight text-bone mb-6"
+        >
+          Turn a room of phones into <span class="text-signal-orange">one massive</span> speaker system.
+        </h1>
+
+        <!-- Subtitle & Value Proposition -->
+        <p class="font-sans text-base sm:text-lg text-text-muted leading-relaxed mb-8 max-w-xl">
+          Zero subscriptions. Zero accounts. 100% offline local Wi-Fi multicast with sub-millisecond
+          NDK C++ clock synchronization. Connect 2 to 32+ Android devices instantly.
+        </p>
+
+        <!-- Value Pillar Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+          <div class="p-3.5 rounded-[6px] bg-surface-panel border border-border-milled top-edge-lighting">
+            <div class="flex items-center gap-2 mb-1.5 text-signal-orange">
+              <Zap class="w-4 h-4 stroke-[2.25]" />
+              <span class="font-display font-bold text-xs uppercase tracking-wide text-bone">$0 Free & Open</span>
+            </div>
+            <p class="text-xs text-text-muted leading-snug">
+              MIT licensed. No weekly $9.99 paywalls, ads, or tracking.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-[6px] bg-surface-panel border border-border-milled top-edge-lighting">
+            <div class="flex items-center gap-2 mb-1.5 text-sync-green">
+              <Wifi class="w-4 h-4 stroke-[2.25]" />
+              <span class="font-display font-bold text-xs uppercase tracking-wide text-bone">100% Offline LAN</span>
+            </div>
+            <p class="text-xs text-text-muted leading-snug">
+              Local Wi-Fi or portable hotspot. Zero cloud hops or internet required.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-[6px] bg-surface-panel border border-border-milled top-edge-lighting">
+            <div class="flex items-center gap-2 mb-1.5 text-network-cyan">
+              <Cpu class="w-4 h-4 stroke-[2.25]" />
+              <span class="font-display font-bold text-xs uppercase tracking-wide text-bone">Sub-ms Oboe</span>
+            </div>
+            <p class="text-xs text-text-muted leading-snug">
+              Native C++ audio pipeline with fractional resampler precision.
+            </p>
+          </div>
+        </div>
+
+        <!-- Command Action CTAs -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4 mb-8">
+          <!-- Primary CTA Button (Machined 6px keycap, #FF5500) -->
+          <a
+            href="https://github.com/WantedChip/RoomBeat/releases"
+            class="tactile-btn-primary inline-flex items-center justify-center gap-2.5 px-6 py-3.5 text-sm uppercase tracking-wider font-display font-bold text-[#0B0C0E]"
+          >
+            <Download class="w-4 h-4 stroke-[2.5]" />
+            <span>Get RoomBeat APK</span>
+          </a>
+
+          <!-- Secondary CTA: GitHub -->
+          <a
+            href="https://github.com/WantedChip/RoomBeat"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tactile-btn-secondary inline-flex items-center justify-center gap-2 px-4 py-3.5 text-xs sm:text-sm uppercase tracking-wider font-sans font-semibold text-bone"
+          >
+            <GithubIcon class="w-4 h-4" />
+            <span>View on GitHub</span>
+          </a>
+
+          <!-- Secondary CTA: Interactive Simulator Trigger -->
+          <a
+            href="#live-console"
+            class="tactile-btn-secondary inline-flex items-center justify-center gap-2 px-4 py-3.5 text-xs sm:text-sm uppercase tracking-wider font-sans font-semibold text-text-muted hover:text-bone"
+          >
+            <Activity class="w-4 h-4 text-sync-green" />
+            <span>Simulate Sync</span>
+          </a>
+        </div>
+
+        <!-- Hardware Specs Micro-Bar -->
+        <div class="pt-5 border-t border-border-milled/70 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-text-dim">
+          <div class="flex items-center gap-1.5">
+            <span class="text-text-muted font-semibold">CODEC:</span>
+            <span>48kHz / 20ms Opus</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-text-muted font-semibold">TARGET:</span>
+            <span class="text-sync-green font-semibold">&lt; 1.0ms Drift</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-text-muted font-semibold">MULTICAST:</span>
+            <span>239.255.42.99:4242</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-text-muted font-semibold">OS:</span>
+            <span>Android 11–15 (API 30–37)</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= RIGHT RAIL: HARDWARE COMMAND CONSOLE ================= -->
+      <div id="live-console" class="lg:col-span-6 w-full">
+        <div class="hardware-panel rounded-[10px] p-4 sm:p-6 top-edge-lighting relative">
+          
+          <!-- Top Console Rail Header -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-4 border-b border-border-milled">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-[2px] bg-signal-orange"></span>
+              <span class="font-mono text-xs font-bold uppercase tracking-wider text-bone">
+                RACK MODULE: M-01 // SYNC ENGINE CORE
+              </span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <span
+                id="console-beacon"
+                class="font-mono text-[11px] font-semibold text-sync-green bg-[#00E599]/10 border border-[#00E599]/30 px-2 py-0.5 rounded-[3px] flex items-center gap-1.5"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
+                <span id="beacon-text">LOCKED · 0.2ms</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Recessed Telemetry Bay -->
+          <div class="recessed-cavity rounded-[6px] p-3.5 mb-4 font-mono text-xs text-text-muted space-y-1.5">
+            <div class="flex items-center justify-between text-text-dim text-[11px] border-b border-border-milled/60 pb-1 mb-1">
+              <span>MULTICAST UDP BROADCAST</span>
+              <span class="text-network-cyan">IP: 239.255.42.99:4242</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-text-dim">STREAM SPEC:</span>
+              <span class="text-bone font-medium">48,000 Hz · 2-CH STEREO · OPUS (128 kbps)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-text-dim">FRAME / BUFFER:</span>
+              <span class="text-bone font-medium">20ms (960 Samples) · Jitter Buffer: 60ms</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-text-dim">CLOCK DOMAIN:</span>
+              <span class="text-sync-green font-medium">CLOCK_MONOTONIC · NTP FILTERED</span>
+            </div>
+          </div>
+
+          <!-- Multi-Node Calibration Matrix (4 Active Devices) -->
+          <div class="space-y-2 mb-5">
+            <div class="flex items-center justify-between text-[11px] font-mono text-text-dim uppercase tracking-wider px-1">
+              <span>CONNECTED ACOUSTIC NODES (4/8)</span>
+              <span>DRIFT / JITTER / VU</span>
+            </div>
+
+            <!-- Node 01: Host -->
+            <div class="p-2 sm:p-2.5 rounded-[6px] bg-surface-elevated border border-border-milled flex items-center justify-between gap-2 sm:gap-3 text-xs">
+              <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                <span class="font-mono text-[10px] font-bold text-signal-orange bg-signal-orange/10 border border-signal-orange/30 px-1.5 py-0.5 rounded-[3px] shrink-0">
+                  HOST
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="font-sans font-semibold text-bone truncate">Pixel 8 Pro</div>
+                  <div class="font-mono text-[10px] text-text-dim truncate">Master Clock Source</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span class="font-mono text-xs text-sync-green font-semibold w-12 text-right">0.0ms</span>
+                <!-- Mini VU Meter -->
+                <div class="flex items-end gap-0.5 h-4 w-10 sm:w-12 bg-surface-recessed p-0.5 rounded-[2px] border border-border-milled">
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_0.8s_ease-in-out_infinite]" style="height: 85%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_1.0s_ease-in-out_infinite]" style="height: 95%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-signal-orange rounded-[1px] animate-[pulse_0.6s_ease-in-out_infinite]" style="height: 60%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Node 02: Galaxy S24 -->
+            <div class="p-2 sm:p-2.5 rounded-[6px] bg-surface-elevated border border-border-milled flex items-center justify-between gap-2 sm:gap-3 text-xs">
+              <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                <span class="font-mono text-[10px] font-bold text-text-dim bg-surface-panel border border-border-milled px-1.5 py-0.5 rounded-[3px] shrink-0">
+                  P-01
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="font-sans font-semibold text-bone truncate">Galaxy S24 Ultra</div>
+                  <div class="font-mono text-[10px] text-text-dim truncate">Resampler Synced</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span id="drift-node-2" class="font-mono text-xs text-sync-green font-semibold w-12 text-right">+0.2ms</span>
+                <!-- Mini VU Meter -->
+                <div class="flex items-end gap-0.5 h-4 w-10 sm:w-12 bg-surface-recessed p-0.5 rounded-[2px] border border-border-milled">
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_0.9s_ease-in-out_infinite]" style="height: 80%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_0.7s_ease-in-out_infinite]" style="height: 90%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_1.1s_ease-in-out_infinite]" style="height: 65%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Node 03: Xperia 1 V -->
+            <div class="p-2 sm:p-2.5 rounded-[6px] bg-surface-elevated border border-border-milled flex items-center justify-between gap-2 sm:gap-3 text-xs">
+              <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                <span class="font-mono text-[10px] font-bold text-text-dim bg-surface-panel border border-border-milled px-1.5 py-0.5 rounded-[3px] shrink-0">
+                  P-02
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="font-sans font-semibold text-bone truncate">Sony Xperia 1 V</div>
+                  <div class="font-mono text-[10px] text-text-dim truncate">Resampler Synced</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span id="drift-node-3" class="font-mono text-xs text-sync-green font-semibold w-12 text-right">-0.1ms</span>
+                <!-- Mini VU Meter -->
+                <div class="flex items-end gap-0.5 h-4 w-10 sm:w-12 bg-surface-recessed p-0.5 rounded-[2px] border border-border-milled">
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_0.85s_ease-in-out_infinite]" style="height: 75%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_1.05s_ease-in-out_infinite]" style="height: 95%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_0.75s_ease-in-out_infinite]" style="height: 70%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Node 04: Nothing Phone (2) -->
+            <div class="p-2 sm:p-2.5 rounded-[6px] bg-surface-elevated border border-border-milled flex items-center justify-between gap-2 sm:gap-3 text-xs">
+              <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+                <span class="font-mono text-[10px] font-bold text-text-dim bg-surface-panel border border-border-milled px-1.5 py-0.5 rounded-[3px] shrink-0">
+                  P-03
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="font-sans font-semibold text-bone truncate">Nothing Phone (2)</div>
+                  <div class="font-mono text-[10px] text-text-dim truncate">Resampler Synced</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span id="drift-node-4" class="font-mono text-xs text-sync-green font-semibold w-12 text-right">+0.3ms</span>
+                <!-- Mini VU Meter -->
+                <div class="flex items-end gap-0.5 h-4 w-10 sm:w-12 bg-surface-recessed p-0.5 rounded-[2px] border border-border-milled">
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_0.95s_ease-in-out_infinite]" style="height: 85%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-sync-green rounded-[1px] animate-[pulse_0.65s_ease-in-out_infinite]" style="height: 85%;"></div>
+                  <div class="w-1.5 sm:w-2 bg-signal-orange rounded-[1px] animate-[pulse_1.2s_ease-in-out_infinite]" style="height: 55%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Console Control Dock: Interactive Drift Trigger -->
+          <div class="pt-4 border-t border-border-milled flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-xs font-mono text-text-dim">
+              <span class="w-2 h-2 rounded-full bg-sync-green"></span>
+              <span id="radar-status">ACOUSTIC LOCK: 0.2ms DEVIATION</span>
+            </div>
+
+            <button
+              id="simulate-drift-btn"
+              type="button"
+              class="tactile-btn-secondary inline-flex items-center gap-2 px-3.5 py-2 text-xs uppercase tracking-wider font-mono font-semibold text-bone hover:border-sync-amber/60 hover:text-sync-amber active:translate-y-[1.5px] transition-all cursor-pointer"
+            >
+              <RefreshCw id="simulate-icon" class="w-3.5 h-3.5" />
+              <span>Simulate Network Jitter</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Client-side Interactive Simulator Script for Hero Console -->
+<script>
+  function setupHeroConsole() {
+    const btn = document.getElementById('simulate-drift-btn');
+    const beacon = document.getElementById('console-beacon');
+    const beaconText = document.getElementById('beacon-text');
+    const radarStatus = document.getElementById('radar-status');
+    const node2 = document.getElementById('drift-node-2');
+    const node3 = document.getElementById('drift-node-3');
+    const node4 = document.getElementById('drift-node-4');
+    const icon = document.getElementById('simulate-icon');
+
+    if (!btn || !beacon || !beaconText || !radarStatus || !node2 || !node3 || !node4) return;
+
+    let isSimulating = false;
+
+    btn.addEventListener('click', () => {
+      if (isSimulating) return;
+      isSimulating = true;
+
+      // 1. Inject simulated jitter state (Amber warning)
+      if (icon) icon.classList.add('animate-spin');
+      beacon.className = 'font-mono text-[11px] font-semibold text-[#FFB800] bg-[#FFB800]/10 border border-[#FFB800]/30 px-2 py-0.5 rounded-[3px] flex items-center gap-1.5';
+      beaconText.textContent = 'DRIFT DETECTED · +4.8ms';
+      radarStatus.textContent = 'RESAMPLER ENGAGED: SLEWING ±0.08%';
+      radarStatus.className = 'text-xs font-mono text-[#FFB800]';
+
+      node2.textContent = '+4.8ms';
+      node2.className = 'font-mono text-xs text-[#FFB800] font-semibold w-12 text-right';
+      node3.textContent = '-3.6ms';
+      node3.className = 'font-mono text-xs text-[#FFB800] font-semibold w-12 text-right';
+      node4.textContent = '+5.2ms';
+      node4.className = 'font-mono text-xs text-[#FFB800] font-semibold w-12 text-right';
+
+      // 2. Micro-step down after 600ms
+      setTimeout(() => {
+        node2.textContent = '+1.4ms';
+        node3.textContent = '-0.8ms';
+        node4.textContent = '+1.1ms';
+        beaconText.textContent = 'CONVERGING · +1.1ms';
+      }, 600);
+
+      // 3. Snap back to acoustic sync lock (<0.5ms) after 1400ms
+      setTimeout(() => {
+        if (icon) icon.classList.remove('animate-spin');
+        beacon.className = 'font-mono text-[11px] font-semibold text-sync-green bg-[#00E599]/10 border border-[#00E599]/30 px-2 py-0.5 rounded-[3px] flex items-center gap-1.5';
+        beaconText.textContent = 'LOCKED · 0.2ms';
+        radarStatus.textContent = 'ACOUSTIC LOCK: 0.2ms DEVIATION';
+        radarStatus.className = 'text-xs font-mono text-text-dim';
+
+        node2.textContent = '+0.2ms';
+        node2.className = 'font-mono text-xs text-sync-green font-semibold w-12 text-right';
+        node3.textContent = '-0.1ms';
+        node3.className = 'font-mono text-xs text-sync-green font-semibold w-12 text-right';
+        node4.textContent = '+0.3ms';
+        node4.className = 'font-mono text-xs text-sync-green font-semibold w-12 text-right';
+
+        isSimulating = false;
+      }, 1400);
+    });
+  }
+
+  // Initialize on load and on Astro page swaps if view transitions are used
+  document.addEventListener('DOMContentLoaded', setupHeroConsole);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setupHeroConsole();
+  }
+</script>

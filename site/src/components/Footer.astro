@@ -1,0 +1,82 @@
+---
+import GithubIcon from './icons/GithubIcon.astro';
+---
+
+<footer class="w-full bg-[#07080A] border-t border-border-milled py-12 text-xs font-mono text-text-dim">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+      
+      <!-- Hardware Identity -->
+      <div class="space-y-3">
+        <div class="font-display font-bold text-sm tracking-tight text-bone uppercase">
+          ROOMBEAT // CHASSIS v1.0
+        </div>
+        <p class="font-sans text-xs text-text-muted leading-relaxed">
+          Open-source local network acoustic synchronization engine for Android. Built with Kotlin, Jetpack Compose, NDK C++ and Oboe.
+        </p>
+        <div class="text-[11px] text-text-dim">
+          Copyright &copy; 2026 WantedChip. Released under MIT License.
+        </div>
+      </div>
+
+      <!-- Protocol Specifications -->
+      <div class="space-y-2">
+        <div class="font-sans font-bold text-xs uppercase tracking-wider text-text-muted">
+          Specifications
+        </div>
+        <ul class="space-y-1.5 text-text-dim text-[11px]">
+          <li>Audio: 48,000 Hz / Stereo / 16-bit PCM</li>
+          <li>Codec: Opus 20ms frames (128 kbps)</li>
+          <li>Transport: UDP Multicast (239.255.42.99)</li>
+          <li>Sync Clock: CLOCK_MONOTONIC NTP probe</li>
+        </ul>
+      </div>
+
+      <!-- Compatibility & Platform -->
+      <div class="space-y-2">
+        <div class="font-sans font-bold text-xs uppercase tracking-wider text-text-muted">
+          Compatibility
+        </div>
+        <ul class="space-y-1.5 text-text-dim text-[11px]">
+          <li>Min SDK: Android 11 (API 30)</li>
+          <li>Target SDK: Android 15 (API 35)</li>
+          <li>Local Network: API 37 forward-ready</li>
+          <li>Required: Wi-Fi or Mobile Hotspot</li>
+        </ul>
+      </div>
+
+      <!-- Security & Privacy Statement -->
+      <div class="space-y-2">
+        <div class="font-sans font-bold text-xs uppercase tracking-wider text-text-muted">
+          Security & Privacy
+        </div>
+        <p class="font-sans text-xs text-text-dim leading-relaxed">
+          100% offline local traffic only. No analytics telemetry, no remote servers, no account registration. The host device acts as the local broadcast server.
+        </p>
+        <div>
+          <a
+            href="https://github.com/WantedChip/RoomBeat"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-text-muted hover:text-bone transition-colors"
+          >
+            <GithubIcon class="w-3.5 h-3.5" />
+            <span>GitHub Repository</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Machine Strip -->
+    <div class="pt-6 border-t border-border-milled/50 flex flex-wrap items-center justify-between gap-4 text-[11px] text-text-dim">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-sync-green"></span>
+        <span>STATUS: ALL LOCAL SYSTEMS NOMINAL</span>
+      </div>
+      <div>
+        <span>BUILD: v0.9.0-ASTRO-STATIC</span>
+      </div>
+    </div>
+  </div>
+</footer>
