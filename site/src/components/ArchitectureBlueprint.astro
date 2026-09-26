@@ -10,6 +10,11 @@ import {
   ArrowRight,
   ShieldCheck,
   Zap,
+  Terminal,
+  Copy,
+  Play,
+  Pause,
+  SkipForward,
 } from 'lucide-astro';
 ---
 
@@ -49,265 +54,449 @@ import {
             RACK SCHEMATIC: RB-CORE-V1 // 4-STAGE PIPELINE
           </span>
         </div>
-        <div class="flex items-center gap-3 font-mono text-[11px] text-text-dim">
+        <div class="flex items-center gap-4 font-mono text-[11px] text-text-dim">
           <span class="hidden sm:inline-block">CLOCK: CLOCK_MONOTONIC_RAW</span>
           <span class="inline-flex items-center gap-1.5 text-signal-orange font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-signal-orange"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-signal-orange animate-pulse"></span>
             LATENCY BUDGET: 60.0ms
           </span>
         </div>
       </div>
 
-      <!-- 4-Step Interactive Pipeline Grid -->
-      <div class="p-4 sm:p-6 lg:p-8 bg-[#101217]/50">
+      <!-- 4-Stage Vertical Tracing Beam Conduit Container -->
+      <div class="p-4 sm:p-6 lg:p-8 bg-[#101217]/50 relative" id="architecture-blueprint-container">
         
-        <!-- Signal Flow Header Indicator -->
-        <div class="hidden lg:flex items-center justify-between px-2 mb-6 font-mono text-[11px] text-text-dim uppercase tracking-wider border-b border-border-milled/60 pb-3">
-          <span>01. Ingest Stage</span>
-          <span class="flex items-center gap-1 text-sync-green">PCM Dataflow <ArrowRight class="w-3 h-3" /></span>
-          <span>02. Compression &amp; Sync</span>
-          <span class="flex items-center gap-1 text-sync-green">Opus Payload <ArrowRight class="w-3 h-3" /></span>
-          <span>03. Transport Plane</span>
-          <span class="flex items-center gap-1 text-sync-green">UDP Multicast <ArrowRight class="w-3 h-3" /></span>
-          <span>04. Acoustic Output</span>
-        </div>
-
-        <!-- 4 Step Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" id="blueprint-steps-container">
+        <div class="relative flex gap-4 sm:gap-8 lg:gap-12">
           
-          <!-- STEP 01: CAPTURE -->
-          <div 
-            class="blueprint-step-card hardware-card rounded-[6px] p-5 border border-border-milled relative transition-all duration-300 hover:border-sync-green/60 cursor-pointer group"
-            data-step="1"
-            tabindex="0"
-            role="button"
-            aria-label="Inspect Step 01: High-Res Audio Ingest"
-          >
-            <div class="flex items-center justify-between mb-4">
-              <span class="font-mono text-xs font-bold text-signal-orange px-1.5 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
-                STAGE 01
-              </span>
-              <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
-                <Radio class="w-3.5 h-3.5" />
-              </div>
+          <!-- Aceternity Tracing Beam Vertical Conduit Spine -->
+          <div class="w-8 sm:w-12 shrink-0 relative flex flex-col justify-between py-6 items-center">
+            <!-- Full Height Background & Animated SVG Tracing Beam -->
+            <svg id="tracing-beam-svg" class="absolute inset-0 w-full h-full pointer-events-none overflow-visible" aria-hidden="true">
+              <defs>
+                <linearGradient id="tracing-beam-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#FF5500" stop-opacity="0.9" />
+                  <stop offset="50%" stop-color="#00E599" stop-opacity="1" />
+                  <stop offset="100%" stop-color="#00D2FF" stop-opacity="0.9" />
+                </linearGradient>
+                <filter id="beam-glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="3.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <!-- Milled Conduit Track -->
+              <path id="tracing-beam-track" stroke="#262A35" stroke-width="2.5" stroke-linecap="round" fill="none" />
+              <!-- Active Scrubbed Glowing Beam -->
+              <path id="tracing-beam-path" stroke="url(#tracing-beam-grad)" stroke-width="3" stroke-linecap="round" fill="none" filter="url(#beam-glow)" />
+              <!-- Traveling Signal Head Bead -->
+              <circle id="tracing-beam-head" r="5" fill="#00E599" filter="url(#beam-glow)" opacity="0" />
+            </svg>
+
+            <!-- 4 Stage Port Nodes Along Beam -->
+            <div class="tracing-stage-port w-8 h-8 rounded-full bg-[#07080A] border border-[#262A35] flex items-center justify-center font-mono text-[10px] font-bold text-text-dim relative z-10 transition-all duration-300" data-stage="1">
+              <span class="stage-num">01</span>
+              <span class="port-led absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-signal-orange/60"></span>
             </div>
 
-            <h3 class="font-display font-bold text-bone text-base tracking-tight mb-1 group-hover:text-white">
-              High-Res Capture
-            </h3>
-            <p class="font-mono text-[11px] text-sync-green font-medium mb-3">
-              Zero-Latency PCM Ingest
-            </p>
-
-            <p class="font-sans text-xs text-text-muted leading-relaxed mb-4">
-              Captures audio via Android 14+ <code class="text-bone text-[11px]">AudioPlaybackCapture</code>, local Storage Access Framework, or Spotify App Remote pre-warmed socket.
-            </p>
-
-            <!-- Recessed Telemetry Box -->
-            <div class="recessed-cavity rounded-[4px] p-3 font-mono text-[10px] space-y-1.5 text-text-dim">
-              <div class="flex justify-between">
-                <span>FORMAT</span>
-                <span class="text-bone font-semibold">48,000 Hz / 16-Bit</span>
-              </div>
-              <div class="flex justify-between">
-                <span>CHANNELS</span>
-                <span class="text-bone font-semibold">Stereo (2-Ch)</span>
-              </div>
-              <div class="flex justify-between">
-                <span>BITRATE</span>
-                <span class="text-sync-green font-semibold">1,536 kbps PCM</span>
-              </div>
+            <div class="tracing-stage-port w-8 h-8 rounded-full bg-[#07080A] border border-[#262A35] flex items-center justify-center font-mono text-[10px] font-bold text-text-dim relative z-10 transition-all duration-300" data-stage="2">
+              <span class="stage-num">02</span>
+              <span class="port-led absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-signal-orange/60"></span>
             </div>
+
+            <div class="tracing-stage-port w-8 h-8 rounded-full bg-[#07080A] border border-[#262A35] flex items-center justify-center font-mono text-[10px] font-bold text-text-dim relative z-10 transition-all duration-300" data-stage="3">
+              <span class="stage-num">03</span>
+              <span class="port-led absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-signal-orange/60"></span>
+            </div>
+
+            <div class="tracing-stage-port w-8 h-8 rounded-full bg-[#07080A] border border-[#262A35] flex items-center justify-center font-mono text-[10px] font-bold text-text-dim relative z-10 transition-all duration-300" data-stage="4">
+              <span class="stage-num">04</span>
+              <span class="port-led absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-sync-green/60"></span>
+            </div>
+          </div>
+
+          <!-- 4 Stage Detail Cards Stack -->
+          <div class="flex-1 space-y-6">
             
-            <div class="mt-3 flex items-center justify-between text-[10px] font-mono text-text-dim pt-2 border-t border-border-milled/50">
-              <span>STATUS: CAPTURING</span>
-              <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
-            </div>
-          </div>
+            <!-- STAGE 01: CAPTURE -->
+            <div 
+              class="blueprint-stage-card hardware-card rounded-[8px] p-5 sm:p-6 border border-border-milled transition-all duration-300 hover:border-sync-green/50 cursor-pointer group is-active"
+              data-stage="1"
+              tabindex="0"
+              role="button"
+              aria-label="Inspect Stage 01: High-Res Audio Ingest"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs font-bold text-signal-orange px-2 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
+                    STAGE 01
+                  </span>
+                  <span class="font-mono text-[11px] text-text-dim uppercase tracking-wider">
+                    OS INGEST BUS // ZERO-COPY DMA
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-[11px] text-sync-green font-semibold">1,536 kbps PCM</span>
+                  <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
+                    <Radio class="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </div>
 
-          <!-- STEP 02: TIMESTAMPED ENCODE -->
-          <div 
-            class="blueprint-step-card hardware-card rounded-[6px] p-5 border border-border-milled relative transition-all duration-300 hover:border-sync-green/60 cursor-pointer group"
-            data-step="2"
-            tabindex="0"
-            role="button"
-            aria-label="Inspect Step 02: Native Opus Encode and Timestamping"
-          >
-            <div class="flex items-center justify-between mb-4">
-              <span class="font-mono text-xs font-bold text-signal-orange px-1.5 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
-                STAGE 02
-              </span>
-              <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
-                <Cpu class="w-3.5 h-3.5" />
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-7">
+                  <h3 class="font-display font-bold text-bone text-lg tracking-tight mb-1 group-hover:text-white">
+                    High-Res Audio Capture &amp; SPSC Queue
+                  </h3>
+                  <p class="font-sans text-xs sm:text-sm text-text-muted leading-relaxed mb-3">
+                    Captures system audio via Android 14+ <code class="text-bone text-[11px] font-mono">AudioPlaybackCaptureConfiguration</code> (MediaProjection foreground service), local Storage Access Framework, or pre-warmed Spotify App Remote socket.
+                  </p>
+                  <p class="font-sans text-xs text-text-dim leading-relaxed">
+                    Raw PCM data is fed into a lock-free Single-Producer Single-Consumer (SPSC) ring buffer with CPU affinity pinned to high-efficiency core #6, preventing audio thread preemption.
+                  </p>
+                </div>
+
+                <!-- Recessed Telemetry Box -->
+                <div class="lg:col-span-5 recessed-cavity rounded-[6px] p-3.5 font-mono text-[11px] space-y-2 text-text-dim">
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">SAMPLE FORMAT:</span>
+                    <span class="text-bone font-semibold">48,000 Hz / 16-Bit Signed</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">CHANNELS:</span>
+                    <span class="text-bone font-semibold">Stereo (2-Ch Interleaved)</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">RING BUFFER:</span>
+                    <span class="text-sync-green font-semibold">Lock-Free SPSC (0 Copy)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-text-muted">INGEST LATENCY:</span>
+                    <span class="text-sync-green font-semibold">&lt; 1.85 ms</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <h3 class="font-display font-bold text-bone text-base tracking-tight mb-1 group-hover:text-white">
-              Opus &amp; Time-Tag
-            </h3>
-            <p class="font-mono text-[11px] text-sync-green font-medium mb-3">
-              C++ NDK 20ms Framing
-            </p>
-
-            <p class="font-sans text-xs text-text-muted leading-relaxed mb-4">
-              Native C++ <code class="text-bone text-[11px]">libopus</code> compresses 960 samples into 20ms frames and stamps monotonic clock presentation targets (<code class="text-bone text-[11px]">T_target</code>).
-            </p>
-
-            <!-- Recessed Telemetry Box -->
-            <div class="recessed-cavity rounded-[4px] p-3 font-mono text-[10px] space-y-1.5 text-text-dim">
-              <div class="flex justify-between">
-                <span>FRAME SIZE</span>
-                <span class="text-bone font-semibold">20.0 ms (960 spl)</span>
+            <!-- STAGE 02: ENCODE & TIME-TAG -->
+            <div 
+              class="blueprint-stage-card hardware-card rounded-[8px] p-5 sm:p-6 border border-border-milled transition-all duration-300 hover:border-sync-green/50 cursor-pointer group"
+              data-stage="2"
+              tabindex="0"
+              role="button"
+              aria-label="Inspect Stage 02: Native Opus Compression and Monotonic Time-Tagging"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs font-bold text-signal-orange px-2 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
+                    STAGE 02
+                  </span>
+                  <span class="font-mono text-[11px] text-text-dim uppercase tracking-wider">
+                    C++20 NDK ENGINE // 20ms OPUS FRAMING
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-[11px] text-sync-green font-semibold">960 Samples / Frame</span>
+                  <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
+                    <Cpu class="w-3.5 h-3.5" />
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-between">
-                <span>ENCODER</span>
-                <span class="text-bone font-semibold">C++20 NDK Opus</span>
-              </div>
-              <div class="flex justify-between">
-                <span>CLOCK TAG</span>
-                <span class="text-sync-green font-semibold">T_target (μs Res)</span>
-              </div>
-            </div>
 
-            <div class="mt-3 flex items-center justify-between text-[10px] font-mono text-text-dim pt-2 border-t border-border-milled/50">
-              <span>LATENCY: &lt;1.2ms</span>
-              <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
-            </div>
-          </div>
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-7">
+                  <h3 class="font-display font-bold text-bone text-lg tracking-tight mb-1 group-hover:text-white">
+                    Native Opus Compression &amp; Monotonic Time-Tagging
+                  </h3>
+                  <p class="font-sans text-xs sm:text-sm text-text-muted leading-relaxed mb-3">
+                    Native C++ <code class="text-bone text-[11px] font-mono">libopus 1.5.2</code> compresses 960 stereo samples into 20ms frames at 128 kbps VBR. Zero heap allocations occur in the hot-path audio thread.
+                  </p>
+                  <p class="font-sans text-xs text-text-dim leading-relaxed">
+                    Attaches a 24-byte RoomBeat packet header: 3-byte magic signature <code class="text-sync-green font-mono">0x52, 0x42, 0x01</code>, sequence counter, and nanosecond target presentation timestamp <code class="text-bone font-mono">T_target = CLOCK_MONOTONIC_RAW + 60ms</code>.
+                  </p>
+                </div>
 
-          <!-- STEP 03: UDP MULTICAST BROADCAST -->
-          <div 
-            class="blueprint-step-card hardware-card rounded-[6px] p-5 border border-border-milled relative transition-all duration-300 hover:border-sync-green/60 cursor-pointer group"
-            data-step="3"
-            tabindex="0"
-            role="button"
-            aria-label="Inspect Step 03: Hardware UDP Multicast Broadcast"
-          >
-            <div class="flex items-center justify-between mb-4">
-              <span class="font-mono text-xs font-bold text-signal-orange px-1.5 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
-                STAGE 03
-              </span>
-              <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
-                <Wifi class="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            <h3 class="font-display font-bold text-bone text-base tracking-tight mb-1 group-hover:text-white">
-              UDP Multicast
-            </h3>
-            <p class="font-mono text-[11px] text-sync-green font-medium mb-3">
-              O(1) Bandwidth Distribution
-            </p>
-
-            <p class="font-sans text-xs text-text-muted leading-relaxed mb-4">
-              Emits datagrams to <code class="text-bone text-[11px]">239.255.42.99:4242</code>. Holding Android <code class="text-bone text-[11px]">MulticastLock</code> ensures 1 packet reaches 2 or 50 listeners with zero cloud hops.
-            </p>
-
-            <!-- Recessed Telemetry Box -->
-            <div class="recessed-cavity rounded-[4px] p-3 font-mono text-[10px] space-y-1.5 text-text-dim">
-              <div class="flex justify-between">
-                <span>MULTICAST IP</span>
-                <span class="text-bone font-semibold">239.255.42.99</span>
-              </div>
-              <div class="flex justify-between">
-                <span>PORT</span>
-                <span class="text-bone font-semibold">4242 UDP</span>
-              </div>
-              <div class="flex justify-between">
-                <span>COMPLEXITY</span>
-                <span class="text-sync-green font-semibold">O(1) Bandwidth</span>
+                <!-- Recessed Telemetry Box -->
+                <div class="lg:col-span-5 recessed-cavity rounded-[6px] p-3.5 font-mono text-[11px] space-y-2 text-text-dim">
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">FRAME DURATION:</span>
+                    <span class="text-bone font-semibold">20.00 ms (50.0 Hz)</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">OPUS BITRATE:</span>
+                    <span class="text-bone font-semibold">128 kbps VBR (Audio Mode)</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">MAGIC HEADER:</span>
+                    <span class="text-sync-green font-semibold">0x52, 0x42, 0x01 (RB1)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-text-muted">ENCODE DURATION:</span>
+                    <span class="text-sync-green font-semibold">&lt; 0.88 ms (C++20 NDK)</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="mt-3 flex items-center justify-between text-[10px] font-mono text-text-dim pt-2 border-t border-border-milled/50">
-              <span>CADENCE: 50.0 Hz</span>
-              <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
-            </div>
-          </div>
+            <!-- STAGE 03: HARDWARE UDP MULTICAST -->
+            <div 
+              class="blueprint-stage-card hardware-card rounded-[8px] p-5 sm:p-6 border border-border-milled transition-all duration-300 hover:border-sync-green/50 cursor-pointer group"
+              data-stage="3"
+              tabindex="0"
+              role="button"
+              aria-label="Inspect Stage 03: Hardware UDP Multicast Broadcast"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs font-bold text-signal-orange px-2 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
+                    STAGE 03
+                  </span>
+                  <span class="font-mono text-[11px] text-text-dim uppercase tracking-wider">
+                    TRANSPORT PLANE // O(1) MULTICAST
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-[11px] text-sync-green font-semibold">239.255.42.99:4242</span>
+                  <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
+                    <Wifi class="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </div>
 
-          <!-- STEP 04: SCHEDULED HARDWARE PLAYBACK -->
-          <div 
-            class="blueprint-step-card hardware-card rounded-[6px] p-5 border border-border-milled relative transition-all duration-300 hover:border-sync-green/60 cursor-pointer group"
-            data-step="4"
-            tabindex="0"
-            role="button"
-            aria-label="Inspect Step 04: Hardware Scheduled Playback"
-          >
-            <div class="flex items-center justify-between mb-4">
-              <span class="font-mono text-xs font-bold text-signal-orange px-1.5 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
-                STAGE 04
-              </span>
-              <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
-                <Volume2 class="w-3.5 h-3.5" />
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-7">
+                  <h3 class="font-display font-bold text-bone text-lg tracking-tight mb-1 group-hover:text-white">
+                    Hardware UDP Multicast &amp; MulticastLock
+                  </h3>
+                  <p class="font-sans text-xs sm:text-sm text-text-muted leading-relaxed mb-3">
+                    Emits datagrams directly to multicast group <code class="text-bone text-[11px] font-mono">239.255.42.99:4242</code>. Holding Android's kernel <code class="text-bone text-[11px] font-mono">WifiManager.MulticastLock</code> ensures unfiltered packet reception on all listening nodes.
+                  </p>
+                  <p class="font-sans text-xs text-text-dim leading-relaxed">
+                    O(1) bandwidth complexity: a single 336-byte datagram reaches 2 or 64 phones simultaneously over local Wi-Fi or portable hotspot with zero cloud relay hops.
+                  </p>
+                </div>
+
+                <!-- Recessed Telemetry Box -->
+                <div class="lg:col-span-5 recessed-cavity rounded-[6px] p-3.5 font-mono text-[11px] space-y-2 text-text-dim">
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">DATAGRAM SIZE:</span>
+                    <span class="text-bone font-semibold">336 Bytes (24B Hdr + 312B Pld)</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">BURST CADENCE:</span>
+                    <span class="text-bone font-semibold">50.0 Hz (Every 20.0ms)</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">FANOUT SCALING:</span>
+                    <span class="text-sync-green font-semibold">O(1) Unlimited Peers</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-text-muted">CLOUD DEPENDENCY:</span>
+                    <span class="text-sync-green font-semibold">0 Cloud Hops (100% LAN)</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <h3 class="font-display font-bold text-bone text-base tracking-tight mb-1 group-hover:text-white">
-              Hardware Playback
-            </h3>
-            <p class="font-mono text-[11px] text-sync-green font-medium mb-3">
-              Oboe MMAP &amp; Resampler
-            </p>
-
-            <p class="font-sans text-xs text-text-muted leading-relaxed mb-4">
-              Peer listener nodes feed a jitter buffer with PLC into Oboe AAudio MMAP. Continuous fractional resampling (±0.05%) eliminates clock drift.
-            </p>
-
-            <!-- Recessed Telemetry Box -->
-            <div class="recessed-cavity rounded-[4px] p-3 font-mono text-[10px] space-y-1.5 text-text-dim">
-              <div class="flex justify-between">
-                <span>AUDIO API</span>
-                <span class="text-bone font-semibold">Oboe (AAudio MMAP)</span>
+            <!-- STAGE 04: PLAYBACK & DRIFT RESAMPLER -->
+            <div 
+              class="blueprint-stage-card hardware-card rounded-[8px] p-5 sm:p-6 border border-border-milled transition-all duration-300 hover:border-sync-green/50 cursor-pointer group"
+              data-stage="4"
+              tabindex="0"
+              role="button"
+              aria-label="Inspect Stage 04: Scheduled Hardware Playback and Fractional Resampler"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs font-bold text-signal-orange px-2 py-0.5 rounded-[3px] bg-signal-orange/10 border border-signal-orange/30">
+                    STAGE 04
+                  </span>
+                  <span class="font-mono text-[11px] text-text-dim uppercase tracking-wider">
+                    ACOUSTIC SINK // OBOE MMAP &amp; RESAMPLER
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-[11px] text-sync-green font-semibold">&lt; 0.5ms Phase Lock</span>
+                  <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-text-muted group-hover:text-sync-green transition-colors">
+                    <Volume2 class="w-3.5 h-3.5" />
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-between">
-                <span>PHASE SYNC</span>
-                <span class="text-sync-green font-semibold">&lt;0.5ms Locked</span>
-              </div>
-              <div class="flex justify-between">
-                <span>CONCEALMENT</span>
-                <span class="text-bone font-semibold">Opus PLC + Resamp</span>
+
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-7">
+                  <h3 class="font-display font-bold text-bone text-lg tracking-tight mb-1 group-hover:text-white">
+                    Hardware-Scheduled Playback &amp; Fractional Resampler
+                  </h3>
+                  <p class="font-sans text-xs sm:text-sm text-text-muted leading-relaxed mb-3">
+                    Peer listener nodes queue frames into a 60ms scheduled jitter buffer with Opus Packet Loss Concealment (PLC). Audio renders via Google Oboe AAudio Exclusive MMAP DMA buffers.
+                  </p>
+                  <p class="font-sans text-xs text-text-dim leading-relaxed">
+                    A continuous Catmull-Rom fractional resampler applies subtle speed micro-adjustments (<code class="text-bone font-mono">±0.05%</code>) against the master clock, locking phase alignment down to <strong class="text-sync-green">&lt;0.5ms</strong> with zero acoustic comb filtering.
+                  </p>
+                </div>
+
+                <!-- Recessed Telemetry Box -->
+                <div class="lg:col-span-5 recessed-cavity rounded-[6px] p-3.5 font-mono text-[11px] space-y-2 text-text-dim">
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">AUDIO API:</span>
+                    <span class="text-bone font-semibold">Oboe AAudio (MMAP Exclusive)</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">JITTER BUFFER:</span>
+                    <span class="text-bone font-semibold">60ms Headroom + Opus PLC</span>
+                  </div>
+                  <div class="flex justify-between border-b border-border-milled/50 pb-1">
+                    <span class="text-text-muted">RESAMPLER SLEW:</span>
+                    <span class="text-sync-green font-semibold">±0.05% (Pitch-Neutral)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-text-muted">PHASE DRIFT:</span>
+                    <span class="text-sync-green font-semibold">&lt; 0.5 ms (No Chorus Echo)</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="mt-3 flex items-center justify-between text-[10px] font-mono text-text-dim pt-2 border-t border-border-milled/50">
-              <span>OUTPUT: 0ms ECHO</span>
-              <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
-            </div>
           </div>
 
         </div>
 
       </div>
 
-      <!-- Live Inspection Terminal Readout (Interactive Drill-Down) -->
-      <div class="bg-[#090A0D] p-5 sm:p-6 border-t border-border-milled">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
-            <span class="font-mono text-xs uppercase tracking-wider text-bone font-bold" id="diagnostic-stage-label">
-              DIAGNOSTIC INSPECTOR: STAGE 01 // CAPTURE SUBSYSTEM
+      <!-- ================= INTERACTIVE TERMINAL BAY: LIVE 20ms OPUS HEX DUMP ================= -->
+      <div class="bg-[#090A0D] p-4 sm:p-6 border-t border-border-milled">
+        
+        <!-- Terminal Header Strip -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span id="stream-status-led" class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
+            <span class="font-mono text-xs uppercase tracking-wider text-bone font-bold">
+              BAY 05: OPUS-HEX-DISSECTOR // 20ms PACKET ANALYZER
+            </span>
+            <span id="stream-status-text" class="hidden sm:inline-block font-mono text-[10px] text-sync-green bg-sync-green/10 border border-sync-green/30 px-1.5 py-0.5 rounded-[2px]">
+              50.0 Hz RX (20ms)
             </span>
           </div>
-          <span class="font-mono text-[11px] text-text-dim">
-            CLICK ANY STAGE ABOVE TO INSPECT HOT-PATH REGISTERS
-          </span>
+
+          <!-- Controls & Mode Selector -->
+          <div class="flex items-center gap-2">
+            <!-- Tabs -->
+            <div class="flex items-center gap-1 bg-[#07080A] p-0.5 rounded-[4px] border border-border-milled text-[11px] font-mono">
+              <button
+                type="button"
+                id="tab-hex-stream"
+                class="px-2.5 py-1 rounded-[3px] bg-surface-elevated text-bone font-medium transition-colors border border-border-milled"
+              >
+                HEX PACKET STREAM
+              </button>
+              <button
+                type="button"
+                id="tab-stage-regs"
+                class="px-2.5 py-1 rounded-[3px] text-text-dim hover:text-bone transition-colors"
+              >
+                STAGE REGISTERS
+              </button>
+            </div>
+
+            <!-- Next Packet Trigger -->
+            <button
+              type="button"
+              id="btn-next-packet"
+              class="tactile-btn-secondary px-2.5 py-1 text-[11px] font-mono flex items-center gap-1 hover:border-sync-green/50"
+              title="Inspect Next 20ms Packet Frame"
+            >
+              <SkipForward class="w-3 h-3 text-sync-green" />
+              <span class="hidden sm:inline">NEXT</span>
+            </button>
+
+            <!-- Stream Pause / Resume -->
+            <button
+              type="button"
+              id="btn-toggle-stream"
+              class="tactile-btn-secondary px-2.5 py-1 text-[11px] font-mono flex items-center gap-1"
+              title="Pause or Resume Live Packet Ingestion"
+            >
+              PAUSE ||
+            </button>
+
+            <!-- Copy Hex Button -->
+            <button
+              type="button"
+              id="btn-copy-hex"
+              class="tactile-btn-secondary px-2.5 py-1 text-[11px] font-mono flex items-center gap-1"
+              title="Copy Packet Hex to Clipboard"
+            >
+              <Copy class="w-3 h-3 text-text-muted" />
+              <span class="hidden sm:inline">COPY HEX</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Terminal Output Window -->
-        <div class="recessed-cavity rounded-[6px] p-4 font-mono text-xs text-text-muted space-y-2 overflow-x-auto" id="diagnostic-terminal-body">
-          <div class="flex items-center gap-2 text-sync-green">
-            <span class="text-text-dim">&gt;</span>
-            <span id="diagnostic-line-1">AUDIO_CAPTURE: AudioPlaybackCaptureConfiguration initialized on UID target [MediaProjection-Service].</span>
+        <!-- Terminal View 1: Live Hex Stream & Field Dissector Grid -->
+        <div id="view-hex-stream" class="space-y-4">
+          
+          <!-- Monospace Hex Window (React Bits Decrypted Text Effect) -->
+          <div class="recessed-cavity rounded-[6px] p-4 font-mono text-xs overflow-x-auto border border-border-milled relative">
+            <div class="flex items-center justify-between text-[11px] text-text-dim pb-2 mb-2 border-b border-border-milled/60 font-mono">
+              <div class="flex items-center gap-4">
+                <span>DATAGRAM: 336 BYTES</span>
+                <span>CADENCE: 20.0ms</span>
+                <span class="text-sync-green">SEQ: <span id="packet-meta-seq">#102,220</span></span>
+              </div>
+              <div class="hidden sm:flex items-center gap-2">
+                <span>T_TARGET:</span>
+                <span id="packet-meta-time" class="text-sync-amber">1737458000.060000s</span>
+              </div>
+            </div>
+
+            <!-- Hex Rows Render Target -->
+            <div id="terminal-hex-body" class="space-y-1 text-xs">
+              <!-- Rendered via architectureBlueprint.js with live decryption effect -->
+            </div>
           </div>
-          <div class="text-text-muted">
-            <span class="text-text-dim">&gt;</span>
-            <span id="diagnostic-line-2">PCM_RING_BUFFER: Lock-free SPSC circular queue active · 48000Hz · 16-bit signed interleaved stereo.</span>
+
+          <!-- Interactive Field Inspector Breakdown Card -->
+          <div id="field-inspector-card" class="bg-surface-elevated rounded-[6px] p-4 border border-border-milled transition-all duration-200">
+            <div class="flex items-center justify-between border-b border-border-milled/70 pb-2 mb-2">
+              <span class="font-mono text-xs font-bold text-bone flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
+                MAGIC HEADER [0x52, 0x42, 0x01]
+              </span>
+              <span class="font-mono text-[10px] text-sync-green bg-sync-green/10 border border-sync-green/30 px-1.5 py-0.5 rounded-[2px]">FIELD ACTIVE</span>
+            </div>
+            <p class="font-sans text-xs text-text-muted leading-relaxed mb-2">
+              RoomBeat Datagram Protocol signature ("RB\x01"). Evaluated in 3 CPU instructions; foreign UDP broadcasts are instantly dropped at socket ingress.
+            </p>
+            <div class="font-mono text-[11px] text-text-dim bg-surface-recessed p-2 rounded border border-border-milled/60">
+              Size: 3 Bytes · Value: ASCII "RB1" · Protocol v1 · Target: 239.255.42.99:4242
+            </div>
           </div>
-          <div class="text-text-dim">
-            <span class="text-text-dim">&gt;</span>
-            <span id="diagnostic-line-3">DISPATCH_METRICS: Ingest buffer latency 1.83ms · 0 dropped samples · CPU thread affinity pinned to core #6.</span>
+
+        </div>
+
+        <!-- Terminal View 2: Stage Hot-Path Registers (Initially Hidden) -->
+        <div id="view-stage-regs" class="hidden space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <div id="registers-stage-title" class="font-mono text-xs font-bold text-bone">
+                STAGE 01 // HIGH-RES AUDIO CAPTURE SUBSYSTEM
+              </div>
+              <div id="registers-stage-sublabel" class="font-sans text-xs text-text-muted">
+                Android 14+ AudioPlaybackCaptureConfiguration &amp; SPSC Queue
+              </div>
+            </div>
+            <span class="font-mono text-[10px] text-text-dim">
+              CLICK ANY STAGE CARD ABOVE TO RETRIEVE REGISTERS
+            </span>
+          </div>
+
+          <div id="registers-stage-list" class="space-y-2">
+            <!-- Populated dynamically via architectureBlueprint.js -->
           </div>
         </div>
+
       </div>
 
     </div>
@@ -315,119 +504,27 @@ import {
   </div>
 </section>
 
-<!-- Client Script for Step-by-Step Illumination & Interactive Inspection -->
+<!-- Component Styling for Tracing Beam and Hex Dissector -->
+<style>
+  .tracing-stage-port.is-active {
+    border-color: #00E599;
+    color: #00E599;
+    box-shadow: 0 0 12px rgba(0, 229, 153, 0.45);
+  }
+
+  .tracing-stage-port.is-active .port-led {
+    background-color: #00E599;
+    box-shadow: 0 0 6px #00E599;
+  }
+
+  .blueprint-stage-card.is-active {
+    border-color: #00E599;
+    background-color: #161922;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+</style>
+
+<!-- Client Script for Aceternity Tracing Beam & Decrypted Hex Inspector -->
 <script>
-  interface DiagnosticData {
-    label: string;
-    line1: string;
-    line2: string;
-    line3: string;
-  }
-
-  const DIAGNOSTIC_MAP: Record<number, DiagnosticData> = {
-    1: {
-      label: 'DIAGNOSTIC INSPECTOR: STAGE 01 // HIGH-RES AUDIO CAPTURE',
-      line1: 'AUDIO_CAPTURE: AudioPlaybackCaptureConfiguration initialized on UID target [MediaProjection-Service].',
-      line2: 'PCM_RING_BUFFER: Lock-free SPSC circular queue active · 48000Hz · 16-bit signed interleaved stereo.',
-      line3: 'DISPATCH_METRICS: Ingest buffer latency 1.83ms · 0 dropped samples · CPU thread affinity pinned to core #6.',
-    },
-    2: {
-      label: 'DIAGNOSTIC INSPECTOR: STAGE 02 // NATIVE OPUS ENCODER & TIME-TAGGER',
-      line1: 'OPUS_ENCODER: opus_encode() invoked with 960 frame_size · 128 kbps VBR · Audio signal mode.',
-      line2: 'TIMESTAMP_GEN: T_target = clock_gettime(CLOCK_MONOTONIC_RAW) + 60,000,000 ns presentation deadline.',
-      line3: 'CPU_PROFILER: C++20 hot-path execution duration 0.88ms · Zero heap allocations in processing loop.',
-    },
-    3: {
-      label: 'DIAGNOSTIC INSPECTOR: STAGE 03 // HARDWARE UDP MULTICAST BROADCASTER',
-      line1: 'MULTICAST_TX: Datagram sent to 239.255.42.99:4242 · Header 24B + Payload 312B = 336B total.',
-      line2: 'WIFI_LOCK: WifiManager.MulticastLock ACTIVE · High-perf low-latency lock held.',
-      line3: 'FANOUT_BURDEN: O(1) bandwidth complexity · Single socket sendto() delivers to all listening peers.',
-    },
-    4: {
-      label: 'DIAGNOSTIC INSPECTOR: STAGE 04 // HARDWARE-SCHEDULED PLAYBACK & RESAMPLER',
-      line1: 'OBOE_AAUDIO: AudioStreamCallback onExclusive MMAP buffer · Latency burst 192 frames @ 48kHz.',
-      line2: 'JITTER_BUFFER: 60ms headroom maintained · Native Opus Packet Loss Concealment (PLC) enabled.',
-      line3: 'RESAMPLER_LOCK: Fractional speed micro-adjustment ±0.03% · Acoustic phase drift locked to <0.42ms.',
-    }
-  };
-
-  function initArchitectureBlueprint() {
-    const stepCards = document.querySelectorAll<HTMLElement>('.blueprint-step-card');
-    const labelElem = document.getElementById('diagnostic-stage-label');
-    const line1Elem = document.getElementById('diagnostic-line-1');
-    const line2Elem = document.getElementById('diagnostic-line-2');
-    const line3Elem = document.getElementById('diagnostic-line-3');
-
-    let activeStep = 1;
-
-    function setActiveStep(step: number, updateCardVisuals = true) {
-      activeStep = step;
-      const data = DIAGNOSTIC_MAP[step];
-      if (!data) return;
-
-      if (labelElem) labelElem.textContent = data.label;
-      if (line1Elem) line1Elem.textContent = data.line1;
-      if (line2Elem) line2Elem.textContent = data.line2;
-      if (line3Elem) line3Elem.textContent = data.line3;
-
-      if (updateCardVisuals) {
-        stepCards.forEach((card) => {
-          const cardStep = Number(card.getAttribute('data-step'));
-          if (cardStep === step) {
-            card.classList.add('border-sync-green', 'bg-[#181C24]');
-            card.classList.remove('border-border-milled', 'bg-[#1A1D24]');
-          } else {
-            card.classList.remove('border-sync-green', 'bg-[#181C24]');
-            card.classList.add('border-border-milled', 'bg-[#1A1D24]');
-          }
-        });
-      }
-    }
-
-    // Attach click and keyboard listeners to cards
-    stepCards.forEach((card) => {
-      card.addEventListener('click', () => {
-        const step = Number(card.getAttribute('data-step'));
-        setActiveStep(step);
-      });
-
-      card.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const step = Number(card.getAttribute('data-step'));
-          setActiveStep(step);
-        }
-      });
-    });
-
-    // Lightweight IntersectionObserver for scroll-based illumination
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const step = Number(entry.target.getAttribute('data-step'));
-            if (step && step !== activeStep) {
-              setActiveStep(step);
-            }
-          }
-        });
-      }, {
-        root: null,
-        rootMargin: '0px 0px -20% 0px',
-        threshold: 0.5,
-      });
-
-      stepCards.forEach((card) => observer.observe(card));
-    }
-
-    // Initialize with Step 1 active
-    setActiveStep(1);
-  }
-
-  // Support Astro view transitions / initial page load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initArchitectureBlueprint);
-  } else {
-    initArchitectureBlueprint();
-  }
+  import '../scripts/architectureBlueprint.js';
 </script>

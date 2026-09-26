@@ -12,6 +12,8 @@ import {
   Cpu,
   Lock,
   ExternalLink,
+  Sliders,
+  TrendingDown,
 } from 'lucide-astro';
 ---
 
@@ -33,11 +35,11 @@ import {
         The "Anti-AmpMe" Technical Honesty Matrix
       </h2>
       <p class="mt-4 font-sans text-sm sm:text-base text-text-muted leading-relaxed">
-        Phone speaker clustering is a local acoustic physics problem, not an excuse for a <strong class="text-bone">$520/year subscription trap</strong>. Compare RoomBeat’s native C++ NDK multicast pipeline against commercial commercial sync apps.
+        Phone speaker clustering is a local acoustic physics problem, not an excuse for a <strong class="text-bone">$520/year subscription trap</strong>. Compare RoomBeat’s native C++ NDK multicast pipeline against commercial subscription apps.
       </p>
     </div>
 
-    <!-- Master Hardware Matrix Panel -->
+    <!-- ================= MASTER HARDWARE PANEL ================= -->
     <div class="hardware-panel rounded-[8px] overflow-hidden border border-border-milled">
       
       <!-- Top Rack Strip with Machined Hex-Bolt Markers -->
@@ -60,7 +62,143 @@ import {
         </div>
       </div>
 
-      <!-- Comparison Table (Horizontal Scrollable on Small Screens) -->
+      <!-- ================= INTERACTIVE CUMULATIVE COST CALCULATOR TICKER ================= -->
+      <div class="p-5 sm:p-6 lg:p-8 bg-[#0D0F14] border-b border-border-milled">
+        
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <div class="flex items-center gap-2 text-xs font-mono text-signal-orange uppercase font-bold tracking-wider">
+              <Sliders class="w-3.5 h-3.5" />
+              <span>MODULE: COST-TICKER-CALC // RECURRING TOLL DISSECTOR</span>
+            </div>
+            <h3 class="font-display font-bold text-lg sm:text-xl text-bone mt-1">
+              Cumulative Commercial Toll vs. RoomBeat $0 FOSS
+            </h3>
+          </div>
+
+          <!-- Time Horizon Selector Buttons -->
+          <div class="flex items-center gap-1.5 bg-[#07080A] p-1 rounded-[6px] border border-border-milled text-xs font-mono">
+            <button
+              type="button"
+              id="btn-cost-1yr"
+              class="px-3 py-1.5 rounded-[4px] bg-sync-green/20 text-sync-green font-bold border border-sync-green/60 transition-all cursor-pointer"
+            >
+              1 YEAR
+            </button>
+            <button
+              type="button"
+              id="btn-cost-2yr"
+              class="px-3 py-1.5 rounded-[4px] text-text-muted hover:text-bone border border-transparent transition-all cursor-pointer"
+            >
+              2 YEARS
+            </button>
+            <button
+              type="button"
+              id="btn-cost-3yr"
+              class="px-3 py-1.5 rounded-[4px] text-text-muted hover:text-bone border border-transparent transition-all cursor-pointer"
+            >
+              3 YEARS
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Duration Slider -->
+        <div class="mb-6 space-y-2">
+          <div class="flex items-center justify-between text-xs font-mono text-text-dim">
+            <span class="flex items-center gap-2">
+              <span>ACTIVE HORIZON:</span>
+              <strong id="cost-duration-label" class="text-bone font-bold">1 Year</strong>
+              <span>(<span id="cost-weeks-count" class="text-text-muted">52 weeks</span>)</span>
+            </span>
+            <span class="text-sync-amber">SUBSCRIPTION BASIS: $9.99 / WEEK (AMPME VIP)</span>
+          </div>
+
+          <input
+            type="range"
+            id="cost-duration-slider"
+            min="1"
+            max="3"
+            step="1"
+            value="1"
+            class="w-full accent-signal-orange cursor-pointer h-2 bg-[#07080A] rounded-lg border border-border-milled"
+            aria-label="Adjust cumulative cost duration in years"
+          />
+          <div class="flex justify-between text-[10px] font-mono text-text-dim px-1">
+            <span>1 Year (52 Wks)</span>
+            <span>2 Years (104 Wks)</span>
+            <span>3 Years (156 Wks)</span>
+          </div>
+        </div>
+
+        <!-- Dual Comparison Cards: Commercial App Hazard vs. RoomBeat FOSS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4">
+          
+          <!-- COMMERCIAL SUBSCRIPTION CARD (Caution Hazard Stripes) -->
+          <div class="caution-hazard-panel rounded-[8px] p-5 border border-sync-amber/40 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[3px] bg-sync-amber/20 border border-sync-amber/50 font-mono text-[10px] font-bold text-sync-amber uppercase">
+                <AlertTriangle class="w-3 h-3 text-sync-amber" />
+                COMMERCIAL SUBSCRIPTION TOLL (AMPME)
+              </span>
+              <span class="font-mono text-[10px] text-sync-red font-semibold">$9.99 / week</span>
+            </div>
+
+            <div class="my-2">
+              <div class="font-mono text-3xl sm:text-4xl font-extrabold text-sync-red tabular-nums tracking-tight" id="commercial-cost-ticker">
+                $519.48
+              </div>
+              <span class="font-mono text-xs text-text-muted block mt-1">
+                Cumulative cash surrendered to cloud relays
+              </span>
+            </div>
+
+            <p class="font-sans text-xs text-text-dim leading-relaxed border-t border-sync-amber/20 pt-3 mt-3">
+              Mandatory cloud relay architecture forces weekly recurring billing. Stops functioning the second subscription lapses.
+            </p>
+          </div>
+
+          <!-- ROOMBEAT FOSS CARD (Illuminated Phosphor Green Badge) -->
+          <div class="roombeat-illuminated-panel rounded-[8px] p-5 border-2 border-sync-green relative overflow-hidden bg-[#00E599]/10 shadow-[0_0_20px_rgba(0,229,153,0.18)]">
+            <div class="flex items-center justify-between mb-3">
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[3px] bg-sync-green text-[#0B0C0E] font-mono text-[10px] font-extrabold uppercase shadow-[0_0_8px_#00E599]">
+                <Check class="w-3 h-3 stroke-[3]" />
+                ROOMBEAT · 100% FREE &amp; OPEN SOURCE
+              </span>
+              <span class="font-mono text-[10px] text-sync-green font-bold">MIT LICENSE</span>
+            </div>
+
+            <div class="my-2">
+              <div class="font-mono text-3xl sm:text-4xl font-extrabold text-sync-green tabular-nums tracking-tight">
+                $0.00
+              </div>
+              <span class="font-mono text-xs text-sync-green/90 font-semibold block mt-1 uppercase tracking-wider">
+                FOREVER UNRESTRICTED · 0 PAYWALLS
+              </span>
+            </div>
+
+            <p class="font-sans text-xs text-text-muted leading-relaxed border-t border-sync-green/30 pt-3 mt-3">
+              100% offline local Wi-Fi &amp; portable hotspot multicast. Zero cloud servers, zero ads, zero accounts, unlimited phones forever.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Full-Width Bottom Savings Ticker Banner -->
+        <div class="recessed-cavity rounded-[6px] p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 border border-border-milled">
+          <div class="flex items-center gap-2">
+            <TrendingDown class="w-4 h-4 text-sync-green" />
+            <span class="font-mono text-xs text-text-muted font-semibold uppercase tracking-wider">
+              NET CAPITAL SAVINGS WITH ROOMBEAT:
+            </span>
+          </div>
+          <div class="font-mono text-base sm:text-lg font-bold text-sync-green tabular-nums" id="net-savings-ticker">
+            +$519.48 POCKETED
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= DETAILED SPECIFICATION TABLE ================= -->
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse min-w-[760px] lg:min-w-full">
           <thead>
@@ -69,25 +207,25 @@ import {
                 Evaluation Metric
               </th>
               
-              <!-- ROOMBEAT HIGHLIGHT COLUMN -->
-              <th scope="col" class="py-4 px-5 text-xs font-display font-extrabold uppercase tracking-wider text-sync-green bg-[#00E599]/5 border-x border-[#00E599]/30 w-[28%] relative">
+              <!-- ROOMBEAT HIGHLIGHT COLUMN (Illuminated Phosphor Green Badge) -->
+              <th scope="col" class="py-4 px-5 text-xs font-display font-extrabold uppercase tracking-wider text-sync-green bg-[#00E599]/10 border-x-2 border-sync-green/50 w-[28%] relative">
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-sync-green"></span>
-                    <span class="text-bone font-bold text-sm">ROOMBEAT</span>
+                    <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
+                    <span class="text-bone font-bold text-sm tracking-tight">ROOMBEAT</span>
                   </div>
-                  <span class="font-mono text-[10px] text-sync-green bg-[#00E599]/15 border border-[#00E599]/40 px-1.5 py-0.5 rounded-[3px]">
-                    MIT / VERIFIED
+                  <span class="font-mono text-[10px] text-[#0B0C0E] bg-sync-green px-2 py-0.5 rounded-[3px] font-extrabold shadow-[0_0_8px_#00E599]">
+                    $0.00 FOSS
                   </span>
                 </div>
               </th>
 
-              <!-- AMPME -->
-              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[20%]">
+              <!-- AMPME (Caution Hazard Stripes) -->
+              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[20%] caution-hazard-header border-r border-sync-amber/30">
                 <div class="flex items-center justify-between gap-1">
                   <span>AmpMe</span>
-                  <span class="font-mono text-[10px] text-sync-red bg-[#FF334B]/10 border border-[#FF334B]/30 px-1 py-0.5 rounded-[3px]">
-                    $520/YR
+                  <span class="font-mono text-[10px] text-sync-amber bg-sync-amber/20 border border-sync-amber/40 px-1.5 py-0.5 rounded-[3px] font-bold">
+                    ⚠ $520+/YR
                   </span>
                 </div>
               </th>
@@ -111,13 +249,13 @@ import {
               <td class="py-4 px-5">
                 <div class="flex items-center gap-2 font-display font-bold text-bone">
                   <DollarSign class="w-4 h-4 text-signal-orange shrink-0" />
-                  <span>Pricing & Model</span>
+                  <span>Pricing &amp; Model</span>
                 </div>
                 <p class="font-sans text-[11px] text-text-dim mt-0.5">True annual cost to maintain access</p>
               </td>
 
               <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
                     <Check class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -131,8 +269,8 @@ import {
                 </div>
               </td>
 
-              <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted">
+              <!-- AmpMe (Caution Stripes) -->
+              <td class="py-4 px-5 text-text-muted caution-hazard-cell border-r border-sync-amber/20">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
                     <X class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -174,7 +312,7 @@ import {
               </td>
 
               <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
                     <Check class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -189,7 +327,7 @@ import {
               </td>
 
               <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted">
+              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
                     <AlertTriangle class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -231,7 +369,7 @@ import {
               </td>
 
               <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
                     <Check class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -246,7 +384,7 @@ import {
               </td>
 
               <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted">
+              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
                     <X class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -288,7 +426,7 @@ import {
               </td>
 
               <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
                     <Check class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -303,7 +441,7 @@ import {
               </td>
 
               <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted">
+              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
                 <span class="font-mono text-text-dim font-medium">Walled Garden APIs</span>
                 <p class="text-[11px] text-text-dim mt-0.5">
                   No system-wide audio capture. Limited to in-app YouTube, SoundCloud, or Spotify web player.
@@ -338,7 +476,7 @@ import {
               </td>
 
               <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
                     <Check class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -353,7 +491,7 @@ import {
               </td>
 
               <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted">
+              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
                     <Lock class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -395,7 +533,7 @@ import {
               </td>
 
               <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
                 <div class="flex items-start gap-2">
                   <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
                     <Check class="w-3.5 h-3.5 stroke-[2.5]" />
@@ -410,7 +548,7 @@ import {
               </td>
 
               <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted">
+              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
                 <span class="font-mono text-text-dim font-medium">Server Bottleneck</span>
                 <p class="text-[11px] text-text-dim mt-0.5">
                   Cloud relay bandwidth degradation and audio stutters as participant count increases.
@@ -456,3 +594,43 @@ import {
 
   </div>
 </section>
+
+<!-- Hazard Stripes and Column Stencil Styles -->
+<style>
+  .caution-hazard-panel {
+    background-color: #14110A;
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 184, 0, 0.06) 0px,
+      rgba(255, 184, 0, 0.06) 12px,
+      transparent 12px,
+      transparent 24px
+    );
+  }
+
+  .caution-hazard-header {
+    background-color: #161209;
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 184, 0, 0.08) 0px,
+      rgba(255, 184, 0, 0.08) 8px,
+      transparent 8px,
+      transparent 16px
+    );
+  }
+
+  .caution-hazard-cell {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(255, 184, 0, 0.03) 0px,
+      rgba(255, 184, 0, 0.03) 8px,
+      transparent 8px,
+      transparent 16px
+    );
+  }
+</style>
+
+<!-- Client Script for Interactive Cost Calculator Ticker -->
+<script>
+  import '../scripts/comparisonMatrix.js';
+</script>

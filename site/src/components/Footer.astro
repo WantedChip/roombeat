@@ -7,7 +7,7 @@ import {
   Radio,
   CheckCircle2,
   ArrowUpRight,
-  ChevronRight,
+  ChevronDown,
   Terminal,
   FileCode2,
   Clock,
@@ -68,7 +68,7 @@ const sdkCompatibility = [
   },
   {
     api: 'API 37',
-    os: 'Android 16+ / Next',
+    os: 'Android 17 / Next',
     role: 'Forward-Ready',
     audio: 'Low-latency NDK C++ audio path with high-res clock ticks',
     capture: 'Multi-channel system audio stream extraction',
@@ -84,11 +84,19 @@ const sdkCompatibility = [
     
     <!-- ================= TOP HARDWARE MODULE CHASSIS ================= -->
     <div class="hardware-panel rounded-lg p-6 sm:p-8 relative">
-      <!-- Decorative corner hex bolts -->
-      <div class="absolute top-2.5 left-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
-      <div class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
-      <div class="absolute bottom-2.5 left-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
-      <div class="absolute bottom-2.5 right-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
+      <!-- Decorative corner Allen hex bolts -->
+      <div class="absolute top-2.5 left-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
+      <div class="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
+      <div class="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
+      <div class="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
 
       <!-- Module Identifier Header -->
       <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-border-milled">
@@ -98,7 +106,7 @@ const sdkCompatibility = [
           </span>
           <span class="text-text-dim text-xs font-mono">•</span>
           <span class="font-display font-bold text-sm tracking-tight text-bone uppercase">
-            ROOMBEAT HARDWARE & SPECIFICATION MATRIX
+            ROOMBEAT HARDWARE &amp; SPECIFICATION MATRIX
           </span>
         </div>
         <div class="flex items-center gap-2 text-[11px] text-text-muted">
@@ -108,7 +116,7 @@ const sdkCompatibility = [
       </div>
 
       <!-- 4-Column Specification Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-8">
         
         <!-- Column 1: Identity & Open Source License -->
         <div class="space-y-4">
@@ -248,36 +256,124 @@ const sdkCompatibility = [
         </div>
 
       </div>
-    </div>
 
-    <!-- ================= COMPREHENSIVE ANDROID SDK COMPATIBILITY MATRIX ================= -->
-    <div class="space-y-4">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2 font-mono text-[11px] text-signal-orange uppercase tracking-wider">
-            <Layers class="w-3.5 h-3.5" />
-            <span>AOSP Architectural Compatibility</span>
-          </div>
-          <h2 class="font-display font-extrabold text-xl sm:text-2xl text-bone tracking-tight mt-1">
-            Android SDK Compatibility Matrix (API 30 – API 37)
-          </h2>
+      <!-- ================= LASER-ETCHED HARDWARE SERIAL PLATE STENCIL ================= -->
+      <div class="hardware-serial-plate rounded-[6px] p-4 sm:p-5 border border-[#3E4454] relative overflow-hidden">
+        <!-- 4 Machined Corner Rivet Screws -->
+        <div class="absolute top-2 left-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
+          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
         </div>
-        <p class="font-sans text-xs text-text-muted max-w-md leading-relaxed">
-          Tested and validated against physical Android devices spanning Android 11 to Android 16+ previews, ensuring low-latency hardware MMAP audio and forward compatibility.
-        </p>
+        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
+          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
+        </div>
+        <div class="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
+          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
+        </div>
+        <div class="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
+          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
+        </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 font-mono text-[10px] text-text-dim uppercase tracking-widest">
+              <span>WANTEDCHIP ACOUSTIC SYSTEMS</span>
+              <span>//</span>
+              <span class="text-sync-green">SPEC RATING PLATE</span>
+            </div>
+
+            <!-- Authoritative Laser-Etched Model & Serial Stencil Graphic -->
+            <div class="font-mono font-extrabold text-sm sm:text-base text-bone tracking-wider laser-etched-stencil">
+              MODEL: ROOMBEAT-V1-LAN // SERIAL NO: RB-2026-FOSS
+            </div>
+
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-text-dim pt-1">
+              <span>CHASSIS: 6061-T6 ANODIZED OBSIDIAN</span>
+              <span>BANDWIDTH: O(1) MULTICAST</span>
+              <span>TOOLCHAIN: NDK r27c C++20</span>
+              <span class="text-sync-green">AIR-GAPPED LAN: COMPLIANT</span>
+            </div>
+          </div>
+
+          <!-- Stencil Laser Barcode Graphic -->
+          <div class="shrink-0 flex items-center gap-3 self-end md:self-auto border-t md:border-t-0 md:border-l border-[#3E4454]/60 pt-3 md:pt-0 md:pl-5">
+            <div class="space-y-1">
+              <!-- Simulated 2D Laser Stencil Barcode -->
+              <div class="flex items-center gap-[2px] h-8" aria-hidden="true">
+                <span class="w-0.5 h-full bg-bone"></span>
+                <span class="w-1 h-full bg-bone"></span>
+                <span class="w-0.5 h-full bg-bone/30"></span>
+                <span class="w-1.5 h-full bg-bone"></span>
+                <span class="w-0.5 h-full bg-bone"></span>
+                <span class="w-2 h-full bg-bone"></span>
+                <span class="w-0.5 h-full bg-bone/30"></span>
+                <span class="w-1 h-full bg-bone"></span>
+                <span class="w-0.5 h-full bg-bone"></span>
+                <span class="w-1.5 h-full bg-bone"></span>
+                <span class="w-0.5 h-full bg-bone/30"></span>
+                <span class="w-1 h-full bg-bone"></span>
+                <span class="w-2 h-full bg-bone"></span>
+                <span class="w-0.5 h-full bg-bone"></span>
+                <span class="w-1 h-full bg-bone"></span>
+                <span class="w-0.5 h-full bg-bone/30"></span>
+                <span class="w-1.5 h-full bg-bone"></span>
+              </div>
+              <span class="font-mono text-[9px] text-text-dim tracking-widest block text-center">
+                *RB-2026-FOSS*
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Industrial Matrix Table -->
-      <div class="hardware-panel rounded-lg overflow-hidden border border-border-milled">
+    </div>
+
+    <!-- ================= EXPANDABLE AOSP ARCHITECTURAL COMPATIBILITY DRAWER (SDK 30–37) ================= -->
+    <div class="space-y-3">
+      
+      <!-- Drawer Interactive Header Button -->
+      <button
+        id="btn-toggle-sdk-drawer"
+        type="button"
+        class="w-full flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5 rounded-[8px] bg-surface-elevated border border-border-milled hover:border-border-active transition-all group cursor-pointer text-left"
+        aria-expanded="false"
+        aria-controls="sdk-drawer-content"
+      >
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-signal-orange group-hover:text-bone transition-colors">
+            <Layers class="w-4 h-4" />
+          </div>
+          <div>
+            <div class="flex items-center gap-2 font-mono text-[11px] text-signal-orange font-bold uppercase tracking-wider">
+              <span>DRAWER: AOSP-SPEC-30-37</span>
+              <span class="text-text-dim">•</span>
+              <span class="text-sync-green">6 TIERS TESTED &amp; CERTIFIED</span>
+            </div>
+            <h3 class="font-display font-bold text-sm sm:text-base text-bone tracking-tight mt-0.5">
+              Android SDK Compatibility Matrix (API 30 – API 37)
+            </h3>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span id="sdk-drawer-toggle-text" class="text-xs font-mono font-bold text-signal-orange group-hover:text-[#FF661A] transition-colors">
+            [ EXPAND TECHNICAL MATRIX + ]
+          </span>
+          <ChevronDown id="sdk-drawer-chevron" class="w-4 h-4 text-signal-orange transition-transform duration-300" />
+        </div>
+      </button>
+
+      <!-- Expandable Drawer Body -->
+      <div id="sdk-drawer-content" class="hidden hardware-panel rounded-lg overflow-hidden border border-border-milled transition-all duration-300">
+        
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
+          <table class="w-full text-left text-xs border-collapse min-w-[760px] lg:min-w-full">
             <thead>
               <tr class="bg-surface-elevated/70 border-b border-border-milled text-[11px] font-mono text-text-muted uppercase tracking-wider">
                 <th class="py-3 px-4 font-bold">API / OS Level</th>
                 <th class="py-3 px-4 font-bold">Role</th>
-                <th class="py-3 px-4 font-bold">Audio Engine & Latency Tier</th>
-                <th class="py-3 px-4 font-bold">Capture & Presentation</th>
-                <th class="py-3 px-4 font-bold">Networking & Permissions</th>
+                <th class="py-3 px-4 font-bold">Audio Engine &amp; Latency Tier</th>
+                <th class="py-3 px-4 font-bold">Capture &amp; Presentation</th>
+                <th class="py-3 px-4 font-bold">Networking &amp; Permissions</th>
                 <th class="py-3 px-4 font-bold text-right">Status</th>
               </tr>
             </thead>
@@ -323,7 +419,9 @@ const sdkCompatibility = [
             <span>TOOLCHAIN: NDK r27c • C++20 • KOTLIN 2.1 • AGP 8.8</span>
           </div>
         </div>
+
       </div>
+
     </div>
 
     <!-- ================= BOTTOM MACHINE STRIP & LEGAL NOTICE ================= -->
@@ -374,3 +472,53 @@ const sdkCompatibility = [
 
   </div>
 </footer>
+
+<!-- Laser-Etched Hardware Serial Plate Stencil Styling -->
+<style>
+  .hardware-serial-plate {
+    background: linear-gradient(135deg, #181B22 0%, #0E1015 45%, #15181F 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  .laser-etched-stencil {
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9), 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+</style>
+
+<!-- Client Script for Expandable Compatibility Matrix Drawer -->
+<script>
+  import { playKeycapClick } from '../scripts/qrPinDemo.js';
+
+  function initFooterDrawer() {
+    const btnToggle = document.getElementById('btn-toggle-sdk-drawer');
+    const drawerContent = document.getElementById('sdk-drawer-content');
+    const chevron = document.getElementById('sdk-drawer-chevron');
+    const toggleText = document.getElementById('sdk-drawer-toggle-text');
+
+    if (!btnToggle || !drawerContent) return;
+
+    btnToggle.addEventListener('click', () => {
+      playKeycapClick();
+      const isExpanded = btnToggle.getAttribute('aria-expanded') === 'true';
+      const nextState = !isExpanded;
+
+      btnToggle.setAttribute('aria-expanded', String(nextState));
+
+      if (nextState) {
+        drawerContent.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        if (toggleText) toggleText.textContent = '[ COLLAPSE TECHNICAL MATRIX − ]';
+      } else {
+        drawerContent.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        if (toggleText) toggleText.textContent = '[ EXPAND TECHNICAL MATRIX + ]';
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFooterDrawer);
+  } else {
+    initFooterDrawer();
+  }
+</script>

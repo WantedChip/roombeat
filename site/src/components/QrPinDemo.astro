@@ -70,20 +70,26 @@ import {
             <span class="text-text-dim">192.168.1.105:4242</span>
           </div>
 
-          <!-- Dual Display: QR Code & Large 6-Digit PIN -->
+          <!-- Dual Display: QR Code & Recessed 6-Digit PIN Display -->
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
             
-            <!-- High-Contrast SVG QR Code Module -->
+            <!-- High-Contrast SVG QR Code Module with Laser Viewfinder -->
             <div class="sm:col-span-5 flex flex-col items-center">
-              <div class="p-3 bg-[#07080A] rounded-[6px] border border-border-milled relative group">
-                <!-- Mechanical Corner Reticle Accents -->
-                <div class="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-signal-orange"></div>
-                <div class="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-signal-orange"></div>
-                <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-signal-orange"></div>
-                <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-signal-orange"></div>
+              <div class="p-3 bg-[#07080A] rounded-[6px] border border-border-milled relative group overflow-hidden" id="qr-viewfinder-box">
+                
+                <!-- Industrial Corner Reticle Brackets -->
+                <div class="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-sync-green pointer-events-none z-10"></div>
+                <div class="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-sync-green pointer-events-none z-10"></div>
+                <div class="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-sync-green pointer-events-none z-10"></div>
+                <div class="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-sync-green pointer-events-none z-10"></div>
+
+                <!-- Continuous Laser Viewfinder Scanning Line -->
+                <div class="laser-viewfinder-line" aria-hidden="true">
+                  <div class="laser-viewfinder-wash"></div>
+                </div>
 
                 <!-- High-Definition Tactile QR SVG -->
-                <svg class="w-36 h-36 bg-[#07080A]" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="RoomBeat Room Join QR Code">
+                <svg class="w-36 h-36 bg-[#07080A] block" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="RoomBeat Room Join QR Code">
                   <!-- Background -->
                   <rect width="120" height="120" fill="#07080A"/>
                   
@@ -145,26 +151,48 @@ import {
                   <rect x="86" y="98" width="6" height="6" fill="#F2F4F8"/>
                   <rect x="100" y="94" width="6" height="6" fill="#F2F4F8"/>
                 </svg>
+
+                <!-- Viewfinder HUD Overlays -->
+                <div class="absolute bottom-1.5 left-2 font-mono text-[8px] text-sync-green/80 uppercase pointer-events-none">
+                  FOV: 78°
+                </div>
+                <div class="absolute top-1.5 right-2 font-mono text-[8px] text-sync-green/80 uppercase pointer-events-none">
+                  60FPS
+                </div>
               </div>
               <span class="font-mono text-[10px] text-text-dim uppercase tracking-wider mt-2">
                 SCAN WITH CAMERAX
               </span>
             </div>
 
-            <!-- Recessed 6-Digit PIN Display Cavity -->
+            <!-- Recessed 6-Digit PIN Readout with Machined Cells -->
             <div class="sm:col-span-7 space-y-3">
               <div>
-                <span class="font-mono text-[10px] uppercase tracking-wider text-text-dim block mb-1">
+                <span class="font-mono text-[10px] uppercase tracking-wider text-text-dim block mb-1.5">
                   EPHEMERAL ROOM PIN (LOCAL SUBNET)
                 </span>
                 
-                <div class="recessed-cavity rounded-[6px] p-4 text-center border border-border-milled relative">
-                  <div class="font-mono font-extrabold text-2xl sm:text-3xl tracking-[0.2em] text-bone select-all" id="host-pin-readout">
-                    834 912
+                <!-- Machined Recessed PIN Cavity -->
+                <div class="recessed-cavity rounded-[6px] p-3 border border-border-milled relative transition-all" id="host-pin-container">
+                  <div class="flex items-center justify-center gap-1.5 sm:gap-2">
+                    <!-- 3 Digits -->
+                    <span class="host-pin-cell w-8 h-10 sm:w-9 sm:h-12 rounded-[4px] bg-[#0B0D11] border border-border-milled flex items-center justify-center font-mono font-extrabold text-xl sm:text-2xl text-bone shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">8</span>
+                    <span class="host-pin-cell w-8 h-10 sm:w-9 sm:h-12 rounded-[4px] bg-[#0B0D11] border border-border-milled flex items-center justify-center font-mono font-extrabold text-xl sm:text-2xl text-bone shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">3</span>
+                    <span class="host-pin-cell w-8 h-10 sm:w-9 sm:h-12 rounded-[4px] bg-[#0B0D11] border border-border-milled flex items-center justify-center font-mono font-extrabold text-xl sm:text-2xl text-bone shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">4</span>
+                    
+                    <span class="text-text-dim font-mono text-base sm:text-lg select-none px-0.5">•</span>
+
+                    <!-- 3 Digits -->
+                    <span class="host-pin-cell w-8 h-10 sm:w-9 sm:h-12 rounded-[4px] bg-[#0B0D11] border border-border-milled flex items-center justify-center font-mono font-extrabold text-xl sm:text-2xl text-bone shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">9</span>
+                    <span class="host-pin-cell w-8 h-10 sm:w-9 sm:h-12 rounded-[4px] bg-[#0B0D11] border border-border-milled flex items-center justify-center font-mono font-extrabold text-xl sm:text-2xl text-bone shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">1</span>
+                    <span class="host-pin-cell w-8 h-10 sm:w-9 sm:h-12 rounded-[4px] bg-[#0B0D11] border border-border-milled flex items-center justify-center font-mono font-extrabold text-xl sm:text-2xl text-bone shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">2</span>
                   </div>
-                  <span class="font-mono text-[10px] text-sync-green mt-1 inline-block">
-                    VALID FOR LOCAL PEERS · NO WAN TRAFFIC
-                  </span>
+
+                  <div class="text-center mt-2">
+                    <span class="font-mono text-[10px] text-sync-green inline-block">
+                      VALID FOR LOCAL PEERS · NO WAN TRAFFIC
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -173,21 +201,22 @@ import {
                 <button
                   type="button"
                   id="btn-copy-pin"
-                  class="tactile-btn-secondary flex-1 py-2 px-3 text-xs flex items-center justify-center gap-1.5"
-                  title="Copy 6-Digit PIN"
+                  class="tactile-btn-secondary flex-1 py-2 px-3 text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  title="Copy 6-Digit PIN to Clipboard"
                 >
                   <Copy class="w-3.5 h-3.5 text-text-muted" />
                   <span id="copy-pin-text">Copy PIN</span>
                 </button>
 
+                <!-- Interactive Regenerate Random PIN Button (GSAP Scramble) -->
                 <button
                   type="button"
                   id="btn-regen-pin"
-                  class="tactile-btn-secondary py-2 px-3 text-xs flex items-center justify-center gap-1.5"
-                  title="Generate New Cryptographic PIN"
+                  class="tactile-btn-secondary py-2 px-3 text-xs flex items-center justify-center gap-1.5 cursor-pointer hover:border-sync-green/60"
+                  title="Generate New Cryptographic Random PIN via GSAP"
                 >
-                  <RefreshCw class="w-3.5 h-3.5 text-text-muted" />
-                  <span class="hidden sm:inline">Regenerate</span>
+                  <RefreshCw class="w-3.5 h-3.5 text-sync-green" />
+                  <span class="hidden sm:inline font-mono">Regenerate</span>
                 </button>
               </div>
             </div>
@@ -249,34 +278,42 @@ import {
 
         <div class="p-6 space-y-5">
           
-          <!-- Mode View 1: 6-Digit PIN Keypad Input -->
+          <!-- Mode View 1: Origin UI Style Recessed 6-Slot Keypad -->
           <div id="view-pin-mode" class="space-y-4">
             <div>
-              <div class="flex items-center justify-between text-xs font-mono mb-1.5">
-                <span class="text-text-dim uppercase">Enter Host 6-Digit PIN:</span>
+              <div class="flex items-center justify-between text-xs font-mono mb-2">
+                <span class="text-text-dim uppercase tracking-wider">Enter Host 6-Digit PIN:</span>
                 <button
                   type="button"
                   id="btn-autofill-pin"
-                  class="text-[11px] text-sync-green hover:underline font-mono"
+                  class="text-[11px] text-sync-green hover:underline font-mono cursor-pointer"
                 >
                   [ AUTO-FILL 834 912 ]
                 </button>
               </div>
 
-              <!-- Input Digits Display -->
-              <div class="recessed-cavity rounded-[6px] p-3 text-center border border-border-milled">
-                <div class="font-mono font-bold text-xl sm:text-2xl tracking-[0.3em] text-bone" id="pin-input-display">
-                  ______
+              <!-- Origin UI OTP Input Recessed 6-Slot Container -->
+              <div class="p-2 sm:p-3 bg-[#0B0D11] rounded-[8px] border border-border-milled/70">
+                <div class="flex items-center justify-center gap-2 sm:gap-3" id="otp-slots-container">
+                  <div class="otp-slot is-active" data-index="0"></div>
+                  <div class="otp-slot" data-index="1"></div>
+                  <div class="otp-slot" data-index="2"></div>
+                  <div class="otp-slot" data-index="3"></div>
+                  <div class="otp-slot" data-index="4"></div>
+                  <div class="otp-slot" data-index="5"></div>
                 </div>
+              </div>
+              <div class="text-center mt-1.5 font-mono text-[10px] text-text-dim">
+                CLICK SLOTS OR TYPE ON KEYBOARD · ARROW KEYS TO NAVIGATE
               </div>
             </div>
 
-            <!-- Tactile 12-Key Pad Grid -->
+            <!-- Tactile 12-Key Pad Grid with Physical Click Depression -->
             <div class="grid grid-cols-3 gap-2 max-w-xs mx-auto">
               {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
                 <button
                   type="button"
-                  class="keypad-digit-btn tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-sm font-bold text-bone hover:border-sync-green/50 active:scale-[0.98]"
+                  class="keypad-digit-btn tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-sm font-bold text-bone hover:border-sync-green/50 active:scale-[0.98] cursor-pointer"
                   data-digit={digit}
                 >
                   {digit}
@@ -286,14 +323,14 @@ import {
               <button
                 type="button"
                 id="btn-keypad-clear"
-                class="tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-xs font-bold text-sync-red hover:border-sync-red/50 active:scale-[0.98]"
+                class="tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-xs font-bold text-sync-red hover:border-sync-red/50 active:scale-[0.98] cursor-pointer"
               >
                 CLR
               </button>
 
               <button
                 type="button"
-                class="keypad-digit-btn tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-sm font-bold text-bone hover:border-sync-green/50 active:scale-[0.98]"
+                class="keypad-digit-btn tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-sm font-bold text-bone hover:border-sync-green/50 active:scale-[0.98] cursor-pointer"
                 data-digit="0"
               >
                 0
@@ -302,7 +339,7 @@ import {
               <button
                 type="button"
                 id="btn-keypad-back"
-                class="tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-xs font-bold text-text-muted hover:border-border-active active:scale-[0.98]"
+                class="tactile-btn-secondary py-2.5 rounded-[4px] font-mono text-xs font-bold text-text-muted hover:border-border-active active:scale-[0.98] cursor-pointer"
               >
                 DEL
               </button>
@@ -312,7 +349,7 @@ import {
             <button
               type="button"
               id="btn-simulate-join"
-              class="w-full tactile-btn-primary py-2.5 px-4 text-xs font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+              class="w-full tactile-btn-primary py-2.5 px-4 text-xs font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
             >
               <Zap class="w-4 h-4 stroke-[2.5]" />
               <span>CONNECT VIA LOCAL LAN PIN</span>
@@ -323,9 +360,11 @@ import {
           <div id="view-qr-mode" class="hidden space-y-4">
             <div class="recessed-cavity rounded-[6px] p-6 text-center border border-border-milled relative overflow-hidden">
               <!-- Scanning Laser Line Animation -->
-              <div class="w-32 h-32 mx-auto rounded-[6px] border-2 border-dashed border-sync-green/40 relative flex items-center justify-center">
+              <div class="w-32 h-32 mx-auto rounded-[6px] border-2 border-dashed border-sync-green/40 relative flex items-center justify-center overflow-hidden">
                 <Camera class="w-8 h-8 text-sync-green/60" />
-                <div class="absolute inset-x-0 h-0.5 bg-sync-green shadow-[0_0_8px_#00E599] animate-pulse"></div>
+                <div class="laser-viewfinder-line" aria-hidden="true">
+                  <div class="laser-viewfinder-wash"></div>
+                </div>
               </div>
               <p class="font-mono text-xs text-text-muted mt-3">
                 Pointing CameraX Scanner at Host Display...
@@ -335,7 +374,7 @@ import {
             <button
               type="button"
               id="btn-simulate-qr-scan"
-              class="w-full tactile-btn-primary py-2.5 px-4 text-xs font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+              class="w-full tactile-btn-primary py-2.5 px-4 text-xs font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
             >
               <QrCode class="w-4 h-4 stroke-[2.5]" />
               <span>SIMULATE INSTANT QR CAMERA SCAN</span>
@@ -366,182 +405,111 @@ import {
   </div>
 </section>
 
+<!-- Viewfinder Laser & Origin UI Recessed Keypad Styles -->
+<style>
+  @keyframes laserSweep {
+    0% {
+      top: 0%;
+      opacity: 0.85;
+    }
+    50% {
+      top: 100%;
+      opacity: 1;
+    }
+    100% {
+      top: 0%;
+      opacity: 0.85;
+    }
+  }
+
+  .laser-viewfinder-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #00E599;
+    box-shadow: 0 0 10px #00E599, 0 0 20px rgba(0, 229, 153, 0.7);
+    animation: laserSweep 2.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .laser-viewfinder-wash {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 20px;
+    transform: translateY(-50%);
+    background: linear-gradient(180deg, rgba(0, 229, 153, 0) 0%, rgba(0, 229, 153, 0.22) 50%, rgba(0, 229, 153, 0) 100%);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .laser-viewfinder-line {
+      animation: none !important;
+      top: 50% !important;
+    }
+  }
+
+  /* Origin UI OTP Recessed 6-Slot Keypad */
+  .otp-slot {
+    width: 2.75rem;
+    height: 3.5rem;
+    background-color: #07080A;
+    border: 1px solid #262A35;
+    border-radius: 6px;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #F2F4F8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+    user-select: none;
+    position: relative;
+  }
+
+  @media (min-width: 640px) {
+    .otp-slot {
+      width: 3rem;
+      height: 4rem;
+      font-size: 1.75rem;
+    }
+  }
+
+  .otp-slot.is-active {
+    border-color: #00E599;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.85), 0 0 12px rgba(0, 229, 153, 0.35);
+  }
+
+  .otp-slot.is-active::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 1.25rem;
+    background-color: #00E599;
+    animation: cursorBlink 1s step-end infinite;
+  }
+
+  .otp-slot.is-filled {
+    border-color: #3E4454;
+    color: #F2F4F8;
+  }
+
+  .otp-slot.is-empty {
+    color: #5D6475;
+  }
+
+  @keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
+
 <!-- Client Script for Keypad, QR Scanning & Simulated Local Socket Handshake -->
 <script>
-  function initQrPinDemo() {
-    // Host Elements
-    const hostPinReadout = document.getElementById('host-pin-readout');
-    const btnCopyPin = document.getElementById('btn-copy-pin');
-    const copyPinText = document.getElementById('copy-pin-text');
-    const btnRegenPin = document.getElementById('btn-regen-pin');
-    const connectedNodesCount = document.getElementById('connected-nodes-count');
-
-    // Listener Elements
-    const tabPinMode = document.getElementById('tab-pin-mode');
-    const tabQrMode = document.getElementById('tab-qr-mode');
-    const viewPinMode = document.getElementById('view-pin-mode');
-    const viewQrMode = document.getElementById('view-qr-mode');
-    const pinInputDisplay = document.getElementById('pin-input-display');
-    const btnAutofillPin = document.getElementById('btn-autofill-pin');
-    const digitBtns = document.querySelectorAll<HTMLButtonElement>('.keypad-digit-btn');
-    const btnKeypadClear = document.getElementById('btn-keypad-clear');
-    const btnKeypadBack = document.getElementById('btn-keypad-back');
-    const btnSimulateJoin = document.getElementById('btn-simulate-join');
-    const btnSimulateQrScan = document.getElementById('btn-simulate-qr-scan');
-    const terminalLog = document.getElementById('handshake-terminal-log');
-    const elapsedTimeLabel = document.getElementById('handshake-elapsed-time');
-
-    let currentHostPin = '834912';
-    let enteredPin = '';
-    let isConnecting = false;
-    let peerCount = 3;
-
-    function formatPin(pin: string) {
-      if (!pin) return '______';
-      const padded = pin.padEnd(6, '_');
-      return `${padded.slice(0, 3)} ${padded.slice(3, 6)}`;
-    }
-
-    function updatePinDisplay() {
-      if (pinInputDisplay) {
-        pinInputDisplay.textContent = formatPin(enteredPin);
-      }
-    }
-
-    // Tab Switching
-    tabPinMode?.addEventListener('click', () => {
-      tabPinMode.classList.add('bg-surface-elevated', 'text-bone', 'border', 'border-border-milled');
-      tabPinMode.classList.remove('text-text-dim');
-      tabQrMode?.classList.remove('bg-surface-elevated', 'text-bone', 'border', 'border-border-milled');
-      tabQrMode?.classList.add('text-text-dim');
-      viewPinMode?.classList.remove('hidden');
-      viewQrMode?.classList.add('hidden');
-    });
-
-    tabQrMode?.addEventListener('click', () => {
-      tabQrMode.classList.add('bg-surface-elevated', 'text-bone', 'border', 'border-border-milled');
-      tabQrMode.classList.remove('text-text-dim');
-      tabPinMode?.classList.remove('bg-surface-elevated', 'text-bone', 'border', 'border-border-milled');
-      tabPinMode?.classList.add('text-text-dim');
-      viewQrMode?.classList.remove('hidden');
-      viewPinMode?.classList.add('hidden');
-    });
-
-    // Keypad Digit Buttons
-    digitBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if (enteredPin.length < 6) {
-          enteredPin += btn.getAttribute('data-digit') || '';
-          updatePinDisplay();
-        }
-      });
-    });
-
-    btnKeypadClear?.addEventListener('click', () => {
-      enteredPin = '';
-      updatePinDisplay();
-    });
-
-    btnKeypadBack?.addEventListener('click', () => {
-      if (enteredPin.length > 0) {
-        enteredPin = enteredPin.slice(0, -1);
-        updatePinDisplay();
-      }
-    });
-
-    btnAutofillPin?.addEventListener('click', () => {
-      enteredPin = currentHostPin;
-      updatePinDisplay();
-    });
-
-    // Regenerate Cryptographic PIN
-    btnRegenPin?.addEventListener('click', () => {
-      const randomSixDigit = Math.floor(100000 + Math.random() * 900000).toString();
-      currentHostPin = randomSixDigit;
-      if (hostPinReadout) {
-        hostPinReadout.textContent = `${randomSixDigit.slice(0, 3)} ${randomSixDigit.slice(3, 6)}`;
-      }
-      if (btnAutofillPin) {
-        btnAutofillPin.textContent = `[ AUTO-FILL ${randomSixDigit.slice(0, 3)} ${randomSixDigit.slice(3, 6)} ]`;
-      }
-      if (copyPinText) {
-        copyPinText.textContent = 'Copy PIN';
-      }
-    });
-
-    // Copy PIN to Clipboard
-    btnCopyPin?.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(currentHostPin);
-        if (copyPinText) {
-          copyPinText.textContent = 'Copied!';
-          setTimeout(() => {
-            if (copyPinText) copyPinText.textContent = 'Copy PIN';
-          }, 2000);
-        }
-      } catch {
-        if (copyPinText) copyPinText.textContent = currentHostPin;
-      }
-    });
-
-    // Execute Simulated Join Sequence
-    function runSimulatedHandshake(methodName: string) {
-      if (isConnecting) return;
-      isConnecting = true;
-
-      if (terminalLog) terminalLog.innerHTML = '';
-      if (elapsedTimeLabel) elapsedTimeLabel.textContent = '0.0ms';
-
-      const logSteps = [
-        { ms: 12, text: `[+12ms] INIT: Initiating ${methodName} over local Wi-Fi interface...` },
-        { ms: 45, text: `[+45ms] DISCOVER: mDNS '_roombeat._tcp' resolved host at 192.168.1.105:4242` },
-        { ms: 88, text: `[+88ms] TCP_AUTH: Handshake token verified against PIN [${currentHostPin}]` },
-        { ms: 135, text: `[+135ms] NTP_PROBE: 3-roundtrip calibration complete · Offset: -0.18ms · Jitter: 0.4ms` },
-        { ms: 168, text: `[+168ms] MULTICAST_LOCK: Joined group 239.255.42.99:4242 · Oboe MMAP exclusive active!` },
-        { ms: 172, text: `[+172ms] SYNC_LOCKED: Zero cloud hops. Acoustic sync phase locked across ${peerCount + 1} devices.` }
-      ];
-
-      logSteps.forEach((step, idx) => {
-        setTimeout(() => {
-          if (terminalLog) {
-            const line = document.createElement('div');
-            line.className = idx === logSteps.length - 1 ? 'text-sync-green font-bold' : 'text-text-muted';
-            line.textContent = `> ${step.text}`;
-            terminalLog.appendChild(line);
-            terminalLog.scrollTop = terminalLog.scrollHeight;
-          }
-          if (elapsedTimeLabel) {
-            elapsedTimeLabel.textContent = `${step.ms}.0ms`;
-          }
-
-          if (idx === logSteps.length - 1) {
-            isConnecting = false;
-            peerCount += 1;
-            if (connectedNodesCount) {
-              connectedNodesCount.textContent = `${peerCount} NODES LOCKED`;
-            }
-          }
-        }, step.ms * 3.5); // Scaled for visible cinematic cadence (~600ms total)
-      });
-    }
-
-    btnSimulateJoin?.addEventListener('click', () => {
-      if (!enteredPin || enteredPin.length < 6) {
-        enteredPin = currentHostPin;
-        updatePinDisplay();
-      }
-      runSimulatedHandshake('6-Digit PIN Handshake');
-    });
-
-    btnSimulateQrScan?.addEventListener('click', () => {
-      runSimulatedHandshake('CameraX QR Auto-Discovery');
-    });
-  }
-
-  // Support Astro view transitions / initial page load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initQrPinDemo);
-  } else {
-    initQrPinDemo();
-  }
+  import '../scripts/qrPinDemo.js';
 </script>
