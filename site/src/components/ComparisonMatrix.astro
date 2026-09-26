@@ -1,0 +1,458 @@
+---
+import {
+  Check,
+  X,
+  AlertTriangle,
+  ShieldCheck,
+  Zap,
+  Wifi,
+  DollarSign,
+  Radio,
+  Layers,
+  Cpu,
+  Lock,
+  ExternalLink,
+} from 'lucide-astro';
+---
+
+<section id="comparison" class="py-16 md:py-24 border-t border-border-milled relative" aria-labelledby="comparison-title">
+  <!-- Subtle Industrial Grid Accent -->
+  <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    
+    <!-- Section Header -->
+    <div class="max-w-3xl mb-12 md:mb-16">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-surface-panel border border-border-milled mb-4">
+        <span class="w-1.5 h-1.5 rounded-full bg-signal-orange"></span>
+        <span class="font-mono text-[11px] font-semibold tracking-wider uppercase text-signal-orange">
+          System Comparison · Technical Honesty
+        </span>
+      </div>
+      <h2 id="comparison-title" class="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-bone tracking-tight leading-tight">
+        The "Anti-AmpMe" Technical Honesty Matrix
+      </h2>
+      <p class="mt-4 font-sans text-sm sm:text-base text-text-muted leading-relaxed">
+        Phone speaker clustering is a local acoustic physics problem, not an excuse for a <strong class="text-bone">$520/year subscription trap</strong>. Compare RoomBeat’s native C++ NDK multicast pipeline against commercial commercial sync apps.
+      </p>
+    </div>
+
+    <!-- Master Hardware Matrix Panel -->
+    <div class="hardware-panel rounded-[8px] overflow-hidden border border-border-milled">
+      
+      <!-- Top Rack Strip with Machined Hex-Bolt Markers -->
+      <div class="bg-[#0D0F13] px-4 py-3 border-b border-border-milled flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <!-- Mechanical Allen Bolt Graphic -->
+          <span class="w-2.5 h-2.5 rounded-[2px] bg-[#07080A] border border-[#3E4454] flex items-center justify-center">
+            <span class="w-1 h-1 rounded-full bg-[#5D6475]"></span>
+          </span>
+          <span class="font-mono text-[11px] uppercase tracking-wider text-text-muted font-medium">
+            BENCHMARK CHASSIS: M-02 // PEER-TO-PEER SYNC SPECIFICATIONS
+          </span>
+        </div>
+        <div class="flex items-center gap-4 font-mono text-[11px] text-text-dim">
+          <span class="inline-flex items-center gap-1.5 text-sync-green font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
+            STANDARDS: FACT-VERIFIED
+          </span>
+          <span class="hidden sm:inline-block">LICENSE: MIT</span>
+        </div>
+      </div>
+
+      <!-- Comparison Table (Horizontal Scrollable on Small Screens) -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[760px] lg:min-w-full">
+          <thead>
+            <tr class="border-b border-border-milled bg-[#101217]">
+              <th scope="col" class="py-4 px-5 text-xs font-mono font-semibold uppercase tracking-wider text-text-dim w-[22%]">
+                Evaluation Metric
+              </th>
+              
+              <!-- ROOMBEAT HIGHLIGHT COLUMN -->
+              <th scope="col" class="py-4 px-5 text-xs font-display font-extrabold uppercase tracking-wider text-sync-green bg-[#00E599]/5 border-x border-[#00E599]/30 w-[28%] relative">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-sync-green"></span>
+                    <span class="text-bone font-bold text-sm">ROOMBEAT</span>
+                  </div>
+                  <span class="font-mono text-[10px] text-sync-green bg-[#00E599]/15 border border-[#00E599]/40 px-1.5 py-0.5 rounded-[3px]">
+                    MIT / VERIFIED
+                  </span>
+                </div>
+              </th>
+
+              <!-- AMPME -->
+              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[20%]">
+                <div class="flex items-center justify-between gap-1">
+                  <span>AmpMe</span>
+                  <span class="font-mono text-[10px] text-sync-red bg-[#FF334B]/10 border border-[#FF334B]/30 px-1 py-0.5 rounded-[3px]">
+                    $520/YR
+                  </span>
+                </div>
+              </th>
+
+              <!-- SOUNDSEEDER -->
+              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[15%]">
+                SoundSeeder
+              </th>
+
+              <!-- RAVE -->
+              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[15%]">
+                Rave
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-border-milled text-xs font-sans">
+            
+            <!-- ROW 1: PRICING & LICENSING -->
+            <tr class="hover:bg-[#161920] transition-colors">
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-2 font-display font-bold text-bone">
+                  <DollarSign class="w-4 h-4 text-signal-orange shrink-0" />
+                  <span>Pricing & Model</span>
+                </div>
+                <p class="font-sans text-[11px] text-text-dim mt-0.5">True annual cost to maintain access</p>
+              </td>
+
+              <!-- RoomBeat -->
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
+                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono font-bold text-bone text-xs sm:text-sm">$0 Free &amp; Open Source</span>
+                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
+                      MIT License. Zero paywalls, zero in-app purchases, zero ads. Forever unrestricted for unlimited nodes.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- AmpMe -->
+              <td class="py-4 px-5 text-text-muted">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
+                    <X class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono font-bold text-sync-red">$9.99 / week</span>
+                    <p class="text-[11px] text-text-dim mt-0.5">
+                      ~$520/year VIP subscription. Aggressive paywall after 3-day trial. Free mode strictly crippled.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- SoundSeeder -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-bone font-medium">Free (2 devices)</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  $4.99 one-time unlock for up to 16 devices. 15-min playback limit on free tier.
+                </p>
+              </td>
+
+              <!-- Rave -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-bone font-medium">Free w/ Ads</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  $1.99–$3.99/mo Rave Premium to remove video ads. Requires own streaming accounts.
+                </p>
+              </td>
+            </tr>
+
+            <!-- ROW 2: ACOUSTIC SYNC ENGINE -->
+            <tr class="hover:bg-[#161920] transition-colors">
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-2 font-display font-bold text-bone">
+                  <Cpu class="w-4 h-4 text-sync-green shrink-0" />
+                  <span>Sync Engine</span>
+                </div>
+                <p class="font-sans text-[11px] text-text-dim mt-0.5">Audio thread &amp; drift compensation</p>
+              </td>
+
+              <!-- RoomBeat -->
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
+                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono font-bold text-sync-green">Native C++ NDK Oboe (&lt;0.5ms)</span>
+                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
+                      Hardware MMAP low-latency buffer, monotonic clock presentation target, and NDK fractional speed resampler (±0.05%).
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- AmpMe -->
+              <td class="py-4 px-5 text-text-muted">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
+                    <AlertTriangle class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono text-sync-red font-medium">High-Level Java / Web</span>
+                    <p class="text-[11px] text-text-dim mt-0.5">
+                      Noticeable chorus echo (20–100ms drift). Relies on manual user slider calibration.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- SoundSeeder -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-bone font-medium">Java AudioTrack</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Static buffer with manual buffer size tuning. Bluetooth introduces 20–70ms variable lag.
+                </p>
+              </td>
+
+              <!-- Rave -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-text-dim font-medium">Cloud Media Sync</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  100–500ms delay. Unsuitable for acoustic playback in the same room.
+                </p>
+              </td>
+            </tr>
+
+            <!-- ROW 3: NETWORK & OFFLINE UTILITY -->
+            <tr class="hover:bg-[#161920] transition-colors">
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-2 font-display font-bold text-bone">
+                  <Wifi class="w-4 h-4 text-network-cyan shrink-0" />
+                  <span>Network Dependency</span>
+                </div>
+                <p class="font-sans text-[11px] text-text-dim mt-0.5">Offline viability &amp; transport</p>
+              </td>
+
+              <!-- RoomBeat -->
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
+                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono font-bold text-bone">100% Offline Hotspot &amp; LAN</span>
+                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
+                      Direct UDP multicast (`239.255.42.99`). Functions in dead zones, parks, beaches, and camp sites with zero cellular data.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- AmpMe -->
+              <td class="py-4 px-5 text-text-muted">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
+                    <X class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono text-sync-red font-medium">Mandatory Internet</span>
+                    <p class="text-[11px] text-text-dim mt-0.5">
+                      Requires active WAN connection and cloud server handshake even when phones are on the same Wi-Fi.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- SoundSeeder -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-sync-green font-medium">Offline Capable</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Works over local Wi-Fi or portable hotspot for local files and DLNA.
+                </p>
+              </td>
+
+              <!-- Rave -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-sync-red font-medium">Mandatory Cloud</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  All audio/video streams pulled independently from external cloud CDNs.
+                </p>
+              </td>
+            </tr>
+
+            <!-- ROW 4: AUDIO PIPELINE & CAPTURE -->
+            <tr class="hover:bg-[#161920] transition-colors">
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-2 font-display font-bold text-bone">
+                  <Radio class="w-4 h-4 text-signal-orange shrink-0" />
+                  <span>Audio Pipeline</span>
+                </div>
+                <p class="font-sans text-[11px] text-text-dim mt-0.5">Codec, latency &amp; system ingest</p>
+              </td>
+
+              <!-- RoomBeat -->
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
+                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono font-bold text-bone">20ms Opus @ 48kHz Stereo</span>
+                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
+                      Low-latency jitter buffer with PLC. Captures system app audio (<code class="text-bone">AudioPlaybackCapture</code> on API 34+), SAF storage, &amp; Spotify App Remote.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- AmpMe -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-text-dim font-medium">Walled Garden APIs</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  No system-wide audio capture. Limited to in-app YouTube, SoundCloud, or Spotify web player.
+                </p>
+              </td>
+
+              <!-- SoundSeeder -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-text-dim font-medium">PCM / MP3 Unicast</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Cannot capture modern Android app audio (YouTube, TikTok); restricted to local files or UPnP.
+                </p>
+              </td>
+
+              <!-- Rave -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-text-dim font-medium">Cloud Media WebViews</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  High CPU/battery drain from simultaneous video rendering and VoIP audio processing.
+                </p>
+              </td>
+            </tr>
+
+            <!-- ROW 5: PRIVACY & AUTHENTICATION -->
+            <tr class="hover:bg-[#161920] transition-colors">
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-2 font-display font-bold text-bone">
+                  <ShieldCheck class="w-4 h-4 text-sync-green shrink-0" />
+                  <span>Privacy &amp; Accounts</span>
+                </div>
+                <p class="font-sans text-[11px] text-text-dim mt-0.5">Telemetry, logins &amp; data collection</p>
+              </td>
+
+              <!-- RoomBeat -->
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
+                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono font-bold text-sync-green">0 Tracking · 0 Accounts</span>
+                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
+                      Host phone is the server. Zero cloud telemetry, zero analytics SDKs, zero user registration. No data ever leaves the local subnet.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- AmpMe -->
+              <td class="py-4 px-5 text-text-muted">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
+                    <Lock class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono text-sync-red font-medium">Mandatory Social Login</span>
+                    <p class="text-[11px] text-text-dim mt-0.5">
+                      Forces Facebook or Google authentication even for local party joining. Multiple ad trackers embedded.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- SoundSeeder -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-bone font-medium">No Social Login</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Standard Google Play Store licensing validation; privacy friendly.
+                </p>
+              </td>
+
+              <!-- Rave -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-sync-red font-medium">Account Required</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Mandatory user profile. Requires authenticating private Netflix/Spotify credentials.
+                </p>
+              </td>
+            </tr>
+
+            <!-- ROW 6: DEVICE SCALABILITY -->
+            <tr class="hover:bg-[#161920] transition-colors">
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-2 font-display font-bold text-bone">
+                  <Layers class="w-4 h-4 text-network-cyan shrink-0" />
+                  <span>Listener Scalability</span>
+                </div>
+                <p class="font-sans text-[11px] text-text-dim mt-0.5">Bandwidth complexity &amp; peer limits</p>
+              </td>
+
+              <!-- RoomBeat -->
+              <td class="py-4 px-5 bg-[#00E599]/5 border-x border-[#00E599]/30">
+                <div class="flex items-start gap-2">
+                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
+                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
+                  </span>
+                  <div>
+                    <span class="font-mono font-bold text-bone">Unlimited Peers — O(1) Bandwidth</span>
+                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
+                      Single UDP multicast packet serves 2 or 200 phones simultaneously. Host transmission load does not scale with room size.
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- AmpMe -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-text-dim font-medium">Server Bottleneck</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Cloud relay bandwidth degradation and audio stutters as participant count increases.
+                </p>
+              </td>
+
+              <!-- SoundSeeder -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-text-dim font-medium">Capped at 2 (Free) / 16 (Paid)</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Unicast TCP streaming: host phone transmits duplicate streams per client, choking Wi-Fi bandwidth.
+                </p>
+              </td>
+
+              <!-- Rave -->
+              <td class="py-4 px-5 text-text-muted">
+                <span class="font-mono text-text-dim font-medium">Room Capped</span>
+                <p class="text-[11px] text-text-dim mt-0.5">
+                  Host and server connections degrade under concurrent video synchronization.
+                </p>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Bottom Citation & Fact-Check Footer -->
+      <div class="bg-[#0D0F13] px-5 py-4 border-t border-border-milled flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[11px] font-mono text-text-dim">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span class="text-text-muted font-medium">Factual Citations:</span>
+          <span>[1] AmpMe Terms &amp; VIP pricing ($9.99/wk)</span>
+          <span>[2] SoundSeeder Play Store spec (2-device free limit)</span>
+          <span>[3] AOSP Oboe AAudio MMAP Documentation</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-sync-green">
+          <span class="w-1.5 h-1.5 rounded-full bg-sync-green"></span>
+          <span>Zero affiliate sponsorships · 100% engineering honesty</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
