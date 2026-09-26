@@ -27,6 +27,10 @@ export class RadarCanvas {
     this.visualDelays = [0, 0, 0, 0];
     this.lockPulsePhase = 0;
 
+    // Dual-Mode Oscilloscope: 'radar' (Mode A) vs 'lissajous' (Mode B)
+    this.mode = 'radar';
+    this.phaseCorrelation = 1.0;
+
     // Node angles on polar grid
     this.nodeAngles = [
       0,                  // Host: center
@@ -38,6 +42,18 @@ export class RadarCanvas {
     this.resizeObserver = null;
     this._handleResize = this._handleResize.bind(this);
     this._render = this._render.bind(this);
+  }
+
+  setMode(mode) {
+    if (mode === 'radar' || mode === 'lissajous') {
+      this.mode = mode;
+    }
+    return this.mode;
+  }
+
+  toggleMode() {
+    this.mode = this.mode === 'radar' ? 'lissajous' : 'radar';
+    return this.mode;
   }
 
   init() {
@@ -117,23 +133,36 @@ export class RadarCanvas {
     this.ctx.fillStyle = '#07080A';
     this.ctx.fillRect(0, 0, this.width, this.height);
 
-    // 1. Draw subtle background coordinate grid
-    this._drawGrid();
+    if (this.mode === 'radar') {
+      // Mode A: Polar Radar Oscilloscope
+      // 1. Draw subtle background coordinate grid
+      this._drawGrid();
 
-    // 2. Draw Polar Range Rings and Angular Bezel
-    this._drawPolarReticle(isLocked);
+      // 2. Draw Polar Range Rings and Angular Bezel
+      this._drawPolarReticle(isLocked);
 
-    // 3. Draw Oscilloscope / Lissajous Phase Core
-    this._drawPhaseScope(telemetry);
+      // 3. Draw Oscilloscope / Lissajous Phase Core inside center ring
+      this._drawPhaseScope(telemetry);
 
-    // 4. Draw Radar Sweep and Phosphor Trail
-    this._drawRadarSweep(isLocked, isPlaying);
+      // 4. Draw Radar Sweep and Phosphor Trail
+      this._drawRadarSweep(isLocked, isPlaying);
 
-    // 5. Draw 4 Node Blips, Vectors, and Telemetry Tags
-    this._drawNodes(telemetry, isLocked);
+      // 5. Draw 4 Node Blips, Vectors, and Telemetry Tags
+      this._drawNodes(telemetry, isLocked);
 
-    // 6. Draw HUD Readout & Status Stamp
-    this._drawHudOverlays(telemetry, isLocked);
+      // 6. Draw HUD Readout & Status Stamp
+      this._drawHudOverlays(telemetry, isLocked);
+    } else {
+      // Mode B: Dedicated Lissajous Phase Correlation Scope
+      // 1. Draw Tektronix CRT Graticule with In-Phase (+45°) & Anti-Phase (-45°) axes
+      this._drawLissajousGraticule(isLocked);
+
+      // 2. Draw Stereo Phase Correlation Curve from WebAudio analysers
+      this._drawLissajousCurve(telemetry, isLocked, isPlaying);
+
+      // 3. Draw Lissajous Oscilloscope HUD Overlays
+      this._drawLissajousHudOverlays(telemetry, isLocked);
+    }
   }
 
   _drawGrid() {
@@ -476,6 +505,267 @@ export class RadarCanvas {
     // Bottom-right sweep mode
     ctx.textAlign = 'right';
     ctx.fillText('OBOE MMAP / OPUS 20ms', this.width - 12, this.height - 12);
+
+    ctx.restore();
+  }
+
+  /**
+   * Mode B: Tektronix-style CRT Oscilloscope Graticule
+   * Features Cartesian coordinate grid, center crosshairs with sub-ticks,
+   * and in-phase (+45°) / anti-phase (-45°) reference axes.
+   */
+  _drawLissajousGraticule(isLocked) {
+    const ctx = this.ctx;
+    ctx.save();
+
+    const margin = 20;
+    const scopeW = this.width - margin * 2;
+    const scopeH = this.height - margin * 2;
+    const left = margin;
+    const top = margin;
+
+    // Outer screen enclosure
+    ctx.strokeStyle = 'rgba(38, 42, 53, 0.7)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(left, top, scopeW, scopeH);
+
+    // Subtle CRT phosphor background grid (10 columns x 8 rows)
+    ctx.strokeStyle = 'rgba(38, 42, 53, 0.4)';
+    const cols = 10;
+    const rows = 8;
+    const colW = scopeW / cols;
+    const rowH = scopeH / rows;
+
+    for (let c = 1; c < cols; c++) {
+      const x = left + c * colW;
+      ctx.beginPath();
+      ctx.moveTo(x, top);
+      ctx.lineTo(x, top + scopeH);
+      ctx.stroke();
+    }
+
+    for (let r = 1; r < rows; r++) {
+      const y = top + r * rowH;
+      ctx.beginPath();
+      ctx.moveTo(left, y);
+      ctx.lineTo(left + scopeW, y);
+      ctx.stroke();
+    }
+
+    // Major Center Crosshairs (X and Y axes)
+    ctx.strokeStyle = 'rgba(62, 68, 84, 0.9)';
+    ctx.lineWidth = 1.25;
+
+    // Horizontal Axis (X: Host Reference)
+    ctx.beginPath();
+    ctx.moveTo(left, this.centerY);
+    ctx.lineTo(left + scopeW, this.centerY);
+    ctx.stroke();
+
+    // Vertical Axis (Y: Peer A Delayed / Sum)
+    ctx.beginPath();
+    ctx.moveTo(this.centerX, top);
+    ctx.lineTo(this.centerX, top + scopeH);
+    ctx.stroke();
+
+    // Millimeter tick marks along Center Crosshairs
+    const subTicks = 5;
+    for (let c = 0; c < cols; c++) {
+      for (let s = 1; s < subTicks; s++) {
+        const tx = left + c * colW + (s * colW) / subTicks;
+        ctx.beginPath();
+        ctx.moveTo(tx, this.centerY - 2.5);
+        ctx.lineTo(tx, this.centerY + 2.5);
+        ctx.strokeStyle = 'rgba(93, 100, 117, 0.6)';
+        ctx.stroke();
+      }
+    }
+    for (let r = 0; r < rows; r++) {
+      for (let s = 1; s < subTicks; s++) {
+        const ty = top + r * rowH + (s * rowH) / subTicks;
+        ctx.beginPath();
+        ctx.moveTo(this.centerX - 2.5, ty);
+        ctx.lineTo(this.centerX + 2.5, ty);
+        ctx.strokeStyle = 'rgba(93, 100, 117, 0.6)';
+        ctx.stroke();
+      }
+    }
+
+    // 45-degree In-Phase Reference Axis (Bottom-Left to Top-Right)
+    const diagSpan = Math.min(scopeW, scopeH) * 0.44;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = isLocked ? 'rgba(0, 229, 153, 0.45)' : 'rgba(255, 184, 0, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(this.centerX - diagSpan, this.centerY + diagSpan);
+    ctx.lineTo(this.centerX + diagSpan, this.centerY - diagSpan);
+    ctx.stroke();
+
+    // -45-degree Anti-Phase Reference Axis (Top-Left to Bottom-Right)
+    ctx.strokeStyle = 'rgba(255, 51, 75, 0.25)';
+    ctx.beginPath();
+    ctx.moveTo(this.centerX - diagSpan, this.centerY - diagSpan);
+    ctx.lineTo(this.centerX + diagSpan, this.centerY + diagSpan);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Reference Axis Labels
+    ctx.font = '8.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = isLocked ? '#00E599' : '#FFB800';
+    ctx.textAlign = 'left';
+    ctx.fillText('+45° [IN-PHASE]', this.centerX + diagSpan + 4, this.centerY - diagSpan);
+
+    ctx.fillStyle = '#FF334B';
+    ctx.textAlign = 'right';
+    ctx.fillText('-45° [ANTI-PHASE]', this.centerX - diagSpan - 4, this.centerY - diagSpan);
+
+    // Concentric unity correlation limit ring
+    ctx.beginPath();
+    ctx.arc(this.centerX, this.centerY, diagSpan, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(38, 42, 53, 0.6)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /**
+   * Mode B: Real-Time Stereo Phase Correlation Curve
+   * Computes X-Y trajectory from Host & Peer analyser time data.
+   * Renders a crisp 45° diagonal line when locked in phase,
+   * and chaotic warped loops when jittered.
+   */
+  _drawLissajousCurve(telemetry, isLocked, isPlaying) {
+    const ctx = this.ctx;
+    ctx.save();
+
+    if (!isPlaying) {
+      // Resting CRT phosphor spot at center
+      const spotPulse = 3.5 + Math.sin(this.lockPulsePhase * 2) * 1;
+      ctx.beginPath();
+      ctx.arc(this.centerX, this.centerY, spotPulse, 0, Math.PI * 2);
+      ctx.fillStyle = isLocked ? '#00E599' : '#FFB800';
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = 10;
+      ctx.fill();
+
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#5D6475';
+      ctx.textAlign = 'center';
+      ctx.fillText('[ BEAM STANDBY // CLICK START RIG ]', this.centerX, this.centerY + 24);
+      ctx.restore();
+      return;
+    }
+
+    const host = telemetry.channels[0];
+    const peerA = telemetry.channels[1];
+    if (!host || !host.timeData) {
+      ctx.restore();
+      return;
+    }
+
+    const hostData = host.timeData;
+    const peerData = peerA ? peerA.timeData : hostData;
+    const len = hostData.length;
+
+    // Calculate real-time Pearson correlation coefficient
+    let sumXY = 0;
+    let sumX2 = 0;
+    let sumY2 = 0;
+    for (let i = 0; i < len; i++) {
+      const x = hostData[i];
+      const y = peerData[i];
+      sumXY += x * y;
+      sumX2 += x * x;
+      sumY2 += y * y;
+    }
+    const denom = Math.sqrt(sumX2 * sumY2);
+    const rawR = denom > 0.0001 ? (sumXY / denom) : (isLocked ? 1.0 : 0.0);
+    this.phaseCorrelation += (rawR - this.phaseCorrelation) * 0.12;
+
+    const scopeSpan = Math.min(this.width, this.height) * 0.38;
+    const step = 2;
+
+    const curveColor = isLocked ? '#00E599' : (telemetry.maxDriftMs > 25 ? '#FF334B' : '#FFB800');
+    const glowColor = isLocked ? 'rgba(0, 229, 153, 0.35)' : 'rgba(255, 184, 0, 0.35)';
+
+    // Pass 1: Ambient Phosphor Glow
+    ctx.beginPath();
+    for (let i = 0; i < len; i += step) {
+      const xVal = hostData[i];
+      const yVal = peerData[i];
+      const px = this.centerX + xVal * scopeSpan * 1.6;
+      const py = this.centerY - yVal * scopeSpan * 1.6;
+      if (i === 0) {
+        ctx.moveTo(px, py);
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+    ctx.strokeStyle = glowColor;
+    ctx.lineWidth = 4;
+    ctx.shadowColor = curveColor;
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+
+    // Pass 2: High-voltage Core Electron Beam
+    ctx.beginPath();
+    for (let i = 0; i < len; i += step) {
+      const xVal = hostData[i];
+      const yVal = peerData[i];
+      const px = this.centerX + xVal * scopeSpan * 1.6;
+      const py = this.centerY - yVal * scopeSpan * 1.6;
+      if (i === 0) {
+        ctx.moveTo(px, py);
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+    ctx.strokeStyle = curveColor;
+    ctx.lineWidth = 1.75;
+    ctx.shadowColor = curveColor;
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /**
+   * Mode B: Lissajous Telemetry & HUD Readout
+   */
+  _drawLissajousHudOverlays(telemetry, isLocked) {
+    const ctx = this.ctx;
+    ctx.save();
+
+    // Top-left
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#9DA5B4';
+    ctx.textAlign = 'left';
+    ctx.fillText('LISSAJOUS PHASE CORRELATION SCOPE // X-Y MODE', 12, 18);
+
+    ctx.fillStyle = '#5D6475';
+    ctx.fillText('X: HOST [REF]  |  Y: PEER A [S24]', 12, 30);
+
+    // Top-right status
+    ctx.textAlign = 'right';
+    if (isLocked) {
+      ctx.fillStyle = '#00E599';
+      ctx.fillText('PHASE LOCK: 45° DIAGONAL (<0.5ms)', this.width - 12, 18);
+      ctx.fillText('CORRELATION: +1.00 [COHERENT]', this.width - 12, 30);
+    } else {
+      ctx.fillStyle = '#FFB800';
+      ctx.fillText(`PHASE JITTER: +${telemetry.maxDriftMs.toFixed(1)}ms DRIFT`, this.width - 12, 18);
+      ctx.fillText(`CORRELATION: ${this.phaseCorrelation.toFixed(2)} [COMB FILTERING]`, this.width - 12, 30);
+    }
+
+    // Bottom-left
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#5D6475';
+    ctx.fillText('TRACE: 48kHz WEBAUDIO ANALYSER // FLOAT32', 12, this.height - 12);
+
+    // Bottom-right
+    ctx.textAlign = 'right';
+    ctx.fillText('MODE: STEREO GONIOMETER', this.width - 12, this.height - 12);
 
     ctx.restore();
   }

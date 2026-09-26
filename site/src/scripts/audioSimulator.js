@@ -12,6 +12,62 @@
  */
 
 export class AudioSimulator {
+  /**
+   * Logarithmic audio fader gain mapping (-inf to +3dB).
+   * Maps fader position [0..100] to gain amplitude:
+   *   pos = 0   => -inf dB (gain = 0.0)
+   *   pos = 25  => -12 dB  (gain = 0.2512)
+   *   pos = 50  => -6 dB   (gain = 0.5012)
+   *   pos = 75  => 0 dB    (gain = 1.0000, unity center detent)
+   *   pos = 100 => +3 dB   (gain = 1.4125)
+   */
+  static faderPosToGain(pos) {
+    if (pos <= 0) return 0.0;
+    // Magnetic center detent at 0 dB (pos 75)
+    if (pos >= 73 && pos <= 77) return 1.0;
+
+    let db = 0;
+    if (pos <= 25) {
+      const u = pos / 25.0;
+      db = -48.0 + u * 36.0; // -48dB to -12dB
+    } else if (pos <= 50) {
+      const u = (pos - 25) / 25.0;
+      db = -12.0 + u * 6.0; // -12dB to -6dB
+    } else if (pos <= 75) {
+      const u = (pos - 50) / 25.0;
+      db = -6.0 + u * 6.0; // -6dB to 0dB
+    } else {
+      const u = (pos - 75) / 25.0;
+      db = u * 3.0; // 0dB to +3dB
+    }
+    return Math.pow(10, db / 20.0);
+  }
+
+  static faderPosToDb(pos) {
+    if (pos <= 0) return '-inf dB';
+    if (pos >= 73 && pos <= 77) return '0.0 dB';
+
+    let db = 0;
+    if (pos <= 25) {
+      const u = pos / 25.0;
+      db = -48.0 + u * 36.0;
+    } else if (pos <= 50) {
+      const u = (pos - 25) / 25.0;
+      db = -12.0 + u * 6.0;
+    } else if (pos <= 75) {
+      const u = (pos - 50) / 25.0;
+      db = -6.0 + u * 6.0;
+    } else {
+      const u = (pos - 75) / 25.0;
+      db = u * 3.0;
+    }
+
+    if (db > 0) {
+      return `+${db.toFixed(1)} dB`;
+    }
+    return `${db.toFixed(1)} dB`;
+  }
+
   constructor() {
     this.ctx = null;
     this.isPlaying = false;
@@ -24,7 +80,7 @@ export class AudioSimulator {
     this.nextStepTime = 0;
     this.timerId = null;
 
-    // 4 channel nodes data
+    // 4 channel nodes data (Host + 3 Peers)
     this.channels = [
       {
         id: 'host',
@@ -32,7 +88,9 @@ export class AudioSimulator {
         role: 'HOST (REF)',
         delayMs: 0.0,
         targetDelayMs: 0.0,
-        volume: 0.8,
+        faderPos: 75,
+        volume: 1.0,
+        dbText: '0.0 dB',
         muted: false,
         solo: false,
         delayNode: null,
@@ -48,7 +106,9 @@ export class AudioSimulator {
         role: 'PEER A',
         delayMs: 0.0,
         targetDelayMs: 0.0,
-        volume: 0.8,
+        faderPos: 75,
+        volume: 1.0,
+        dbText: '0.0 dB',
         muted: false,
         solo: false,
         delayNode: null,
@@ -64,7 +124,9 @@ export class AudioSimulator {
         role: 'PEER B',
         delayMs: 0.0,
         targetDelayMs: 0.0,
-        volume: 0.8,
+        faderPos: 75,
+        volume: 1.0,
+        dbText: '0.0 dB',
         muted: false,
         solo: false,
         delayNode: null,
@@ -80,7 +142,9 @@ export class AudioSimulator {
         role: 'PEER C',
         delayMs: 0.0,
         targetDelayMs: 0.0,
-        volume: 0.8,
+        faderPos: 75,
+        volume: 1.0,
+        dbText: '0.0 dB',
         muted: false,
         solo: false,
         delayNode: null,
@@ -520,13 +584,68 @@ export class AudioSimulator {
   }
 
   /**
-   * Sets channel volume (0.0 to 1.0).
+   * Sets channel volume using fader position [0..100] with logarithmic dB mapping.
+   * Snaps magnetic center detent at 0 dB (pos 75).
+   * @param {number} idx Channel index (0..3)
+   * @param {number} faderPos Fader position (0..100)
    */
-  setChannelVolume(idx, vol) {
+  setChannelVolume(idx, faderPos) {
     if (idx < 0 || idx >= this.channels.length) return;
-    this.channels[idx].volume = Math.max(0, Math.min(1, vol));
+    let pos = Math.max(0, Math.min(100, Math.round(faderPos)));
+    if (pos >= 73 && pos <= 77) {
+      pos = 75; // Magnetic detent snap at 0 dB
+    }
+
+    const ch = this.channels[idx];
+    ch.faderPos = pos;
+    ch.volume = AudioSimulator.faderPosToGain(pos);
+    ch.dbText = AudioSimulator.faderPosToDb(pos);
+
     this._updateGains();
     this._notify();
+    return { faderPos: pos, volume: ch.volume, dbText: ch.dbText };
+  }
+
+  /**
+   * Sets master transport tempo in BPM (80..160).
+   * @param {number} bpm
+   */
+  setTempo(bpm) {
+    this.tempoBpm = Math.max(80, Math.min(160, Math.round(bpm)));
+    this._notify();
+    return this.tempoBpm;
+  }
+
+  /**
+   * Synthesizes subtle tactile audio click feedback on physical keycap button presses.
+   */
+  playKeycapClick() {
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(2200, t);
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(2800, t);
+      osc.frequency.exponentialRampToValueAtTime(700, t + 0.007);
+
+      gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.008);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.01);
+    } catch {
+      // Ignore if AudioContext is blocked
+    }
   }
 
   /**
@@ -537,6 +656,7 @@ export class AudioSimulator {
     this.channels[idx].muted = !this.channels[idx].muted;
     this._updateGains();
     this._notify();
+    return this.channels[idx].muted;
   }
 
   /**
@@ -547,10 +667,13 @@ export class AudioSimulator {
     this.channels[idx].solo = !this.channels[idx].solo;
     this._updateGains();
     this._notify();
+    return this.channels[idx].solo;
   }
 
   /**
-   * Computes active gain based on volume, mute, and solo.
+   * Computes active gain based on volume, mute, and solo across all 4 channels.
+   * - If ANY channel is soloed: only soloed channels that are not muted pass audio.
+   * - If NO channels are soloed: all unmuted channels pass audio at their fader gain.
    */
   _updateGains() {
     if (!this.ctx) return;
@@ -572,7 +695,7 @@ export class AudioSimulator {
   }
 
   /**
-   * Polls telemetry for visualizers (VU meters, radar canvas).
+   * Polls telemetry for visualizers (VU meters, radar canvas, diagnostic dials).
    * Call inside requestAnimationFrame loop.
    */
   getTelemetry() {
@@ -612,11 +735,24 @@ export class AudioSimulator {
     this.isLocked = allWithinLockZone;
     this.isJittered = !allWithinLockZone;
 
+    // Simulate real-time packet loss and jitter buffer depth for Bay 04 dials
+    let packetLossPct = 0.0;
+    let bufferDepthMs = 20;
+
+    if (!allWithinLockZone) {
+      packetLossPct = Number(Math.min(12.0, (maxDriftMs * 0.14) + 0.6).toFixed(1));
+      bufferDepthMs = Math.min(60, Math.round(20 + maxDriftMs * 0.7));
+    }
+
     return {
       isPlaying: this.isPlaying,
       isLocked: this.isLocked,
       isJittered: this.isJittered,
       maxDriftMs: maxDriftMs,
+      packetLossPct: packetLossPct,
+      bufferDepthMs: bufferDepthMs,
+      tempoBpm: this.tempoBpm,
+      currentStep: this.currentStep,
       channels: this.channels,
     };
   }
