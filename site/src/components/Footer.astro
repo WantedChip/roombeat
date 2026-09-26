@@ -1,82 +1,376 @@
 ---
+import {
+  Download,
+  ShieldCheck,
+  Cpu,
+  Wifi,
+  Radio,
+  CheckCircle2,
+  ArrowUpRight,
+  ChevronRight,
+  Terminal,
+  FileCode2,
+  Clock,
+  Layers,
+} from 'lucide-astro';
 import GithubIcon from './icons/GithubIcon.astro';
+
+const sdkCompatibility = [
+  {
+    api: 'API 30',
+    os: 'Android 11',
+    role: 'Min SDK',
+    audio: 'Oboe AAudio / OpenSL ES fallback (<5ms)',
+    capture: 'Local Storage (SAF) / Mic acoustic sync',
+    network: 'WifiManager.MulticastLock + NsdManager mDNS',
+    status: 'SUPPORTED',
+    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
+  },
+  {
+    api: 'API 31–33',
+    os: 'Android 12–13',
+    role: 'Standard',
+    audio: 'Direct AAudio MMAP hardware output buffer',
+    capture: 'Exact Alarm presentation scheduling (CLOCK_MONOTONIC)',
+    network: 'SCHEDULE_EXACT_ALARM + dynamic device routing',
+    status: 'SUPPORTED',
+    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
+  },
+  {
+    api: 'API 34',
+    os: 'Android 14',
+    role: 'Capture Engine',
+    audio: 'Oboe AAudio Exclusive Mode + Catmull-Rom Resampler',
+    capture: 'AudioPlaybackCaptureConfiguration + mediaProjection FGS',
+    network: 'Full Wi-Fi multicast lock + foreground notification',
+    status: 'SUPPORTED',
+    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
+  },
+  {
+    api: 'API 35',
+    os: 'Android 15',
+    role: 'Target SDK',
+    audio: '16KB ELF page size alignment + low-jitter thread affinity',
+    capture: 'Lossless stereo system capture + per-device volume balancing',
+    network: 'WIFI_MODE_FULL_LOW_LATENCY + edge-to-edge Compose',
+    status: 'PRIMARY TARGET',
+    statusColor: 'text-signal-orange border-signal-orange/30 bg-signal-orange/10 font-bold',
+  },
+  {
+    api: 'API 36',
+    os: 'Android 16',
+    role: 'Modern',
+    audio: 'Power-optimized NDK C++20 audio threads & zero CPU clipping',
+    capture: 'Continuous system audio projection with zero frame drop',
+    network: 'High-throughput local multicast optimization',
+    status: 'SUPPORTED',
+    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
+  },
+  {
+    api: 'API 37',
+    os: 'Android 16+ / Next',
+    role: 'Forward-Ready',
+    audio: 'Low-latency NDK C++ audio path with high-res clock ticks',
+    capture: 'Multi-channel system audio stream extraction',
+    network: 'Forward-compatible ACCESS_LOCAL_NETWORK permission scaffolding',
+    status: 'FORWARD-READY',
+    statusColor: 'text-network-cyan border-network-cyan/30 bg-network-cyan/10',
+  },
+];
 ---
 
-<footer class="w-full bg-[#07080A] border-t border-border-milled py-12 text-xs font-mono text-text-dim">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-      
-      <!-- Hardware Identity -->
-      <div class="space-y-3">
-        <div class="font-display font-bold text-sm tracking-tight text-bone uppercase">
-          ROOMBEAT // CHASSIS v1.0
+<footer class="w-full bg-[#0B0C0E] border-t border-border-milled pt-14 pb-8 text-xs font-mono text-text-dim relative z-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    
+    <!-- ================= TOP HARDWARE MODULE CHASSIS ================= -->
+    <div class="hardware-panel rounded-lg p-6 sm:p-8 relative">
+      <!-- Decorative corner hex bolts -->
+      <div class="absolute top-2.5 left-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
+      <div class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
+      <div class="absolute bottom-2.5 left-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
+      <div class="absolute bottom-2.5 right-2.5 w-2 h-2 rounded-full border border-border-milled bg-[#07080A]" aria-hidden="true"></div>
+
+      <!-- Module Identifier Header -->
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-border-milled">
+        <div class="flex items-center gap-3">
+          <span class="px-2 py-0.5 rounded-[3px] bg-surface-elevated border border-border-milled text-[11px] font-mono text-signal-orange font-bold uppercase tracking-wider">
+            MODULE // CHASSIS-SPEC-M05
+          </span>
+          <span class="text-text-dim text-xs font-mono">•</span>
+          <span class="font-display font-bold text-sm tracking-tight text-bone uppercase">
+            ROOMBEAT HARDWARE & SPECIFICATION MATRIX
+          </span>
         </div>
-        <p class="font-sans text-xs text-text-muted leading-relaxed">
-          Open-source local network acoustic synchronization engine for Android. Built with Kotlin, Jetpack Compose, NDK C++ and Oboe.
-        </p>
-        <div class="text-[11px] text-text-dim">
-          Copyright &copy; 2026 WantedChip. Released under MIT License.
+        <div class="flex items-center gap-2 text-[11px] text-text-muted">
+          <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
+          <span>100% OFFLINE LOCAL LAN MULTICAST</span>
         </div>
       </div>
 
-      <!-- Protocol Specifications -->
-      <div class="space-y-2">
-        <div class="font-sans font-bold text-xs uppercase tracking-wider text-text-muted">
-          Specifications
-        </div>
-        <ul class="space-y-1.5 text-text-dim text-[11px]">
-          <li>Audio: 48,000 Hz / Stereo / 16-bit PCM</li>
-          <li>Codec: Opus 20ms frames (128 kbps)</li>
-          <li>Transport: UDP Multicast (239.255.42.99)</li>
-          <li>Sync Clock: CLOCK_MONOTONIC NTP probe</li>
-        </ul>
-      </div>
+      <!-- 4-Column Specification Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        
+        <!-- Column 1: Identity & Open Source License -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
+            <FileCode2 class="w-4 h-4 text-signal-orange" />
+            <span>Open Source License</span>
+          </div>
+          <div class="recessed-cavity rounded p-3 text-[11px] space-y-1.5">
+            <div class="text-bone font-bold">MIT License</div>
+            <div class="text-text-muted leading-relaxed">
+              Copyright &copy; 2026 WantedChip
+            </div>
+            <p class="text-text-dim text-[10px] leading-normal pt-1">
+              Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
+            </p>
+          </div>
+          <div class="flex flex-col gap-2 pt-1">
+            <a
+              href="https://github.com/WantedChip/RoomBeat"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-between px-3 py-2 rounded-[4px] bg-surface-elevated border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-all group"
+            >
+              <div class="flex items-center gap-2">
+                <GithubIcon class="w-4 h-4 text-bone" />
+                <span class="font-sans text-xs font-medium">WantedChip/RoomBeat</span>
+              </div>
+              <ArrowUpRight class="w-3.5 h-3.5 text-text-dim group-hover:text-bone transition-colors" />
+            </a>
 
-      <!-- Compatibility & Platform -->
-      <div class="space-y-2">
-        <div class="font-sans font-bold text-xs uppercase tracking-wider text-text-muted">
-          Compatibility
+            <a
+              href="https://github.com/WantedChip/RoomBeat/releases/latest"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-between px-3 py-2 rounded-[4px] bg-signal-orange/10 border border-signal-orange/30 text-signal-orange hover:bg-signal-orange/20 transition-all group"
+            >
+              <div class="flex items-center gap-2">
+                <Download class="w-4 h-4" />
+                <span class="font-sans text-xs font-bold">Download RoomBeat APK</span>
+              </div>
+              <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-signal-orange/20">v1.0.0-rc</span>
+            </a>
+          </div>
         </div>
-        <ul class="space-y-1.5 text-text-dim text-[11px]">
-          <li>Min SDK: Android 11 (API 30)</li>
-          <li>Target SDK: Android 15 (API 35)</li>
-          <li>Local Network: API 37 forward-ready</li>
-          <li>Required: Wi-Fi or Mobile Hotspot</li>
-        </ul>
-      </div>
 
-      <!-- Security & Privacy Statement -->
-      <div class="space-y-2">
-        <div class="font-sans font-bold text-xs uppercase tracking-wider text-text-muted">
-          Security & Privacy
+        <!-- Column 2: Acoustic Pipeline Specs -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
+            <Cpu class="w-4 h-4 text-sync-green" />
+            <span>Acoustic Audio Pipeline</span>
+          </div>
+          <ul class="space-y-2 text-[11px]">
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Sample Rate:</span>
+              <span class="text-bone font-medium">48,000 Hz / Stereo</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Format:</span>
+              <span class="text-bone font-medium">Float32 / 16-bit PCM</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Codec Frame:</span>
+              <span class="text-bone font-medium">Opus 20ms (960 smp/ch)</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Opus Bitrate:</span>
+              <span class="text-bone font-medium">128 kbps (CBR / VBR)</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Transport:</span>
+              <span class="text-network-cyan font-medium">UDP Multicast</span>
+            </li>
+            <li class="flex items-start justify-between">
+              <span class="text-text-muted">Multicast Group:</span>
+              <span class="text-network-cyan font-medium">239.255.42.99:4242</span>
+            </li>
+          </ul>
         </div>
-        <p class="font-sans text-xs text-text-dim leading-relaxed">
-          100% offline local traffic only. No analytics telemetry, no remote servers, no account registration. The host device acts as the local broadcast server.
-        </p>
+
+        <!-- Column 3: Local Network Privacy Declaration -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
+            <ShieldCheck class="w-4 h-4 text-network-cyan" />
+            <span>Local Privacy Declaration</span>
+          </div>
+          <div class="recessed-cavity rounded p-3 text-[11px] space-y-2">
+            <div class="flex items-center gap-1.5 text-sync-green font-bold">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>0 Analytics Telemetry</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-sync-green font-bold">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>0 Commercial Trackers</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-sync-green font-bold">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>0 Cloud Accounts / Logins</span>
+            </div>
+            <p class="text-text-dim text-[10px] leading-relaxed pt-1 border-t border-border-milled/60">
+              100% offline local subnet traffic. Audio packets never cross the default gateway. Host phone acts as the embedded NTP server.
+            </p>
+          </div>
+        </div>
+
+        <!-- Column 4: Clock Synchronization & Resampler -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
+            <Clock class="w-4 h-4 text-sync-amber" />
+            <span>Synchronization Engine</span>
+          </div>
+          <ul class="space-y-2 text-[11px]">
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Master Clock:</span>
+              <span class="text-bone font-medium">CLOCK_MONOTONIC</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Target Sync:</span>
+              <span class="text-sync-green font-medium">&lt; 0.5 ms (Phase Lock)</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">NDK Resampler:</span>
+              <span class="text-bone font-medium">Catmull-Rom Spline</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Slew Rate:</span>
+              <span class="text-bone font-medium">&plusmn; 0.05% to &plusmn; 0.1%</span>
+            </li>
+            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
+              <span class="text-text-muted">Jitter Buffer:</span>
+              <span class="text-bone font-medium">Adaptive 40–120ms</span>
+            </li>
+            <li class="flex items-start justify-between">
+              <span class="text-text-muted">Scaling:</span>
+              <span class="text-bone font-medium">O(1) Unlimited Peers</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= COMPREHENSIVE ANDROID SDK COMPATIBILITY MATRIX ================= -->
+    <div class="space-y-4">
+      <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <a
-            href="https://github.com/WantedChip/RoomBeat"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-1.5 text-text-muted hover:text-bone transition-colors"
-          >
-            <GithubIcon class="w-3.5 h-3.5" />
-            <span>GitHub Repository</span>
-          </a>
+          <div class="flex items-center gap-2 font-mono text-[11px] text-signal-orange uppercase tracking-wider">
+            <Layers class="w-3.5 h-3.5" />
+            <span>AOSP Architectural Compatibility</span>
+          </div>
+          <h2 class="font-display font-extrabold text-xl sm:text-2xl text-bone tracking-tight mt-1">
+            Android SDK Compatibility Matrix (API 30 – API 37)
+          </h2>
+        </div>
+        <p class="font-sans text-xs text-text-muted max-w-md leading-relaxed">
+          Tested and validated against physical Android devices spanning Android 11 to Android 16+ previews, ensuring low-latency hardware MMAP audio and forward compatibility.
+        </p>
+      </div>
+
+      <!-- Industrial Matrix Table -->
+      <div class="hardware-panel rounded-lg overflow-hidden border border-border-milled">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface-elevated/70 border-b border-border-milled text-[11px] font-mono text-text-muted uppercase tracking-wider">
+                <th class="py-3 px-4 font-bold">API / OS Level</th>
+                <th class="py-3 px-4 font-bold">Role</th>
+                <th class="py-3 px-4 font-bold">Audio Engine & Latency Tier</th>
+                <th class="py-3 px-4 font-bold">Capture & Presentation</th>
+                <th class="py-3 px-4 font-bold">Networking & Permissions</th>
+                <th class="py-3 px-4 font-bold text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-milled/60 font-sans">
+              {sdkCompatibility.map((tier) => (
+                <tr class="hover:bg-surface-elevated/30 transition-colors">
+                  <td class="py-3 px-4 font-mono font-bold text-bone whitespace-nowrap">
+                    <div>{tier.api}</div>
+                    <div class="text-[11px] text-text-dim font-normal">{tier.os}</div>
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="px-2 py-0.5 rounded-[3px] bg-surface-elevated border border-border-milled font-mono text-[10px] text-text-muted">
+                      {tier.role}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-text-muted font-mono text-[11px]">
+                    {tier.audio}
+                  </td>
+                  <td class="py-3 px-4 text-text-dim text-[11px]">
+                    {tier.capture}
+                  </td>
+                  <td class="py-3 px-4 text-text-dim font-mono text-[11px]">
+                    {tier.network}
+                  </td>
+                  <td class="py-3 px-4 text-right whitespace-nowrap">
+                    <span class={`inline-block px-2 py-0.5 rounded-[3px] border font-mono text-[10px] tracking-wider uppercase ${tier.statusColor}`}>
+                      {tier.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Table Footnote -->
+        <div class="bg-surface-recessed p-3 border-t border-border-milled flex flex-wrap items-center justify-between gap-3 text-[11px] text-text-dim font-mono">
+          <div class="flex items-center gap-2">
+            <span class="text-signal-orange font-bold">NOTE:</span>
+            <span>API 34+ utilizes AudioPlaybackCaptureConfiguration with user MediaProjection consent. API 37 includes forward-compatible ACCESS_LOCAL_NETWORK declarations.</span>
+          </div>
+          <div>
+            <span>TOOLCHAIN: NDK r27c • C++20 • KOTLIN 2.1 • AGP 8.8</span>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- ================= BOTTOM MACHINE STRIP & LEGAL NOTICE ================= -->
+    <div class="pt-8 border-t border-border-milled flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] text-text-dim">
+      
+      <!-- Left: Status Beacon & Multicast Identity -->
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
+        <span class="font-mono text-text-muted">
+          STATUS: <span class="text-sync-green font-semibold">ALL LOCAL SYSTEMS NOMINAL</span>
+        </span>
+        <span class="text-text-dim">•</span>
+        <span class="font-mono text-text-dim">239.255.42.99:4242</span>
+      </div>
+
+      <!-- Center: Explicit MIT License & Copyright -->
+      <div class="font-mono text-center md:text-left text-text-muted">
+        <span>MIT License • Copyright &copy; 2026 WantedChip</span>
+      </div>
+
+      <!-- Right: Links & Back to Top -->
+      <div class="flex items-center gap-5 font-mono">
+        <a
+          href="https://github.com/WantedChip/RoomBeat"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-text-muted hover:text-bone transition-colors"
+        >
+          GitHub
+        </a>
+        <a
+          href="https://github.com/WantedChip/RoomBeat/releases/latest"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-text-muted hover:text-signal-orange transition-colors"
+        >
+          APK Releases
+        </a>
+        <a
+          href="#main-content"
+          class="text-text-muted hover:text-bone transition-colors inline-flex items-center gap-1"
+        >
+          <span>Top &uarr;</span>
+        </a>
+      </div>
 
     </div>
 
-    <!-- Bottom Machine Strip -->
-    <div class="pt-6 border-t border-border-milled/50 flex flex-wrap items-center justify-between gap-4 text-[11px] text-text-dim">
-      <div class="flex items-center gap-2">
-        <span class="w-1.5 h-1.5 rounded-full bg-sync-green"></span>
-        <span>STATUS: ALL LOCAL SYSTEMS NOMINAL</span>
-      </div>
-      <div>
-        <span>BUILD: v0.9.0-ASTRO-STATIC</span>
-      </div>
-    </div>
   </div>
 </footer>
