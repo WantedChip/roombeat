@@ -78,6 +78,29 @@ android {
             } else {
                 // Fallback to debug keystore for local developer release builds and CI verification
                 initWith(getByName("debug"))
+                val store = storeFile
+                if (store != null && !store.exists()) {
+                    store.parentFile?.mkdirs()
+                    try {
+                        val isWin = System.getProperty("os.name").lowercase().contains("win")
+                        val keytoolBin = if (isWin) "keytool.exe" else "keytool"
+                        val javaHome = System.getProperty("java.home")
+                        val keytoolFile = File(javaHome, "bin/$keytoolBin")
+                        val keytoolCmd = if (keytoolFile.exists()) keytoolFile.absolutePath else "keytool"
+                        ProcessBuilder(
+                            keytoolCmd,
+                            "-genkeypair",
+                            "-keystore", store.absolutePath,
+                            "-storepass", "android",
+                            "-alias", "androiddebugkey",
+                            "-keypass", "android",
+                            "-keyalg", "RSA",
+                            "-keysize", "2048",
+                            "-validity", "10000",
+                            "-dname", "CN=Android Debug,O=Android,C=US"
+                        ).start().waitFor()
+                    } catch (_: Exception) {}
+                }
             }
         }
     }

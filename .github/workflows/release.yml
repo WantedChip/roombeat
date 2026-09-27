@@ -52,6 +52,21 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Ensure Debug Keystore Exists for Fallback Signing
+        run: |
+          mkdir -p ~/.android ~/.config/.android
+          if [ ! -f ~/.config/.android/debug.keystore ] && [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v -keystore ~/.config/.android/debug.keystore \
+              -storepass android -alias androiddebugkey -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          if [ -f ~/.config/.android/debug.keystore ] && [ ! -f ~/.android/debug.keystore ]; then
+            cp ~/.config/.android/debug.keystore ~/.android/debug.keystore
+          elif [ -f ~/.android/debug.keystore ] && [ ! -f ~/.config/.android/debug.keystore ]; then
+            cp ~/.android/debug.keystore ~/.config/.android/debug.keystore
+          fi
+
       - name: Build Standalone Release APKs (Universal & Per-ABI Splits)
         run: ./gradlew assembleRelease --no-daemon --stacktrace
         env:
