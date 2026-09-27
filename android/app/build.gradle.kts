@@ -22,7 +22,7 @@ android {
         }
 
         ndk {
-            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
         }
 
         externalNativeBuild {
@@ -45,14 +45,51 @@ android {
         }
     }
 
+    splits {
+        abi {
+            // ABI splits are used for APK generation; AAB handles splitting dynamically in Google Play.
+            // In AGP 8.9.0, enabling splits during bundle tasks causes PerModuleBundleTask to fail.
+            val isBuildingBundle = gradle.startParameter.taskNames.any {
+                it.contains("bundle", ignoreCase = true)
+            }
+            isEnable = !isBuildingBundle
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("ROOMBEAT_RELEASE_KEYSTORE_PATH")
+                ?: (project.findProperty("ROOMBEAT_RELEASE_KEYSTORE_PATH") as? String)
+            if (keystorePath != null && file(keystorePath).exists()) {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("ROOMBEAT_RELEASE_KEYSTORE_PASSWORD")
+                    ?: (project.findProperty("ROOMBEAT_RELEASE_KEYSTORE_PASSWORD") as? String)
+                keyAlias = System.getenv("ROOMBEAT_RELEASE_KEY_ALIAS")
+                    ?: (project.findProperty("ROOMBEAT_RELEASE_KEY_ALIAS") as? String)
+                keyPassword = System.getenv("ROOMBEAT_RELEASE_KEY_PASSWORD")
+                    ?: (project.findProperty("ROOMBEAT_RELEASE_KEY_PASSWORD") as? String)
+            } else {
+                // Fallback to debug keystore for local developer release builds and CI verification
+                initWith(getByName("debug"))
+            }
+        }
+    }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isDebuggable = true
