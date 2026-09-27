@@ -7,6 +7,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -17,9 +18,16 @@ class PowerLockManagerTest {
         var acquireCount: Int = 0
         var releaseCount: Int = 0
         var isReferenceCounted: Boolean? = null
+        var lastTimeoutMs: Long? = null
 
         override fun acquire() {
             acquireCount++
+            isHeld = true
+        }
+
+        override fun acquire(timeoutMs: Long) {
+            acquireCount++
+            lastTimeoutMs = timeoutMs
             isHeld = true
         }
 
@@ -139,6 +147,16 @@ class PowerLockManagerTest {
     }
 
     @Test
+    fun testAcquireWithTimeout_PassesTimeoutToHandle() {
+        val manager = PowerLockManager(lockFactory = factory)
+
+        val acquired = manager.acquireWakeLock(timeoutMs = 60_000L)
+        assertTrue(acquired)
+        assertTrue(manager.isWakeLockHeld)
+        assertEquals(60_000L, factory.fakeWakeLock.lastTimeoutMs)
+    }
+
+    @Test
     fun testIdempotentAcquire_DoesNotReacquireIfAlreadyHeld() {
         val manager = PowerLockManager(lockFactory = factory)
 
@@ -203,5 +221,92 @@ class PowerLockManagerTest {
         assertFalse("Acquiring null multicast lock should return false", manager.acquireMulticastLock())
         assertFalse("Releasing null multicast lock should return false", manager.releaseMulticastLock())
         assertFalse("areAllLocksHeld should be false when multicast lock is missing", manager.areAllLocksHeld)
+    }
+
+    @Test
+    fun testAssertAllLocksHeld_SucceedsWhenHeld_ThrowsWhenNotHeld() {
+        val manager = PowerLockManager(lockFactory = factory)
+
+        // Initially not held -> assert should throw
+        try {
+            manager.assertAllLocksHeld("TestContext", throwOnError = true)
+            fail("Expected IllegalStateException when locks are not held")
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message?.contains("Lock assertion failed in [TestContext]") == true)
+        }
+
+        // Without throwing
+        assertFalse(manager.assertAllLocksHeld("TestContext", throwOnError = false))
+
+        // When held -> assert succeeds
+        manager.acquireAll()
+        assertTrue(manager.assertAllLocksHeld("TestContext", throwOnError = true))
+    }
+
+    @Test
+    fun testAssertNoLocksHeld_SucceedsWhenReleased_ThrowsWhenHeld() {
+        val manager = PowerLockManager(lockFactory = factory)
+
+        // Initially all released -> should succeed
+        assertTrue(manager.assertNoLocksHeld("TestTeardown", throwOnError = true))
+        assertTrue(manager.verifyNoLeaks())
+        assertFalse(manager.hasLeak())
+
+        // Acquire a lock -> now has leak
+        manager.acquireWakeLock()
+        assertTrue(manager.hasLeak())
+        assertFalse(manager.verifyNoLeaks())
+
+        try {
+            manager.assertNoLocksHeld("TestTeardown", throwOnError = true)
+            fail("Expected IllegalStateException when lock is leaked")
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message?.contains("leak detected in [TestTeardown]") == true)
+        }
+
+        // Clean release -> assertion succeeds
+        manager.releaseAll()
+        assertTrue(manager.assertNoLocksHeld("TestTeardown", throwOnError = true))
+    }
+
+    @Test
+    fun testStatusReport_TracksMetricsAndCounts() {
+        val manager = PowerLockManager(lockFactory = factory)
+
+        manager.acquireAll()
+        val reportHeld = manager.getStatusReport()
+        assertTrue(reportHeld.isMulticastHeld)
+        assertTrue(reportHeld.isWifiHeld)
+        assertTrue(reportHeld.isWakeHeld)
+        assertTrue(reportHeld.areAllHeld)
+        assertEquals(1L, reportHeld.multicastAcquireCount)
+        assertEquals(1L, reportHeld.wifiAcquireCount)
+        assertEquals(1L, reportHeld.wakeAcquireCount)
+
+        manager.releaseAll()
+        val reportReleased = manager.getStatusReport()
+        assertFalse(reportReleased.isMulticastHeld)
+        assertFalse(reportReleased.isWifiHeld)
+        assertFalse(reportReleased.isWakeHeld)
+        assertFalse(reportReleased.areAllHeld)
+    }
+
+    @Test
+    fun testCloseAvertsLeaks_DetectsUnreleasedLocksAndReleasesThem() {
+        val manager = PowerLockManager(lockFactory = factory)
+        manager.acquireAll()
+        assertTrue(manager.areAllLocksHeld)
+
+        // Close without calling releaseAll
+        manager.close()
+
+        // Underlying locks were forcibly released
+        assertEquals(1, factory.fakeMulticastLock.releaseCount)
+        assertEquals(1, factory.fakeWifiLock.releaseCount)
+        assertEquals(1, factory.fakeWakeLock.releaseCount)
+
+        val report = manager.getStatusReport()
+        assertEquals(1L, report.potentialLeaksDetected)
+        assertTrue(manager.verifyNoLeaks())
     }
 }

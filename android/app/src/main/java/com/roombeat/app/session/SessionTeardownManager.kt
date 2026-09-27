@@ -249,6 +249,7 @@ class SessionTeardownManager(
             _teardownPhase.value = TeardownPhase.RELEASING_LOCKS
             try {
                 powerLockManager?.releaseAll()
+                powerLockManager?.assertNoLocksHeld("SessionTeardownManager.teardownHostSession", throwOnError = false)
             } catch (e: Exception) {
                 Log.w(TAG, "Error releasing power locks: ${e.message}")
             }
@@ -357,6 +358,7 @@ class SessionTeardownManager(
             _teardownPhase.value = TeardownPhase.RELEASING_LOCKS
             try {
                 powerLockManager?.releaseAll()
+                powerLockManager?.assertNoLocksHeld("SessionTeardownManager.teardownPeerSession", throwOnError = false)
             } catch (e: Exception) {
                 Log.w(TAG, "Error releasing power locks: ${e.message}")
             }

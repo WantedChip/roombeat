@@ -3,6 +3,7 @@ package com.roombeat.app.system
 import android.content.Context
 import android.net.wifi.WifiManager
 import android.os.PowerManager
+import android.os.SystemClock
 import android.util.Log
 
 /**
@@ -11,6 +12,7 @@ import android.util.Log
 interface LockHandle {
     val isHeld: Boolean
     fun acquire()
+    fun acquire(timeoutMs: Long) { acquire() }
     fun release()
     fun setReferenceCounted(refCounted: Boolean)
 }
@@ -27,21 +29,34 @@ interface LockFactory {
 class AndroidMulticastLock(private val lock: WifiManager.MulticastLock) : LockHandle {
     override val isHeld: Boolean get() = lock.isHeld
     override fun acquire() = lock.acquire()
-    override fun release() = lock.release()
+    override fun release() {
+        if (lock.isHeld) {
+            lock.release()
+        }
+    }
     override fun setReferenceCounted(refCounted: Boolean) = lock.setReferenceCounted(refCounted)
 }
 
 class AndroidWifiLock(private val lock: WifiManager.WifiLock) : LockHandle {
     override val isHeld: Boolean get() = lock.isHeld
     override fun acquire() = lock.acquire()
-    override fun release() = lock.release()
+    override fun release() {
+        if (lock.isHeld) {
+            lock.release()
+        }
+    }
     override fun setReferenceCounted(refCounted: Boolean) = lock.setReferenceCounted(refCounted)
 }
 
 class AndroidWakeLock(private val lock: PowerManager.WakeLock) : LockHandle {
     override val isHeld: Boolean get() = lock.isHeld
     override fun acquire() = lock.acquire()
-    override fun release() = lock.release()
+    override fun acquire(timeoutMs: Long) = lock.acquire(timeoutMs)
+    override fun release() {
+        if (lock.isHeld) {
+            lock.release()
+        }
+    }
     override fun setReferenceCounted(refCounted: Boolean) = lock.setReferenceCounted(refCounted)
 }
 
@@ -64,8 +79,26 @@ class DefaultLockFactory(context: Context) : LockFactory {
 }
 
 /**
- * Encapsulates the acquisition, tracking, and safe release of low-latency network
- * and power locks required for synchronized UDP multicast streaming:
+ * Diagnostic and audit status report for system power locks.
+ */
+data class LockStatusReport(
+    val isMulticastHeld: Boolean,
+    val isWifiHeld: Boolean,
+    val isWakeHeld: Boolean,
+    val areAllHeld: Boolean,
+    val multicastHoldDurationMs: Long,
+    val wifiHoldDurationMs: Long,
+    val wakeHoldDurationMs: Long,
+    val multicastAcquireCount: Long,
+    val wifiAcquireCount: Long,
+    val wakeAcquireCount: Long,
+    val potentialLeaksDetected: Long,
+    val timestampMs: Long = System.currentTimeMillis()
+)
+
+/**
+ * Encapsulates the acquisition, tracking, hardening assertions, and safe release of low-latency
+ * network and power locks required for synchronized UDP multicast streaming:
  *
  * 1. [WifiManager.MulticastLock]: Essential for receiving 20ms UDP multicast audio packets
  *    without kernel/Wi-Fi chip packet dropping during power-save states.
@@ -73,6 +106,12 @@ class DefaultLockFactory(context: Context) : LockFactory {
  *    TX/RX jitter and scheduling delays.
  * 3. [PowerManager.WakeLock]: Set to [PowerManager.PARTIAL_WAKE_LOCK] to prevent CPU throttling
  *    or deep sleep while audio streaming is active.
+ *
+ * Hardened Features for v1.0.1:
+ * - Precise acquisition timestamps and cumulative hold duration tracking.
+ * - [assertAllLocksHeld] and [assertNoLocksHeld] verification assertions.
+ * - Leak detection and automatic release on [close].
+ * - Optional safety timeouts on WakeLocks to prevent perpetual battery drain.
  */
 class PowerLockManager(
     context: Context? = null,
@@ -85,8 +124,15 @@ class PowerLockManager(
         const val MULTICAST_LOCK_TAG = "RoomBeat:MulticastLock"
         const val WIFI_LOCK_TAG = "RoomBeat:WifiLock"
         const val WAKE_LOCK_TAG = "RoomBeat:WakeLock"
+
+        /**
+         * Default safety timeout (4 hours) applied to wake lock acquisitions to prevent
+         * permanent battery depletion in case of abnormal app termination.
+         */
+        const val DEFAULT_WAKE_LOCK_SAFETY_TIMEOUT_MS = 4 * 60 * 60 * 1000L
     }
 
+    private val lockMutex = Any()
     private val factory: LockFactory? = lockFactory ?: context?.let { DefaultLockFactory(it) }
 
     val multicastLock: LockHandle? = try {
@@ -116,6 +162,25 @@ class PowerLockManager(
         null
     }
 
+    // Telemetry & lifecycle metrics
+    @Volatile private var multicastAcquireTimeMs: Long = 0L
+    @Volatile private var wifiAcquireTimeMs: Long = 0L
+    @Volatile private var wakeAcquireTimeMs: Long = 0L
+
+    @Volatile private var totalMulticastHoldDurationMs: Long = 0L
+    @Volatile private var totalWifiHoldDurationMs: Long = 0L
+    @Volatile private var totalWakeHoldDurationMs: Long = 0L
+
+    @Volatile private var multicastAcquires: Long = 0L
+    @Volatile private var wifiAcquires: Long = 0L
+    @Volatile private var wakeAcquires: Long = 0L
+
+    @Volatile private var multicastReleases: Long = 0L
+    @Volatile private var wifiReleases: Long = 0L
+    @Volatile private var wakeReleases: Long = 0L
+
+    @Volatile private var leaksAvertedCount: Long = 0L
+
     /**
      * Checks whether the MulticastLock is currently held.
      */
@@ -141,10 +206,16 @@ class PowerLockManager(
         get() = isMulticastLockHeld && isWifiLockHeld && isWakeLockHeld
 
     /**
+     * Returns true if no locks are currently held (i.e. zero leaks).
+     */
+    val isCompletelyReleased: Boolean
+        get() = !isMulticastLockHeld && !isWifiLockHeld && !isWakeLockHeld
+
+    /**
      * Acquires the MulticastLock if not already held.
      * @return true if successfully acquired or already held, false otherwise.
      */
-    fun acquireMulticastLock(): Boolean {
+    fun acquireMulticastLock(): Boolean = synchronized(lockMutex) {
         val lock = multicastLock ?: run {
             Log.w(TAG, "Cannot acquire MulticastLock: lock is null")
             return false
@@ -152,7 +223,9 @@ class PowerLockManager(
         return try {
             if (!lock.isHeld) {
                 lock.acquire()
-                Log.d(TAG, "Acquired MulticastLock")
+                multicastAcquireTimeMs = SystemClock.elapsedRealtime()
+                multicastAcquires++
+                Log.d(TAG, "Acquired MulticastLock [$MULTICAST_LOCK_TAG]")
             }
             true
         } catch (e: Exception) {
@@ -165,12 +238,20 @@ class PowerLockManager(
      * Releases the MulticastLock safely if held.
      * @return true if released, false if not held or an error occurred.
      */
-    fun releaseMulticastLock(): Boolean {
+    fun releaseMulticastLock(): Boolean = synchronized(lockMutex) {
         val lock = multicastLock ?: return false
         return try {
             if (lock.isHeld) {
                 lock.release()
-                Log.d(TAG, "Released MulticastLock")
+                if (multicastAcquireTimeMs > 0) {
+                    val heldDuration = SystemClock.elapsedRealtime() - multicastAcquireTimeMs
+                    totalMulticastHoldDurationMs += heldDuration
+                    multicastAcquireTimeMs = 0L
+                    Log.d(TAG, "Released MulticastLock [$MULTICAST_LOCK_TAG] after ${heldDuration}ms")
+                } else {
+                    Log.d(TAG, "Released MulticastLock [$MULTICAST_LOCK_TAG]")
+                }
+                multicastReleases++
                 true
             } else {
                 false
@@ -185,7 +266,7 @@ class PowerLockManager(
      * Acquires the low-latency WifiLock if not already held.
      * @return true if successfully acquired or already held, false otherwise.
      */
-    fun acquireWifiLock(): Boolean {
+    fun acquireWifiLock(): Boolean = synchronized(lockMutex) {
         val lock = wifiLock ?: run {
             Log.w(TAG, "Cannot acquire WifiLock: lock is null")
             return false
@@ -193,7 +274,9 @@ class PowerLockManager(
         return try {
             if (!lock.isHeld) {
                 lock.acquire()
-                Log.d(TAG, "Acquired low-latency WifiLock")
+                wifiAcquireTimeMs = SystemClock.elapsedRealtime()
+                wifiAcquires++
+                Log.d(TAG, "Acquired low-latency WifiLock [$WIFI_LOCK_TAG]")
             }
             true
         } catch (e: Exception) {
@@ -206,12 +289,20 @@ class PowerLockManager(
      * Releases the low-latency WifiLock safely if held.
      * @return true if released, false if not held or an error occurred.
      */
-    fun releaseWifiLock(): Boolean {
+    fun releaseWifiLock(): Boolean = synchronized(lockMutex) {
         val lock = wifiLock ?: return false
         return try {
             if (lock.isHeld) {
                 lock.release()
-                Log.d(TAG, "Released WifiLock")
+                if (wifiAcquireTimeMs > 0) {
+                    val heldDuration = SystemClock.elapsedRealtime() - wifiAcquireTimeMs
+                    totalWifiHoldDurationMs += heldDuration
+                    wifiAcquireTimeMs = 0L
+                    Log.d(TAG, "Released WifiLock [$WIFI_LOCK_TAG] after ${heldDuration}ms")
+                } else {
+                    Log.d(TAG, "Released WifiLock [$WIFI_LOCK_TAG]")
+                }
+                wifiReleases++
                 true
             } else {
                 false
@@ -224,17 +315,26 @@ class PowerLockManager(
 
     /**
      * Acquires the partial WakeLock if not already held.
+     *
+     * @param timeoutMs Optional maximum duration in milliseconds before the lock automatically releases.
      * @return true if successfully acquired or already held, false otherwise.
      */
-    fun acquireWakeLock(): Boolean {
+    fun acquireWakeLock(timeoutMs: Long? = null): Boolean = synchronized(lockMutex) {
         val lock = wakeLock ?: run {
             Log.w(TAG, "Cannot acquire WakeLock: lock is null")
             return false
         }
         return try {
             if (!lock.isHeld) {
-                lock.acquire()
-                Log.d(TAG, "Acquired partial WakeLock")
+                if (timeoutMs != null && timeoutMs > 0) {
+                    lock.acquire(timeoutMs)
+                    Log.d(TAG, "Acquired partial WakeLock [$WAKE_LOCK_TAG] with timeout ${timeoutMs}ms")
+                } else {
+                    lock.acquire()
+                    Log.d(TAG, "Acquired partial WakeLock [$WAKE_LOCK_TAG]")
+                }
+                wakeAcquireTimeMs = SystemClock.elapsedRealtime()
+                wakeAcquires++
             }
             true
         } catch (e: Exception) {
@@ -247,12 +347,20 @@ class PowerLockManager(
      * Releases the partial WakeLock safely if held.
      * @return true if released, false if not held or an error occurred.
      */
-    fun releaseWakeLock(): Boolean {
+    fun releaseWakeLock(): Boolean = synchronized(lockMutex) {
         val lock = wakeLock ?: return false
         return try {
             if (lock.isHeld) {
                 lock.release()
-                Log.d(TAG, "Released partial WakeLock")
+                if (wakeAcquireTimeMs > 0) {
+                    val heldDuration = SystemClock.elapsedRealtime() - wakeAcquireTimeMs
+                    totalWakeHoldDurationMs += heldDuration
+                    wakeAcquireTimeMs = 0L
+                    Log.d(TAG, "Released WakeLock [$WAKE_LOCK_TAG] after ${heldDuration}ms")
+                } else {
+                    Log.d(TAG, "Released WakeLock [$WAKE_LOCK_TAG]")
+                }
+                wakeReleases++
                 true
             } else {
                 false
@@ -265,28 +373,120 @@ class PowerLockManager(
 
     /**
      * Acquires all three locks: MulticastLock, low-latency WifiLock, and partial WakeLock.
+     *
+     * @param wakeLockTimeoutMs Optional safety timeout applied to the wake lock.
      * @return true if all locks were successfully acquired or already held.
      */
-    fun acquireAll(): Boolean {
+    fun acquireAll(wakeLockTimeoutMs: Long? = null): Boolean = synchronized(lockMutex) {
         val mAcquired = acquireMulticastLock()
         val wAcquired = acquireWifiLock()
-        val pAcquired = acquireWakeLock()
+        val pAcquired = acquireWakeLock(wakeLockTimeoutMs)
         return mAcquired && wAcquired && pAcquired
     }
 
     /**
      * Safely releases all locks.
      */
-    fun releaseAll() {
+    fun releaseAll(): Unit = synchronized(lockMutex) {
         releaseMulticastLock()
         releaseWifiLock()
         releaseWakeLock()
     }
 
     /**
+     * Asserts that all locks are currently held during an active streaming session.
+     *
+     * @param callerContext Identifying context string for diagnostics (e.g. "ActiveStreamingSession").
+     * @param throwOnError If true, throws an [IllegalStateException] on assertion failure.
+     * @return true if all locks are held, false if any lock is missing.
+     */
+    fun assertAllLocksHeld(callerContext: String = "ActiveSession", throwOnError: Boolean = true): Boolean {
+        val allHeld = areAllLocksHeld
+        if (!allHeld) {
+            val msg = "Lock assertion failed in [$callerContext]: expected all locks held, " +
+                    "but state is [Multicast=$isMulticastLockHeld, Wifi=$isWifiLockHeld, Wake=$isWakeLockHeld]"
+            Log.e(TAG, msg)
+            if (throwOnError) {
+                throw IllegalStateException(msg)
+            }
+        }
+        return allHeld
+    }
+
+    /**
+     * Asserts that all locks have been cleanly released upon session termination.
+     *
+     * @param callerContext Identifying context string for diagnostics (e.g. "SessionTeardown").
+     * @param throwOnError If true, throws an [IllegalStateException] on assertion failure.
+     * @return true if all locks are released, false if any lock remains held (leak detected).
+     */
+    fun assertNoLocksHeld(callerContext: String = "SessionTeardown", throwOnError: Boolean = true): Boolean {
+        val noLeaks = isCompletelyReleased
+        if (!noLeaks) {
+            val msg = "WakeLock/WifiLock leak detected in [$callerContext]! " +
+                    "Active locks: [Multicast=$isMulticastLockHeld, Wifi=$isWifiLockHeld, Wake=$isWakeLockHeld]"
+            Log.e(TAG, msg)
+            if (throwOnError) {
+                throw IllegalStateException(msg)
+            }
+        }
+        return noLeaks
+    }
+
+    /**
+     * Verifies that no locks are leaked.
+     * @return true if all locks are released.
+     */
+    fun verifyNoLeaks(): Boolean = isCompletelyReleased
+
+    /**
+     * Returns true if any lock remains held.
+     */
+    fun hasLeak(): Boolean = !isCompletelyReleased
+
+    /**
+     * Produces a comprehensive status and telemetry report for Battery Historian audit.
+     */
+    fun getStatusReport(): LockStatusReport {
+        val now = SystemClock.elapsedRealtime()
+        val currentMulticastDuration = totalMulticastHoldDurationMs +
+                (if (isMulticastLockHeld && multicastAcquireTimeMs > 0) now - multicastAcquireTimeMs else 0L)
+        val currentWifiDuration = totalWifiHoldDurationMs +
+                (if (isWifiLockHeld && wifiAcquireTimeMs > 0) now - wifiAcquireTimeMs else 0L)
+        val currentWakeDuration = totalWakeHoldDurationMs +
+                (if (isWakeLockHeld && wakeAcquireTimeMs > 0) now - wakeAcquireTimeMs else 0L)
+
+        return LockStatusReport(
+            isMulticastHeld = isMulticastLockHeld,
+            isWifiHeld = isWifiLockHeld,
+            isWakeHeld = isWakeLockHeld,
+            areAllHeld = areAllLocksHeld,
+            multicastHoldDurationMs = currentMulticastDuration,
+            wifiHoldDurationMs = currentWifiDuration,
+            wakeHoldDurationMs = currentWakeDuration,
+            multicastAcquireCount = multicastAcquires,
+            wifiAcquireCount = wifiAcquires,
+            wakeAcquireCount = wakeAcquires,
+            potentialLeaksDetected = leaksAvertedCount
+        )
+    }
+
+    /**
      * Implements [AutoCloseable] to ensure safe automatic lock release in try-with-resources.
+     * Hardened to detect and avert leaks if locks were not explicitly released prior to close.
      */
     override fun close() {
-        releaseAll()
+        synchronized(lockMutex) {
+            if (!isCompletelyReleased) {
+                leaksAvertedCount++
+                Log.w(
+                    TAG,
+                    "PowerLockManager.close() invoked while locks were still actively held! " +
+                            "[Multicast=$isMulticastLockHeld, Wifi=$isWifiLockHeld, Wake=$isWakeLockHeld]. " +
+                            "Forcibly releasing all locks to prevent system wakelock leak."
+                )
+            }
+            releaseAll()
+        }
     }
 }

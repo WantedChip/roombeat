@@ -21,6 +21,7 @@ import com.roombeat.app.capture.DefaultMediaProjectionProvider
 import com.roombeat.app.capture.MediaProjectionHandle
 import com.roombeat.app.capture.MediaProjectionProvider
 import com.roombeat.app.system.PowerLockManager
+import com.roombeat.app.system.ThermalStatusMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -129,6 +130,7 @@ class RoomBeatCaptureService : Service() {
 
     // Configurable collaborators for unit testing
     var powerLockManager: PowerLockManager? = null
+    var thermalStatusMonitor: ThermalStatusMonitor? = null
     var mediaProjectionProvider: MediaProjectionProvider? = null
     var foregroundDelegate: ForegroundDelegate = DefaultForegroundDelegate()
 
@@ -161,6 +163,9 @@ class RoomBeatCaptureService : Service() {
         Log.i(TAG, "Creating RoomBeatCaptureService")
         if (powerLockManager == null) {
             powerLockManager = PowerLockManager(this)
+        }
+        if (thermalStatusMonitor == null) {
+            thermalStatusMonitor = ThermalStatusMonitor(this)
         }
         if (mediaProjectionProvider == null) {
             mediaProjectionProvider = DefaultMediaProjectionProvider(this)
@@ -251,6 +256,8 @@ class RoomBeatCaptureService : Service() {
 
         // STEP 2: Acquire Wi-Fi low-latency and multicast locks for uninterrupted distribution
         powerLockManager?.acquireAll()
+        powerLockManager?.assertAllLocksHeld("RoomBeatCaptureService.handleStartCapture", throwOnError = false)
+        thermalStatusMonitor?.startMonitoring()
 
         // STEP 3: Instantiate MediaProjection token if consent data was supplied
         if (resultData != null && resultCode == Activity.RESULT_OK) {
@@ -327,10 +334,14 @@ class RoomBeatCaptureService : Service() {
         // 1. Release active MediaProjection and unregister callback
         releaseActiveProjection()
 
-        // 2. Release power and Wi-Fi locks
-        powerLockManager?.releaseAll()
+        // 2. Stop thermal monitoring
+        thermalStatusMonitor?.stopMonitoring()
 
-        // 3. Remove foreground service notification
+        // 3. Release power and Wi-Fi locks
+        powerLockManager?.releaseAll()
+        powerLockManager?.assertNoLocksHeld("RoomBeatCaptureService.stopCapture", throwOnError = false)
+
+        // 4. Remove foreground service notification
         if (isForegroundActive) {
             foregroundDelegate.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
             isForegroundActive = false
@@ -346,6 +357,8 @@ class RoomBeatCaptureService : Service() {
         super.onDestroy()
         Log.i(TAG, "Destroying RoomBeatCaptureService")
         stopCapture()
+        powerLockManager?.close()
+        thermalStatusMonitor?.close()
     }
 
     override fun onBind(intent: Intent?): IBinder {
