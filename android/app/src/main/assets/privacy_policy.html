@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomBeat — Privacy Policy</title>
+    <style>
+        :root {
+            --chassis-base: #0B0C0E;
+            --surface-panel: #13151A;
+            --surface-elevated: #1A1D24;
+            --surface-recessed: #07080A;
+            --border-milled: #262A35;
+            --border-active: #3E4454;
+            --bone: #F2F4F8;
+            --text-muted: #9DA5B4;
+            --text-dim: #5D6475;
+            --signal-orange: #FF5500;
+            --sync-green: #00E599;
+            --sync-amber: #FFB800;
+            --network-cyan: #00D2FF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--chassis-base);
+            color: var(--bone);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 24px 16px 48px;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-milled);
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+        }
+
+        .badge-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-family: "JetBrains Mono", Consolas, monospace;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-milled);
+            background: var(--surface-elevated);
+            color: var(--signal-orange);
+            letter-spacing: 0.05em;
+        }
+
+        .badge-green {
+            color: var(--sync-green);
+            border-color: rgba(0, 229, 153, 0.3);
+            background: rgba(0, 229, 153, 0.08);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--bone);
+            margin-bottom: 6px;
+        }
+
+        .meta-text {
+            font-family: "JetBrains Mono", Consolas, monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .highlight-card {
+            background: var(--surface-panel);
+            border: 1px solid var(--border-milled);
+            border-left: 3px solid var(--sync-green);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .highlight-card h2 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--sync-green);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-card p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        section {
+            background: var(--surface-panel);
+            border: 1px solid var(--border-milled);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        section h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--bone);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-milled);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 14px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        li::before {
+            content: "•";
+            position: absolute;
+            left: 6px;
+            color: var(--signal-orange);
+            font-weight: bold;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat-card {
+            background: var(--surface-recessed);
+            border: 1px solid var(--border-milled);
+            border-radius: 6px;
+            padding: 12px 14px;
+        }
+
+        .stat-val {
+            font-family: "JetBrains Mono", Consolas, monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--sync-green);
+            margin-bottom: 2px;
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+
+        th {
+            background: var(--surface-recessed);
+            color: var(--text-dim);
+            font-family: "JetBrains Mono", Consolas, monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-milled);
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(38, 42, 53, 0.6);
+            color: var(--text-muted);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        code {
+            font-family: "JetBrains Mono", Consolas, monospace;
+            font-size: 11px;
+            color: var(--bone);
+            background: var(--surface-recessed);
+            padding: 2px 5px;
+            border-radius: 3px;
+            border: 1px solid var(--border-milled);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-family: "JetBrains Mono", Consolas, monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-milled);
+        }
+
+        a {
+            color: var(--signal-orange);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge-bar">
+                <span class="badge">SPEC: POL-PRIVACY-v1</span>
+                <span class="badge badge-green">100% OFFLINE LOCAL LAN</span>
+                <span class="badge">ZERO DATA COLLECTION</span>
+            </div>
+            <h1>RoomBeat Privacy Policy</h1>
+            <div class="meta-text">Effective Date: September 27, 2026 • Version 1.0.0 • WantedChip Open Source</div>
+        </header>
+
+        <div class="highlight-card">
+            <h2>Core Commitment: Zero Telemetry, 100% Offline Local Network</h2>
+            <p>
+                RoomBeat is designed from the silicon up to be an air-gapped, local-only acoustic system. 
+                We do not collect, transmit, store, sell, or analyze any personal information, audio streams, device identifiers, or telemetry. 
+                All communication happens directly between phones on your local Wi-Fi or portable hotspot.
+            </p>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-val">0</div>
+                <div class="stat-lbl">Analytics Telemetry</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">0</div>
+                <div class="stat-lbl">Advertising Trackers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">0</div>
+                <div class="stat-lbl">User Accounts / Logins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">0</div>
+                <div class="stat-lbl">Cloud / Relay Servers</div>
+            </div>
+        </div>
+
+        <section>
+            <h2>1. Information We Do Not Collect</h2>
+            <p>RoomBeat adheres strictly to a zero-knowledge, zero-collection operational paradigm:</p>
+            <ul>
+                <li><strong>No Personal Identifiers:</strong> We do not ask for or collect names, email addresses, phone numbers, usernames, or contact lists.</li>
+                <li><strong>No Device or Hardware IDs:</strong> We do not log Android IDs, IMEI numbers, MAC addresses, advertising IDs (GAID), or hardware serials.</li>
+                <li><strong>No Location Data:</strong> RoomBeat never requests or accesses fine or coarse GPS/network location permissions.</li>
+                <li><strong>No Telemetry or Usage Analytics:</strong> There are no third-party trackers (e.g., Google Analytics, Firebase, Sentry, Mixpanel, AppsFlyer) embedded in RoomBeat.</li>
+                <li><strong>No Cloud Storage or Remote Backends:</strong> RoomBeat has no central database, remote server, or user authentication cloud. Your phone is the entire system.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>2. Local Network Architecture & Traffic Isolation</h2>
+            <p>
+                All network communication initiated by RoomBeat is strictly isolated to your local Area Network (LAN) or portable Wi-Fi hotspot:
+            </p>
+            <ul>
+                <li><strong>UDP Multicast (Port 4242):</strong> Audio packets encoded in 20ms Opus frames are broadcast locally across the multicast group <code>239.255.42.99:4242</code>. Multicast packets never cross the default internet gateway router.</li>
+                <li><strong>Local Socket Control Plane (Port 8080):</strong> The host device hosts an embedded TCP socket server to manage room lobbies and clock calibration. Only authorized local peers on the same subnet can connect.</li>
+                <li><strong>mDNS / Zero-Configuration Discovery:</strong> Service discovery uses standard Android Network Service Discovery (<code>_roombeat._tcp</code>) broadcast exclusively on your local subnet.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. Audio Processing & Ingest Pipelines</h2>
+            <p>RoomBeat handles audio exclusively in volatile RAM on the local device:</p>
+            <ul>
+                <li><strong>System App Audio Capture (Android 11+ / API 30+):</strong>
+                    System audio capture uses Android's official <code>AudioPlaybackCaptureConfiguration</code> paired with a foreground service (type <code>mediaProjection</code>). 
+                    Audio data is read directly into memory, encoded to Opus, and transmitted over local UDP multicast. 
+                    <strong>Audio is never written to persistent disk storage, recorded to files, or sent to external servers.</strong> 
+                    Every capture session requires explicit confirmation via Android's system consent dialog.
+                </li>
+                <li><strong>Local Storage Audio Playback:</strong>
+                    When selecting local audio files, RoomBeat uses the Android Storage Access Framework (SAF) and scoped <code>READ_MEDIA_AUDIO</code> permission. 
+                    Audio is decoded directly from local storage into memory. No file contents or file metadata leave your local device and room network.
+                </li>
+                <li><strong>Spotify App Remote Synchronization:</strong>
+                    When using Spotify mode, RoomBeat uses the official Spotify Android App Remote SDK. 
+                    Playback commands (track URI, seek timestamp) are communicated directly to the Spotify application installed on your device via Android IPC. 
+                    RoomBeat does not intercept, collect, or store your Spotify credentials, authentication tokens, or playback history.
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Camera & QR Code Scanning</h2>
+            <p>
+                RoomBeat includes an optional QR code scanner to simplify joining rooms. 
+                Camera video frames are processed entirely on-device in volatile memory by the Google MLKit / ZXing barcode scanning engine. 
+                <strong>No camera images, photographs, or video frames are ever captured, saved to storage, or transmitted over any network.</strong> 
+                Camera access ceases immediately when the QR scanner sheet is closed.
+            </p>
+        </section>
+
+        <section>
+            <h2>5. Android System Permissions & Purpose</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Permission</th>
+                        <th>API Level</th>
+                        <th>Exact Technical Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>INTERNET</code></td>
+                        <td>All</td>
+                        <td>Enables local Wi-Fi TCP/WebSocket sockets and UDP multicast between peer phones.</td>
+                    </tr>
+                    <tr>
+                        <td><code>ACCESS_WIFI_STATE</code><br><code>CHANGE_WIFI_MULTICAST_STATE</code></td>
+                        <td>All</td>
+                        <td>Acquires <code>WifiManager.MulticastLock</code> so the Android kernel does not discard incoming UDP multicast audio packets.</td>
+                    </tr>
+                    <tr>
+                        <td><code>WAKE_LOCK</code></td>
+                        <td>All</td>
+                        <td>Maintains low-power CPU audio execution when the phone screen is locked during active playback.</td>
+                    </tr>
+                    <tr>
+                        <td><code>REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</code></td>
+                        <td>All</td>
+                        <td>Allows requesting exemption from aggressive OEM background battery throttling during multi-phone streaming.</td>
+                    </tr>
+                    <tr>
+                        <td><code>FOREGROUND_SERVICE</code><br><code>FOREGROUND_SERVICE_MEDIA_PROJECTION</code></td>
+                        <td>API 34+</td>
+                        <td>Required by Android 14+ to run the audio capture service with a user-visible persistent notification.</td>
+                    </tr>
+                    <tr>
+                        <td><code>RECORD_AUDIO</code></td>
+                        <td>All</td>
+                        <td>Platform requirement for Android <code>AudioPlaybackCaptureConfiguration</code> system audio capture.</td>
+                    </tr>
+                    <tr>
+                        <td><code>POST_NOTIFICATIONS</code></td>
+                        <td>API 33+</td>
+                        <td>Displays the persistent foreground playback notification with transport controls (Pause, Stop, Volume).</td>
+                    </tr>
+                    <tr>
+                        <td><code>READ_MEDIA_AUDIO</code></td>
+                        <td>API 33+</td>
+                        <td>Scoped media access to allow the user to select local music files from device storage via SAF.</td>
+                    </tr>
+                    <tr>
+                        <td><code>CAMERA</code></td>
+                        <td>All</td>
+                        <td>Optional permission used exclusively for real-time QR code scanning to join rooms. Never saves or uploads frames.</td>
+                    </tr>
+                    <tr>
+                        <td><code>ACCESS_LOCAL_NETWORK</code></td>
+                        <td>API 37+</td>
+                        <td>Forward-compatible declaration for Android 17 local subnet socket authorization.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>6. Children's Privacy (COPPA & GDPR-K Compliance)</h2>
+            <p>
+                RoomBeat does not collect, maintain, or process personal data from any person, including children under the age of 13. 
+                Because RoomBeat operates strictly offline on local Wi-Fi without user registration or cloud servers, it is safe for all audiences.
+            </p>
+        </section>
+
+        <section>
+            <h2>7. Open Source & Independent Verification</h2>
+            <p>
+                RoomBeat is free and open-source software licensed under the MIT License. 
+                The entire source code, build scripts, and protocol specifications are publicly hosted on GitHub for public security and privacy audit:
+            </p>
+            <p>
+                <a href="https://github.com/WantedChip/RoomBeat" target="_blank">https://github.com/WantedChip/RoomBeat</a>
+            </p>
+        </section>
+
+        <section>
+            <h2>8. Contact & Inquiries</h2>
+            <p>
+                If you have questions or suggestions regarding this privacy policy or RoomBeat's local architecture, please submit an issue or discussion on the official GitHub repository:
+            </p>
+            <p>
+                GitHub: <a href="https://github.com/WantedChip/RoomBeat/issues" target="_blank">WantedChip/RoomBeat Issues</a><br>
+                Website: <a href="https://roombeat.app/privacy" target="_blank">https://roombeat.app/privacy</a>
+            </p>
+        </section>
+
+        <div class="footer-note">
+            ROOMBEAT • MODEL: RB-2026-FOSS • COPYRIGHT &copy; 2026 WANTEDCHIP • MIT LICENSE
+        </div>
+    </div>
+</body>
+</html>

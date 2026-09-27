@@ -1,0 +1,380 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import {
+  ShieldCheck,
+  Cpu,
+  Wifi,
+  Radio,
+  CheckCircle2,
+  Lock,
+  EyeOff,
+  ServerOff,
+  FolderLock,
+  Camera,
+  ArrowLeft,
+  FileCode2,
+  ExternalLink,
+} from 'lucide-astro';
+---
+
+<BaseLayout
+  title="RoomBeat — Privacy Policy"
+  description="RoomBeat Privacy Policy: 100% offline local Wi-Fi multicast operation with zero data collection, zero analytics, zero trackers, and zero cloud backends."
+  canonicalURL="https://roombeat.app/privacy"
+>
+  <Header />
+
+  <main id="main-content" class="flex-1 py-10 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full">
+    <!-- Back Navigation Link -->
+    <div class="mb-8">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-[4px] bg-surface-elevated border border-border-milled text-text-muted hover:text-bone hover:border-border-active font-mono text-xs transition-all group"
+      >
+        <ArrowLeft class="w-3.5 h-3.5 text-signal-orange group-hover:-translate-x-0.5 transition-transform" />
+        <span>Return to Audio Rig Console</span>
+      </a>
+    </div>
+
+    <!-- Hardware Chassis Header -->
+    <div class="hardware-panel rounded-lg p-6 sm:p-8 relative mb-10">
+      <!-- Decorative Corner Allen Bolts -->
+      <div class="absolute top-2.5 left-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
+      <div class="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
+      <div class="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
+      <div class="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
+        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-border-milled">
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <span class="px-2 py-0.5 rounded-[3px] bg-surface-elevated border border-border-milled text-[11px] font-mono text-signal-orange font-bold uppercase tracking-wider">
+            MODULE // PRIVACY-POLICY-M01
+          </span>
+          <span class="text-text-dim text-xs font-mono">•</span>
+          <span class="text-[11px] font-mono text-sync-green font-semibold">
+            STATUS: ZERO DATA RETENTION
+          </span>
+        </div>
+        <div class="flex items-center gap-2 text-[11px] font-mono text-text-dim">
+          <span>EFFECTIVE: SEPTEMBER 27, 2026</span>
+          <span>•</span>
+          <span>VERSION 1.0.0</span>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <h1 class="font-display font-extrabold text-2xl sm:text-4xl text-bone tracking-tight">
+          RoomBeat Privacy Policy
+        </h1>
+        <p class="font-sans text-sm sm:text-base text-text-muted max-w-3xl leading-relaxed">
+          RoomBeat is an open-source, offline-first acoustic synchronization rig designed for phones on the same local network. 
+          Our architecture is built around a single uncompromised rule: <strong class="text-bone">we do not collect, process, track, or transmit your personal data</strong>.
+        </p>
+      </div>
+
+      <!-- Core Commitment Banner -->
+      <div class="mt-8 recessed-cavity rounded-md p-4 sm:p-5 border-l-4 border-l-sync-green space-y-2">
+        <div class="flex items-center gap-2 text-sync-green font-mono text-xs uppercase font-bold tracking-wider">
+          <CheckCircle2 class="w-4 h-4" />
+          <span>Core Guarantee: 100% Offline Local Network Isolation</span>
+        </div>
+        <p class="font-sans text-xs sm:text-sm text-text-muted leading-relaxed">
+          All audio streams, clock synchronization probes, and session discovery packets remain strictly confined to your local Wi-Fi or portable hotspot subnet. 
+          Audio packets never cross the default internet gateway router, never touch any cloud relay, and are never logged to remote servers.
+        </p>
+      </div>
+    </div>
+
+    <!-- 4 Key Zero-Telemetry Indicators -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div class="recessed-cavity rounded-lg p-4 text-center space-y-1">
+        <div class="font-mono font-extrabold text-2xl text-sync-green">0</div>
+        <div class="font-mono text-[11px] uppercase tracking-wider text-text-dim">Analytics Trackers</div>
+      </div>
+      <div class="recessed-cavity rounded-lg p-4 text-center space-y-1">
+        <div class="font-mono font-extrabold text-2xl text-sync-green">0</div>
+        <div class="font-mono text-[11px] uppercase tracking-wider text-text-dim">Advertising SDKs</div>
+      </div>
+      <div class="recessed-cavity rounded-lg p-4 text-center space-y-1">
+        <div class="font-mono font-extrabold text-2xl text-sync-green">0</div>
+        <div class="font-mono text-[11px] uppercase tracking-wider text-text-dim">User Accounts</div>
+      </div>
+      <div class="recessed-cavity rounded-lg p-4 text-center space-y-1">
+        <div class="font-mono font-extrabold text-2xl text-sync-green">0</div>
+        <div class="font-mono text-[11px] uppercase tracking-wider text-text-dim">Cloud Relays</div>
+      </div>
+    </div>
+
+    <!-- Privacy Policy Content Modules -->
+    <div class="space-y-8 font-sans text-xs sm:text-sm text-text-muted">
+
+      <!-- Section 1: Information We Never Collect -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <EyeOff class="w-5 h-5 text-signal-orange" />
+          <h2>1. Information We Do Not Collect</h2>
+        </div>
+        <p class="leading-relaxed">
+          RoomBeat adheres to a zero-knowledge, zero-collection operational paradigm. Because there are no user accounts and no remote backend servers, we have neither the mechanism nor the desire to gather personal information:
+        </p>
+        <ul class="space-y-2 list-none pl-1">
+          <li class="flex items-start gap-2">
+            <span class="text-signal-orange font-bold font-mono">▸</span>
+            <span><strong class="text-bone">Personal Identifiers:</strong> We do not collect names, email addresses, phone numbers, contact books, or social profiles.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-signal-orange font-bold font-mono">▸</span>
+            <span><strong class="text-bone">Device & Hardware Identifiers:</strong> We do not log or store Android IDs, advertising IDs (GAID), IMEI, MAC addresses, or hardware serial numbers.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-signal-orange font-bold font-mono">▸</span>
+            <span><strong class="text-bone">Location Telemetry:</strong> RoomBeat does not request or access GPS, coarse location, or Wi-Fi SSID geolocation.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-signal-orange font-bold font-mono">▸</span>
+            <span><strong class="text-bone">Behavioral Analytics:</strong> No third-party behavioral analytics SDKs (Google Analytics, Firebase, Mixpanel, Amplitude, AppsFlyer) are included in the app or landing page.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-signal-orange font-bold font-mono">▸</span>
+            <span><strong class="text-bone">Crash Reporting:</strong> We do not collect automated telemetry or crash dumps via external services (Crashlytics, Sentry, Bugsnag).</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 2: Local Network Architecture & Traffic Isolation -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <Wifi class="w-5 h-5 text-network-cyan" />
+          <h2>2. Local Network Architecture & Traffic Isolation</h2>
+        </div>
+        <p class="leading-relaxed">
+          RoomBeat's entire transport layer operates on the local subnet via peer-to-peer and broadcast mechanisms:
+        </p>
+        <div class="space-y-3 font-mono text-xs">
+          <div class="recessed-cavity rounded p-3 space-y-1">
+            <div class="text-network-cyan font-bold">UDP MULTICAST AUDIO PIPELINE (239.255.42.99:4242)</div>
+            <div class="text-text-muted font-sans text-xs">
+              Audio frames encoded into 20ms Opus packets are distributed to all peer phones via UDP multicast. 
+              Multicast packets have a Time-To-Live (TTL = 1) restricted strictly to your local Layer 2 broadcast domain and cannot cross the default gateway router to the external internet.
+            </div>
+          </div>
+
+          <div class="recessed-cavity rounded p-3 space-y-1">
+            <div class="text-sync-green font-bold">EMBEDDED LOCAL SOCKET SERVER (TCP PORT 8080)</div>
+            <div class="text-text-muted font-sans text-xs">
+              The host device runs an embedded, lightweight socket server directly on the smartphone. 
+              Peer phones connect directly to the host's private IP (e.g. <code>192.168.x.x</code> or <code>10.x.x.x</code>) via a 6-digit PIN handshake. No cloud relay or intermediary broker is involved.
+            </div>
+          </div>
+
+          <div class="recessed-cavity rounded p-3 space-y-1">
+            <div class="text-bone font-bold">MDNS SERVICE DISCOVERY (_roombeat._tcp)</div>
+            <div class="text-text-muted font-sans text-xs">
+              Local room discovery utilizes Android's native <code>NsdManager</code> mDNS protocol over your local network. 
+              Discovery broadcasts are non-routable and visible only to devices connected to the same Wi-Fi router or portable hotspot.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Audio Processing Pipelines -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <Cpu class="w-5 h-5 text-sync-green" />
+          <h2>3. Audio Processing & Data Ephemerality</h2>
+        </div>
+        <p class="leading-relaxed">
+          RoomBeat processes all audio strictly in-memory (volatile RAM) for real-time distribution:
+        </p>
+        <ul class="space-y-3 list-none pl-1">
+          <li class="flex items-start gap-2">
+            <span class="text-sync-green font-bold font-mono">▸</span>
+            <div>
+              <strong class="text-bone">System App Audio Capture (Android 11+ / API 30+):</strong>
+              Using Android's official <code>AudioPlaybackCaptureConfiguration</code> and a foreground service of type <code>mediaProjection</code>, RoomBeat captures output PCM audio directly into memory, encodes it into Opus frames, and broadcasts it over local multicast. 
+              <span class="text-bone font-semibold">Audio data is never written to persistent disk storage, recorded to files, or uploaded to any third party.</span> 
+              Per Android 14+ platform security, user consent is requested via the system dialog on every capture session.
+            </div>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-sync-green font-bold font-mono">▸</span>
+            <div>
+              <strong class="text-bone">Local Storage Media Playback:</strong>
+              When playing audio files stored on the device, RoomBeat uses Android's Storage Access Framework (SAF) and scoped <code>READ_MEDIA_AUDIO</code> permission. 
+              The selected file is decoded into memory and streamed directly over local multicast. File metadata and audio bytes are never uploaded or stored outside the local playback session.
+            </div>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-sync-green font-bold font-mono">▸</span>
+            <div>
+              <strong class="text-bone">Spotify App Remote Protocol:</strong>
+              In Spotify mode, RoomBeat uses the official Spotify Android App Remote SDK. 
+              Playback instructions (track URI, target timestamp) are passed directly between local devices and dispatched to the installed Spotify app via Android IPC. 
+              RoomBeat never accesses, captures, or transmits your Spotify account credentials, passwords, authentication tokens, or playback history.
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 4: Camera & QR Code Scanning -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <Camera class="w-5 h-5 text-signal-orange" />
+          <h2>4. Camera & Real-Time QR Code Scanning</h2>
+        </div>
+        <p class="leading-relaxed">
+          RoomBeat includes a camera viewfinder used solely to scan RoomBeat 6-digit room join QR codes. 
+          Camera image buffers are analyzed in volatile memory on-device using the Google MLKit and ZXing barcode scanning engines:
+        </p>
+        <ul class="space-y-2 list-none pl-1">
+          <li class="flex items-start gap-2">
+            <span class="text-signal-orange font-bold font-mono">▸</span>
+            <span><strong class="text-bone">Zero Image Persistence:</strong> No photos, video frames, or image streams are ever saved to disk, saved to gallery, or uploaded over any network.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-signal-orange font-bold font-mono">▸</span>
+            <span><strong class="text-bone">Instant Teardown:</strong> Camera hardware access is immediately stopped and released the moment a QR code is recognized or the scanner dialog is closed.</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 5: Android System Permissions -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <Lock class="w-5 h-5 text-sync-amber" />
+          <h2>5. Android System Permissions & Purpose</h2>
+        </div>
+        <p class="leading-relaxed">
+          RoomBeat requests only permissions that are strictly necessary for low-latency local audio distribution:
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse min-w-[640px]">
+            <thead>
+              <tr class="bg-surface-elevated/70 border-b border-border-milled font-mono text-[11px] text-text-muted uppercase">
+                <th class="py-2.5 px-3">Permission</th>
+                <th class="py-2.5 px-3">Scope / Tier</th>
+                <th class="py-2.5 px-3">Exact Technical Justification</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-milled/50 font-sans">
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">INTERNET</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">Install-time</td>
+                <td class="py-2.5 px-3">Required to open raw UDP sockets for multicast and TCP sockets for local room join handshake.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">ACCESS_WIFI_STATE<br>CHANGE_WIFI_MULTICAST_STATE</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">Install-time</td>
+                <td class="py-2.5 px-3">Allows acquiring <code>WifiManager.MulticastLock</code> so the Linux kernel does not drop incoming UDP multicast audio frames.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">WAKE_LOCK</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">Install-time</td>
+                <td class="py-2.5 px-3">Prevents Android CPU sleep while streaming synchronized audio with the phone screen locked.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">Prompt / Optional</td>
+                <td class="py-2.5 px-3">Provides user guidance to prevent aggressive OEM battery killer mechanisms from terminating background streaming.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">FOREGROUND_SERVICE<br>FOREGROUND_SERVICE_MEDIA_PROJECTION</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">API 34+ (Android 14)</td>
+                <td class="py-2.5 px-3">Mandatory platform requirement for running continuous audio projection with a persistent notification.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">RECORD_AUDIO</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">Runtime</td>
+                <td class="py-2.5 px-3">Mandatory platform requirement for Android <code>AudioPlaybackCaptureConfiguration</code> system audio capture.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">POST_NOTIFICATIONS</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">API 33+ (Android 13)</td>
+                <td class="py-2.5 px-3">Displays ongoing service notification showing active streaming status, room code, and pause/stop controls.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">READ_MEDIA_AUDIO</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">API 33+ (Android 13)</td>
+                <td class="py-2.5 px-3">Scoped media access allowing the user to select local music files from device storage via SAF.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">CAMERA</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">Runtime / Optional</td>
+                <td class="py-2.5 px-3">Used exclusively for live QR code scanning to join rooms. Video frames are processed in-memory and discarded.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-mono font-semibold text-bone">ACCESS_LOCAL_NETWORK</td>
+                <td class="py-2.5 px-3 font-mono text-text-dim text-[11px]">API 37+ (Android 17)</td>
+                <td class="py-2.5 px-3">Forward-compatible declaration for future Android 17 local subnet socket authorization.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 6: Children's Privacy -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <ShieldCheck class="w-5 h-5 text-sync-green" />
+          <h2>6. Children's Privacy (COPPA & GDPR-K Compliance)</h2>
+        </div>
+        <p class="leading-relaxed">
+          RoomBeat does not collect, maintain, or process personal data from any person, including children under the age of 13 (or under 16 in the European Union). 
+          Because RoomBeat is completely offline, contains no advertisements, and does not provide social chat or user profiles, it is completely safe for all audiences.
+        </p>
+      </section>
+
+      <!-- Section 7: Open Source & Code Auditability -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <FileCode2 class="w-5 h-5 text-signal-orange" />
+          <h2>7. Open Source License & Code Auditability</h2>
+        </div>
+        <p class="leading-relaxed">
+          RoomBeat is free and open-source software distributed under the permissive <strong class="text-bone">MIT License</strong> (Copyright &copy; 2026 WantedChip). 
+          The full source code, native C++ audio engine, protocol implementations, and build scripts are publicly available for independent security audit:
+        </p>
+        <div class="pt-2">
+          <a
+            href="https://github.com/WantedChip/RoomBeat"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-[4px] bg-surface-elevated border border-border-milled text-bone hover:border-signal-orange font-mono text-xs font-semibold transition-all group"
+          >
+            <span>Inspect Source Code on GitHub</span>
+            <ExternalLink class="w-3.5 h-3.5 text-signal-orange group-hover:translate-x-0.5 transition-transform" />
+          </a>
+        </div>
+      </section>
+
+      <!-- Section 8: Inquiries and Contact -->
+      <section class="hardware-panel rounded-lg p-6 sm:p-8 space-y-4">
+        <div class="flex items-center gap-2.5 pb-3 border-b border-border-milled text-bone font-display font-bold text-base sm:text-lg">
+          <Radio class="w-5 h-5 text-sync-amber" />
+          <h2>8. Questions & Contact Information</h2>
+        </div>
+        <p class="leading-relaxed">
+          For technical questions, privacy inquiries, or security disclosures regarding RoomBeat, please open an issue or start a discussion on our official repository:
+        </p>
+        <div class="recessed-cavity rounded p-3 font-mono text-xs space-y-1">
+          <div>PROJECT: <span class="text-bone">WantedChip/RoomBeat</span></div>
+          <div>REPOSITORY: <a href="https://github.com/WantedChip/RoomBeat" target="_blank" rel="noopener noreferrer" class="text-signal-orange underline">https://github.com/WantedChip/RoomBeat</a></div>
+          <div>ISSUES: <a href="https://github.com/WantedChip/RoomBeat/issues" target="_blank" rel="noopener noreferrer" class="text-signal-orange underline">https://github.com/WantedChip/RoomBeat/issues</a></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

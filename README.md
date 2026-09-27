@@ -23,6 +23,27 @@ The system operates without requiring an external relay server or cloud backend�
 
 ---
 
-## License
+---
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for full details.
+## Privacy by Design (100% Offline Local Network)
+
+RoomBeat collects **zero telemetry, zero analytics, zero personal identifiers, and zero crash reports**. 
+All audio streaming and clock synchronization operate strictly on your local Wi-Fi subnet or portable hotspot via low-latency UDP multicast (`239.255.42.99:4242`). Audio packets never cross the gateway router to the external internet.
+
+Read the complete [Privacy Policy](https://roombeat.app/privacy) or view the offline document in [privacy_policy.html](./android/app/src/main/assets/privacy_policy.html).
+
+---
+
+## License & Third-Party Attributions
+
+RoomBeat is licensed under the **MIT License**. Copyright (C) 2026 WantedChip. See [LICENSE](./LICENSE) for details.
+
+### Third-Party Software Attributions
+- **[Google Oboe](https://github.com/google/oboe)** — Apache License 2.0 (Copyright (C) 2018 The Android Open Source Project)
+- **[Xiph.Org Opus Codec (libopus)](https://opus-codec.org/)** — BSD 3-Clause License (Copyright (C) 2001-2011 Xiph.Org Foundation, Skype Limited, CSIRO)
+- **[Spotify App Remote SDK](https://developer.spotify.com/documentation/android)** — Spotify Developer Terms of Service (Copyright (C) Spotify AB)
+- **[AndroidX & Jetpack Compose](https://developer.android.com/jetpack/compose)** — Apache License 2.0 (Copyright (C) Google LLC / AOSP)
+- **[ZXing](https://github.com/zxing/zxing)** & **[Google MLKit](https://developers.google.com/ml-kit)** — Apache License 2.0
+- **[Cabinet Grotesk & General Sans](https://www.fontshare.com)** — Fontshare Font Software License (Indian Type Foundry)
+- **[JetBrains Mono](https://www.jetbrains.com/lp/mono/)** — SIL Open Font License 1.1 / Apache License 2.0 (JetBrains s.r.o.)
+
