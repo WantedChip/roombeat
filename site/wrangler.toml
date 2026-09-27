@@ -29,7 +29,7 @@ compatibility_flags = ["nodejs_compat"]
 
 # Static asset configuration for Cloudflare Workers / Pages
 # Deploys pre-built Astro static artifacts from site/dist
-assets = { directory = "./dist", binding = "ASSETS" }
+assets = { directory = "./dist" }
 
 # Production edge environment variables
 [vars]
