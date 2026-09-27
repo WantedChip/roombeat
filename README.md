@@ -5,13 +5,14 @@
 ### Turn a room full of phones into a unified, phase-locked sound system.
 **No Bluetooth range limits. No cloud relay. Zero accounts. 100% offline.**
 
-[![Version](https://img.shields.io/badge/Release-v1.0.0-FF5500?style=for-the-badge&logo=android&logoColor=white)](#)
+[![Version](https://img.shields.io/badge/Release-v1.0.0-FF5500?style=for-the-badge&logo=android&logoColor=white)](https://github.com/WantedChip/RoomBeat/releases/latest)
+[![Download Latest APK](https://img.shields.io/badge/Download-Latest%20APK-00E599?style=for-the-badge&logo=android&logoColor=black)](https://github.com/WantedChip/RoomBeat/releases/latest)
 [![Deployed with Cloudflare Workers](https://img.shields.io/badge/Deployed%20with-Cloudflare%20Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://roombeat.sohamlabs.workers.dev)
 [![Android](https://img.shields.io/badge/Android-11%2B%20(API%2030%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F5A623.svg?style=for-the-badge)](./LICENSE)
 [![Zero Cloud](https://img.shields.io/badge/Cloud%20Dependency-0%25%20(100%25%20Offline)-00E599?style=for-the-badge)](#)
 
-[**🌐 Live Interactive Demo**](https://roombeat.sohamlabs.workers.dev) • [**⚡ Quick Start**](#-quick-start-3-steps) • [**✨ Why RoomBeat?**](#-why-roombeat) • [**📖 Documentation**](#-documentation--community)
+[**📥 Download APK**](https://github.com/WantedChip/RoomBeat/releases/latest) • [**🌐 Live Interactive Demo**](https://roombeat.sohamlabs.workers.dev) • [**⚡ Quick Start**](#-quick-start-3-steps) • [**✨ Why RoomBeat?**](#-why-roombeat) • [**📖 Documentation**](#-documentation--community)
 
 </div>
 
@@ -67,6 +68,22 @@ One phone becomes the **Host**, and any number of surrounding phones connect as 
    Other phones open RoomBeat and scan the Host's QR code or enter the 6-digit PIN.
 3. **Turn Up the Volume**:
    Hit Play! All connected phones instantly lock phase and blast audio together. Adjust individual device volumes right from the Host's channel strips.
+
+---
+
+## 📥 Download & Releases
+
+Download the latest release binaries directly from **[GitHub Releases](https://github.com/WantedChip/RoomBeat/releases/latest)**:
+
+| Package | File | Size | Recommended For |
+| :--- | :--- | :---: | :--- |
+| **Universal APK** *(Recommended)* | `app-release.apk` | **~25 MB** | Sideloading on any Android phone (bundles all architectures). |
+| **ARM64 Split APK** | `app-arm64-v8a-release.apk` | **~11.5 MB** | Modern 64-bit smartphones (Pixel, Galaxy, OnePlus, Xiaomi). |
+| **ARMv7 Split APK** | `app-armeabi-v7a-release.apk` | **~9.3 MB** | Legacy or budget 32-bit Android smartphones. |
+| **x86_64 Split APK** | `app-x86_64-release.apk` | **~12.5 MB** | Emulators, Chromebooks, and x86 Android tablets. |
+| **Google Play Bundle** | `app-release.aab` | **~15.7 MB** | Google Play Store distribution. |
+
+> 💡 **Sideloading Tip**: If downloading the `.apk` on your phone, allow *"Install unknown apps"* for your browser or file manager when prompted.
 
 ---
 

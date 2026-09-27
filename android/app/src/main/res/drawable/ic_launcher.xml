@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Chassis Base Background -->
+    <path
+        android:fillColor="#0B0C0E"
+        android:pathData="M0,0h108v108h-108z" />
+    
+    <!-- Machined module inner bevel rectangle -->
+    <path
+        android:fillColor="#13151A"
+        android:pathData="M14,14h80v80h-80z" />
+
+    <!-- Corner rivet hardware accents -->
+    <path
+        android:fillColor="#262A35"
+        android:pathData="M18,18m-2,0a2,2 0 1,1 4,0a2,2 0 1,1 -4,0 M90,18m-2,0a2,2 0 1,1 4,0a2,2 0 1,1 -4,0 M18,90m-2,0a2,2 0 1,1 4,0a2,2 0 1,1 -4,0 M90,90m-2,0a2,2 0 1,1 4,0a2,2 0 1,1 -4,0" />
+
+    <!-- Outer acoustic border frame -->
+    <path
+        android:strokeColor="#262A35"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M30,30h48v48h-48z" />
+
+    <!-- Bar 1: Amber Bar -->
+    <path
+        android:fillColor="#FFB800"
+        android:pathData="M35,50h5v22h-5z" />
+
+    <!-- Bar 2: Signal Orange Bar -->
+    <path
+        android:fillColor="#FF5500"
+        android:pathData="M43,42h5v30h-5z" />
+
+    <!-- Bar 3: Center Phosphor Green Peak Bar -->
+    <path
+        android:fillColor="#00E599"
+        android:pathData="M51,36h6v36h-6z" />
+
+    <!-- Bar 4: Signal Orange Bar -->
+    <path
+        android:fillColor="#FF5500"
+        android:pathData="M60,44h5v28h-5z" />
+
+    <!-- Bar 5: Right Bone Bar -->
+    <path
+        android:fillColor="#9DA5B4"
+        android:pathData="M68,52h5v20h-5z" />
+
+    <!-- Phase-Lock Beacon Dot -->
+    <path
+        android:fillColor="#00E599"
+        android:pathData="M73,35m-3,0a3,3 0 1,1 6,0a3,3 0 1,1 -6,0" />
+</vector>

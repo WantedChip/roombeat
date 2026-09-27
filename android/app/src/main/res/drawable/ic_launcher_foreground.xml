@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="0"
+        android:translateY="0">
+        <!-- Outer acoustic border frame -->
+        <path
+            android:strokeColor="#262A35"
+            android:strokeWidth="1.5"
+            android:fillColor="#00000000"
+            android:pathData="M30,30h48v48h-48z" />
+
+        <!-- Bar 1: Left Medium Bar (Amber #FFB800) -->
+        <path
+            android:fillColor="#FFB800"
+            android:pathData="M35,50h5v22h-5z" />
+
+        <!-- Bar 2: Signal Orange Bar (#FF5500) -->
+        <path
+            android:fillColor="#FF5500"
+            android:pathData="M43,42h5v30h-5z" />
+
+        <!-- Bar 3: Center Peak Lock Bar (Phosphor Green #00E599) -->
+        <path
+            android:fillColor="#00E599"
+            android:pathData="M51,36h6v36h-6z" />
+
+        <!-- Bar 4: Signal Orange Bar (#FF5500) -->
+        <path
+            android:fillColor="#FF5500"
+            android:pathData="M60,44h5v28h-5z" />
+
+        <!-- Bar 5: Right Medium Bar (Bone Text #9DA5B4) -->
+        <path
+            android:fillColor="#9DA5B4"
+            android:pathData="M68,52h5v20h-5z" />
+
+        <!-- Phase-Lock Beacon Dot (Phosphor Green #00E599) -->
+        <path
+            android:fillColor="#00E599"
+            android:pathData="M73,35m-3,0a3,3 0 1,1 6,0a3,3 0 1,1 -6,0" />
+    </group>
+</vector>

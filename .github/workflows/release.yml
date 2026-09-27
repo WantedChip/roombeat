@@ -1,0 +1,154 @@
+name: Release Build & Distribution
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build Release Artifacts & Publish GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Standalone Release APKs (Universal & Per-ABI Splits)
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        env:
+          ROOMBEAT_RELEASE_KEYSTORE_PATH: ${{ secrets.ROOMBEAT_RELEASE_KEYSTORE_PATH }}
+          ROOMBEAT_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.ROOMBEAT_RELEASE_KEYSTORE_PASSWORD }}
+          ROOMBEAT_RELEASE_KEY_ALIAS: ${{ secrets.ROOMBEAT_RELEASE_KEY_ALIAS }}
+          ROOMBEAT_RELEASE_KEY_PASSWORD: ${{ secrets.ROOMBEAT_RELEASE_KEY_PASSWORD }}
+
+      - name: Build Google Play App Bundle (AAB) & Native Debug Symbols
+        run: ./gradlew bundleRelease --no-daemon --stacktrace
+        env:
+          ROOMBEAT_RELEASE_KEYSTORE_PATH: ${{ secrets.ROOMBEAT_RELEASE_KEYSTORE_PATH }}
+          ROOMBEAT_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.ROOMBEAT_RELEASE_KEYSTORE_PASSWORD }}
+          ROOMBEAT_RELEASE_KEY_ALIAS: ${{ secrets.ROOMBEAT_RELEASE_KEY_ALIAS }}
+          ROOMBEAT_RELEASE_KEY_PASSWORD: ${{ secrets.ROOMBEAT_RELEASE_KEY_PASSWORD }}
+
+      - name: Build Debug APK & Android Test APK
+        run: ./gradlew assembleDebug assembleDebugAndroidTest --no-daemon --stacktrace
+
+      - name: Collect & Package Release Artifacts
+        run: |
+          mkdir -p ../release-artifacts
+          
+          echo "=== Collecting Standalone APKs ==="
+          find app/build/outputs/apk/release/ -maxdepth 1 -name "*.apk" -exec cp {} ../release-artifacts/ \;
+          
+          echo "=== Collecting Google Play Bundle ==="
+          find app/build/outputs/bundle/release/ -maxdepth 1 -name "*.aab" -exec cp {} ../release-artifacts/ \;
+          
+          echo "=== Collecting Native Debug Symbols ==="
+          if [ -d "app/build/outputs/native-debug-symbols/release" ]; then
+            find app/build/outputs/native-debug-symbols/release/ -name "*.zip" -exec cp {} ../release-artifacts/ \;
+          fi
+          
+          echo "=== Collecting Debug & Test APKs ==="
+          find app/build/outputs/apk/debug/ -maxdepth 1 -name "*.apk" -exec cp {} ../release-artifacts/ \;
+          find app/build/outputs/apk/androidTest/debug/ -maxdepth 1 -name "*.apk" -exec cp {} ../release-artifacts/ \;
+          
+          echo "=== Generating SHA-256 Checksums ==="
+          cd ../release-artifacts
+          sha256sum * > SHA256SUMS.txt
+          
+          echo "=== Artifacts Prepared ==="
+          ls -lah
+        shell: bash
+
+      - name: Determine Release Tag
+        id: vars
+        run: |
+          if [ -n "${{ inputs.tag_name }}" ]; then
+            echo "tag=${{ inputs.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: Publish GitHub Release with Artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: RoomBeat ${{ steps.vars.outputs.tag }}
+          draft: false
+          prerelease: false
+          files: |
+            release-artifacts/*.apk
+            release-artifacts/*.aab
+            release-artifacts/*.zip
+            release-artifacts/SHA256SUMS.txt
+          body: |
+            ## 🎛️ RoomBeat ${{ steps.vars.outputs.tag }}
+
+            Perceptually-synchronized audio playback across a room full of Android phones on the same local network. 100% offline, zero cloud relay, sub-10ms acoustic synchronization.
+
+            ---
+
+            ### 📦 Downloadable Release Artifacts
+
+            | Artifact | Description | Target Use Case |
+            | :--- | :--- | :--- |
+            | **`app-release.apk`** | **Universal Standalone Release APK** | Recommended for direct sideloading on any Android phone (bundles all architectures). |
+            | **`app-arm64-v8a-release.apk`** | **64-bit ARM Release APK (<12MB)** | Optimized for modern smartphones (Pixel, Galaxy, OnePlus, Xiaomi). |
+            | **`app-armeabi-v7a-release.apk`** | **32-bit ARM Release APK (<10MB)** | Optimized for older or budget Android phones. |
+            | **`app-x86_64-release.apk`** | **64-bit x86 Release APK (<13MB)** | Optimized for tablets, Chromebooks, and emulators. |
+            | **`app-release.aab`** | **Google Play App Bundle** | Official bundle for Google Play Console submission. |
+            | **`native-debug-symbols.zip`** | **C++ Native Debug Symbols** | For Play Console de-obfuscation of native Oboe/Opus crashes. |
+            | **`app-debug.apk`** | **Developer Debug APK** | Developer build with logging and unstripped debug tables. |
+            | **`app-debug-androidTest.apk`** | **Android Instrumentation Test APK** | Contains the 8-device stress test suite. |
+
+            ---
+
+            ### 🔐 Verification & Integrity
+            Verify downloaded artifact integrity using `SHA256SUMS.txt`:
+            ```bash
+            sha256sum -c SHA256SUMS.txt
+            ```
+
+            ---
+
+            ### 📖 Documentation
+            - [Getting Started Guide](https://github.com/WantedChip/RoomBeat/blob/main/docs/getting-started.md)
+            - [Audio Sources](https://github.com/WantedChip/RoomBeat/blob/main/docs/audio-sources.md)
+            - [Network & Hotspot Guide](https://github.com/WantedChip/RoomBeat/blob/main/docs/network-and-hotspot.md)
+            - [Troubleshooting FAQs](https://github.com/WantedChip/RoomBeat/blob/main/docs/troubleshooting.md)

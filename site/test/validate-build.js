@@ -31,7 +31,7 @@ assert.ok(fs.statSync(privacyPath).size > 5000, 'dist/privacy/index.html must be
 console.log('✓ Verified dist/privacy/index.html (' + fs.statSync(privacyPath).size + ' bytes)');
 
 // 4. Verify deployment & SEO metadata
-const requiredFiles = ['_headers', 'robots.txt', 'sitemap.xml', 'favicon.svg', 'global.css'];
+const requiredFiles = ['_headers', 'robots.txt', 'sitemap.xml', 'favicon.svg', 'global.css', 'og-image.png'];
 for (const file of requiredFiles) {
   const filePath = path.join(distDir, file);
   assert.ok(fs.existsSync(filePath), `dist/${file} must exist`);
