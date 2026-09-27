@@ -62,14 +62,18 @@ android {
     signingConfigs {
         create("release") {
             val keystorePath = System.getenv("ROOMBEAT_RELEASE_KEYSTORE_PATH")
-                ?: (project.findProperty("ROOMBEAT_RELEASE_KEYSTORE_PATH") as? String)
+                ?.takeIf { it.isNotBlank() }
+                ?: (project.findProperty("ROOMBEAT_RELEASE_KEYSTORE_PATH") as? String)?.takeIf { it.isNotBlank() }
             if (keystorePath != null && file(keystorePath).exists()) {
                 storeFile = file(keystorePath)
                 storePassword = System.getenv("ROOMBEAT_RELEASE_KEYSTORE_PASSWORD")
+                    ?.takeIf { it.isNotBlank() }
                     ?: (project.findProperty("ROOMBEAT_RELEASE_KEYSTORE_PASSWORD") as? String)
                 keyAlias = System.getenv("ROOMBEAT_RELEASE_KEY_ALIAS")
+                    ?.takeIf { it.isNotBlank() }
                     ?: (project.findProperty("ROOMBEAT_RELEASE_KEY_ALIAS") as? String)
                 keyPassword = System.getenv("ROOMBEAT_RELEASE_KEY_PASSWORD")
+                    ?.takeIf { it.isNotBlank() }
                     ?: (project.findProperty("ROOMBEAT_RELEASE_KEY_PASSWORD") as? String)
             } else {
                 // Fallback to debug keystore for local developer release builds and CI verification
