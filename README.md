@@ -6,12 +6,12 @@
 **No Bluetooth range limits. No cloud relay. Zero accounts. 100% offline.**
 
 [![Version](https://img.shields.io/badge/Release-v1.0.0-FF5500?style=for-the-badge&logo=android&logoColor=white)](#)
-[![Deployed with Cloudflare Pages](https://img.shields.io/badge/Deployed%20with-Cloudflare%20Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://roombeat.app)
+[![Deployed with Cloudflare Workers](https://img.shields.io/badge/Deployed%20with-Cloudflare%20Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://roombeat.sohamlabs.workers.dev)
 [![Android](https://img.shields.io/badge/Android-11%2B%20(API%2030%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F5A623.svg?style=for-the-badge)](./LICENSE)
 [![Zero Cloud](https://img.shields.io/badge/Cloud%20Dependency-0%25%20(100%25%20Offline)-00E599?style=for-the-badge)](#)
 
-[**🌐 Live Interactive Demo**](https://roombeat.app) • [**⚡ Quick Start**](#-quick-start-3-steps) • [**✨ Why RoomBeat?**](#-why-roombeat) • [**📖 Documentation**](#-documentation--community)
+[**🌐 Live Interactive Demo**](https://roombeat.sohamlabs.workers.dev) • [**⚡ Quick Start**](#-quick-start-3-steps) • [**✨ Why RoomBeat?**](#-why-roombeat) • [**📖 Documentation**](#-documentation--community)
 
 </div>
 
@@ -73,7 +73,7 @@ One phone becomes the **Host**, and any number of surrounding phones connect as 
 ## 🌐 Try the Web Simulator
 
 Experience RoomBeat's dynamic multi-node acoustic synchronization directly in your browser:
-👉 **[roombeat.app](https://roombeat.app)**
+👉 **[roombeat.sohamlabs.workers.dev](https://roombeat.sohamlabs.workers.dev)**
 
 Play with the interactive 4-node soundboard, drag faders, inject network latency spikes, and watch the phase-lock engine lock nodes back into sub-0.5ms synchronization in real time.
 
@@ -82,12 +82,14 @@ Play with the interactive 4-node soundboard, drag faders, inject network latency
 ## 🛠️ Monorepo Structure
 
 - [`android/`](./android/) — Native Android client built with Kotlin, Jetpack Compose, and NDK C++20 (Google Oboe, Opus codec, and fractional sinc resampler).
+- [`docs/`](./docs/) — Comprehensive documentation hub, quickstart guides, network tuning, battery optimization, and architecture blueprints.
 - [`site/`](./site/) — Production landing page and interactive WebAudio sync simulator built with Astro and Tailwind CSS v4.
 
 ---
 
 ## 📖 Documentation & Community
 
+- 📚 **[Documentation Hub](./docs/README.md)** — Complete technical and user guides for RoomBeat.
 - 📜 **[Changelog](./CHANGELOG.md)** — Detailed record of v1.0.0 release milestones and technical features.
 - 🤝 **[Contributing Guidelines](./CONTRIBUTING.md)** — Guide to local environment setup, Gradle/npm commands, and PR submissions.
 - 🛡️ **[Code of Conduct](./CODE_OF_CONDUCT.md)** — Contributor Covenant community pledge.
@@ -103,7 +105,7 @@ RoomBeat is built from the ground up to respect user privacy:
 - **Local Network Only**: Audio streams and clock packets stay strictly inside your local Wi-Fi / Hotspot subnet (`239.255.42.99:4242`) and never cross the internet gateway.
 - **Ephemeral RAM Audio**: Captured system audio frames are processed in transient memory and are **never written to disk or recorded**.
 
-Read the full [Privacy Policy](https://roombeat.app/privacy) or view the offline asset at [`privacy_policy.html`](./android/app/src/main/assets/privacy_policy.html).
+Read the full [Privacy Policy](https://roombeat.sohamlabs.workers.dev/privacy) or view the offline asset at [`privacy_policy.html`](./android/app/src/main/assets/privacy_policy.html).
 
 ---
 

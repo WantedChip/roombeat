@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://roombeat.app/sitemap.xml
+Sitemap: https://roombeat.sohamlabs.workers.dev/sitemap.xml

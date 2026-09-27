@@ -34,7 +34,7 @@ assets = { directory = "./dist", binding = "ASSETS" }
 # Production edge environment variables
 [vars]
 ENVIRONMENT = "production"
-SITE_URL = "https://roombeat.app"
+SITE_URL = "https://roombeat.sohamlabs.workers.dev"
 APP_NAME = "RoomBeat"
 MULTICAST_GROUP = "239.255.42.99"
 MULTICAST_PORT = "4242"
