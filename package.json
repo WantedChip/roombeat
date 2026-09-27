@@ -10,6 +10,7 @@
     "site:install": "npm --prefix site install",
     "site:dev": "npm --prefix site run dev",
     "site:build": "npm --prefix site run build",
+    "site:test": "npm --prefix site test",
     "site:preview": "npm --prefix site run preview"
   }
 }

@@ -7,7 +7,8 @@
     "start": "astro dev",
     "build:css": "tailwindcss -i ./src/styles/global.css -o ./public/global.css --minify",
     "build": "tailwindcss -i ./src/styles/global.css -o ./public/global.css --minify && astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test": "node test/validate-build.js"
   },
   "dependencies": {
     "@lucide/astro": "^1.44.0",
