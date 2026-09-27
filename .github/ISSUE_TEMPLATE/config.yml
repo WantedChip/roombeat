@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a Security Vulnerability
+    url: https://github.com/WantedChip/RoomBeat/blob/main/SECURITY.md
+    about: Please report security vulnerabilities privately via our security reporting process.
+  - name: 💬 Community Discussions & Questions
+    url: https://github.com/WantedChip/RoomBeat/discussions
+    about: Ask questions, share setups, or discuss hardware configurations with the community.

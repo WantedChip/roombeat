@@ -1,0 +1,73 @@
+name: 🐛 Bug Report
+description: Report an issue, glitch, or unexpected behavior in RoomBeat
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please provide as much detail as possible to help reproduce and resolve the defect.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which part of the RoomBeat system is affected?
+      options:
+        - "Android App: Audio Output & Synchronization (NDK / Oboe)"
+        - "Android App: Network Discovery & Multicast (mDNS / UDP)"
+        - "Android App: System Audio Capture (MediaProjection)"
+        - "Android App: Local Storage Player (SAF)"
+        - "Android App: Spotify App Remote Integration"
+        - "Android App: UI / Compose / Visualizers"
+        - "Landing Page / WebAudio Simulator (site/)"
+        - "Build / CI / ProGuard / Packaging"
+        - "Other"
+    validations:
+      required: true
+  - type: input
+    id: device_info
+    attributes:
+      label: Device & OS Information
+      description: Device model, Android OS version, and network setup (e.g. Pixel 8 Pro, Android 15, 5GHz Wi-Fi / Hotspot).
+      placeholder: "e.g. Samsung Galaxy S24 Ultra, Android 14 (One UI 6.1), Local 5GHz Wi-Fi router"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: RoomBeat Version
+      description: App version or git commit hash.
+      placeholder: "v1.0.0 (Build 1) or commit 7a9728e"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the Bug
+      description: Clear and concise description of what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Host starts session via 'Host Room'
+        2. Client node connects via 6-digit PIN
+        3. Start audio streaming via Local Storage
+        4. Turn off screen on client node...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: logcat
+    attributes:
+      label: Logcat / Error Logs
+      description: Relevant logs from logcat (filter tag `RoomBeat`) or build stack traces.
+      render: shell

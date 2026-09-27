@@ -23,7 +23,13 @@ The system operates without requiring an external relay server or cloud backend�
 
 ---
 
----
+## Documentation & Community Health
+
+- **[Changelog](./CHANGELOG.md)** — Comprehensive record of v1.0.0 features, audio engines, and optimizations.
+- **[Contributing Guidelines](./CONTRIBUTING.md)** — Guide to monorepo setup, development commands, and pull requests.
+- **[Code of Conduct](./CODE_OF_CONDUCT.md)** — Community standards and enforcement pledge.
+- **[Security Policy](./SECURITY.md)** — Vulnerability reporting guidelines and security principles.
+- **[Support & Discussions](./SUPPORT.md)** — Getting help and community resources.
 
 ## Privacy by Design (100% Offline Local Network)
 
