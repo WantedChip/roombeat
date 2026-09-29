@@ -101,10 +101,27 @@ class ReleaseLaunchReadinessTest {
         assertNotNull("build.gradle.kts must exist", buildGradleFile)
         val content = buildGradleFile!!.readText()
 
-        assertTrue("versionName must be 1.0.0 for production launch", content.contains("versionName = \"1.0.0\""))
+        assertTrue("versionName must be 1.1.0 for Phase v1.1", content.contains("versionName = \"1.1.0\""))
+        assertTrue("versionCode must be 2", content.contains("versionCode = 2"))
         assertTrue("minSdk must be 30", content.contains("minSdk = 30"))
         assertTrue("targetSdk must be 35", content.contains("targetSdk = 35"))
         assertTrue("compileSdk must be 35", content.contains("compileSdk = 35"))
+    }
+
+    @Test
+    fun testManifestDeclaresLauncherActivity() {
+        val manifestFile = resolveFile(
+            "src/main/AndroidManifest.xml",
+            "app/src/main/AndroidManifest.xml",
+            "android/app/src/main/AndroidManifest.xml"
+        )
+        assertNotNull("AndroidManifest.xml must exist", manifestFile)
+        val content = manifestFile!!.readText()
+
+        assertTrue("Must declare MainActivity", content.contains("android:name=\".MainActivity\""))
+        assertTrue("Must declare ACTION_MAIN", content.contains("android.intent.action.MAIN"))
+        assertTrue("Must declare CATEGORY_LAUNCHER", content.contains("android.intent.category.LAUNCHER"))
+        assertTrue("MainActivity must be exported", content.contains("android:exported=\"true\""))
     }
 
     @Test
