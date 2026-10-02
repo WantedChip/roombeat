@@ -1,1470 +1,421 @@
 ---
-import {
-  Play,
-  Square,
-  Activity,
-  Zap,
-  Radio,
-  Sliders,
-  CheckCircle2,
-  AlertTriangle,
-  RefreshCw,
-} from 'lucide-astro';
 ---
 
-<section
-  id="sync-simulator"
-  class="relative py-16 md:py-24 border-t border-border-milled bg-chassis-base overflow-hidden"
-  aria-labelledby="simulator-heading"
->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    
-    <!-- Section Header Stencil -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <div>
-        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-surface-panel border border-border-milled mb-3">
-          <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
-          <span class="font-mono text-xs font-semibold tracking-wider uppercase text-sync-green">
-            Modular Soundboard Bento Rack
-          </span>
-          <span class="text-text-dim text-xs font-mono">•</span>
-          <span class="font-mono text-xs text-text-muted">Pure WebAudio &amp; Dual-Mode Scope</span>
+<section id="simulator" class="border-b border-[#e0e2d3] bg-white py-20 sm:py-28">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <!-- Section Header (Graphify style) -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-[#e0e2d3]">
+      <div class="max-w-2xl">
+        <div class="op-eyebrow">
+          <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
+          <span>WebAudio Acoustic Testbed</span>
         </div>
-        <h2
-          id="simulator-heading"
-          class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[42px] leading-tight tracking-tight text-bone"
-        >
-          Simulate 4 Phones in Acoustic Sync.
+        <h2 class="op-title mt-3 text-3xl font-normal tracking-tight text-[#062314] sm:text-4xl md:text-5xl">
+          Simulate 4 phones in acoustic sync.
         </h2>
+        <p class="op-sub mt-4 text-[#35433a]">
+          Experience real acoustic comb filtering caused by Wi-Fi packet jitter, then engage
+          RoomBeat’s fractional sinc resampler to witness sub-0.5ms phase-lock convergence in real time.
+        </p>
       </div>
-      <p class="font-sans text-sm sm:text-base text-text-muted max-w-lg leading-relaxed">
-        Experience real acoustic comb filtering caused by Wi-Fi packet jitter, then engage
-        RoomBeat’s NDK fractional resampler to witness sub-0.5ms phase-lock convergence.
-      </p>
+
+      <!-- Quick Start Actions -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button
+          id="sim-master-play-btn"
+          type="button"
+          class="pill lg primary font-mono text-sm shadow-sm"
+        >
+          <svg id="sim-play-icon" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <span id="sim-play-text">START AUDIO ENGINE</span>
+        </button>
+
+        <button
+          id="sim-toggle-lock-btn"
+          type="button"
+          class="pill lg ghost font-mono text-sm border border-[#e0e2d3]"
+        >
+          <span id="sim-lock-indicator" class="h-2 w-2 rounded-full bg-[#118d4f]"></span>
+          <span id="sim-lock-text">ROOMBEAT LOCKED (0ms)</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Main Industrial Soundboard Chassis with Magic UI Perimeter Scanning Border Beam -->
-    <div
-      id="soundboard-console"
-      class="hardware-panel rounded-[10px] p-4 sm:p-6 lg:p-7 top-edge-lighting relative border border-border-milled bg-surface-panel overflow-hidden"
-    >
-      <!-- Magic UI Perimeter Scanning Border Beam -->
-      <div id="soundboard-border-beam" class="pointer-events-none absolute inset-0 rounded-[10px] overflow-hidden z-10">
-        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <defs>
-            <filter id="beam-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="1.2" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          <rect
-            id="beam-rect"
-            x="0.4"
-            y="0.4"
-            width="99.2"
-            height="99.2"
-            rx="2.5"
-            fill="none"
-            stroke="#00E599"
-            stroke-width="1.8"
-            vector-effect="non-scaling-stroke"
-            pathLength="100"
-            stroke-dasharray="14 86"
-            stroke-dashoffset="0"
-            filter="url(#beam-glow)"
-            class="animate-border-beam transition-colors duration-300"
-          />
-        </svg>
-      </div>
+    <!-- Simulator Instrument Console -->
+    <div class="mt-10 overflow-hidden rounded-[4px] border border-[#e0e2d3] bg-[#fbfbf7] shadow-sm">
+      <!-- Console Top Header Bar -->
+      <div class="flex flex-wrap items-center justify-between border-b border-[#e0e2d3] bg-white px-4 py-3 text-xs">
+        <div class="flex items-center gap-3 font-mono text-[#062314]">
+          <span class="font-semibold text-xs tracking-wider">CONSOLE: 4-CHANNEL ACOUSTIC RIG</span>
+          <span class="text-[#e0e2d3]">|</span>
+          <span id="sim-status-badge" class="inline-flex items-center gap-1 font-mono text-[11px] text-[#626b60]">
+            <span id="sim-status-dot" class="h-1.5 w-1.5 rounded-full bg-[#626b60]"></span>
+            <span id="sim-status-label">ENGINE: STANDBY</span>
+          </span>
+        </div>
 
-      <!-- Main Chassis Corner Machined Allen Hex Bolts -->
-      <div class="absolute top-2.5 left-2.5 pointer-events-none z-20">
-        <svg class="allen-hex-bolt w-3.5 h-3.5 text-border-milled/90" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-          <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-        </svg>
-      </div>
-      <div class="absolute top-2.5 right-2.5 pointer-events-none z-20">
-        <svg class="allen-hex-bolt w-3.5 h-3.5 text-border-milled/90" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-          <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-        </svg>
-      </div>
-      <div class="absolute bottom-2.5 left-2.5 pointer-events-none z-20">
-        <svg class="allen-hex-bolt w-3.5 h-3.5 text-border-milled/90" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-          <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-        </svg>
-      </div>
-      <div class="absolute bottom-2.5 right-2.5 pointer-events-none z-20">
-        <svg class="allen-hex-bolt w-3.5 h-3.5 text-border-milled/90" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-          <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-        </svg>
-      </div>
-
-      <!-- Master Rack Top Status Beacon Strip -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-border-milled relative z-10">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-[2px] bg-signal-orange"></span>
-          <span class="font-mono text-xs font-bold uppercase tracking-wider text-bone">
-            RACK MODULE: M-02 // 4-CHANNEL MODULAR ACOUSTIC CONSOLE
-          </span>
-        </div>
-
-        <!-- Telemetry Status Beacons -->
-        <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]">
-          <span
-            id="sim-engine-beacon"
-            class="px-2 py-0.5 rounded-[3px] bg-surface-recessed border border-border-milled text-text-dim flex items-center gap-1.5 transition-colors"
-          >
-            <span id="sim-engine-dot" class="w-1.5 h-1.5 rounded-full bg-text-dim"></span>
-            <span id="sim-engine-text">ENGINE: IDLE</span>
-          </span>
-
-          <span class="hidden sm:inline-block px-2 py-0.5 rounded-[3px] bg-surface-recessed border border-border-milled text-text-muted">
-            CLOCK: 48,000 HZ
-          </span>
-
-          <span class="hidden md:inline-block px-2 py-0.5 rounded-[3px] bg-surface-recessed border border-border-milled text-text-muted">
-            CODEC: 20ms OPUS
-          </span>
-
-          <span
-            id="sim-sync-beacon"
-            class="px-2 py-0.5 rounded-[3px] bg-sync-green/10 border border-sync-green/30 text-sync-green flex items-center gap-1.5 transition-colors"
-          >
-            <span id="sim-sync-dot" class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
-            <span id="sim-sync-text">SYNC: LOCKED (&lt;0.5ms)</span>
-          </span>
-        </div>
-      </div>
-
-      <!-- ========================================================================= -->
-      <!-- ACETERNITY BENTO GRID RACK BAYS                                            -->
-      <!-- ========================================================================= -->
-
-      <!-- UPPER DECK: BAY 02 (Visualizer) + BAY 01 (Clock Generator) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6 relative z-10">
-        
-        <!-- ======================================================================= -->
-        <!-- BAY 02: DUAL-MODE VISUALIZER (Polar Radar vs Lissajous Oscilloscope)   -->
-        <!-- ======================================================================= -->
-        <div class="lg:col-span-7 hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting relative flex flex-col justify-between" id="bay-02">
-          <!-- Corner Allen Hex Bolts -->
-          <div class="absolute top-2 left-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
-          </div>
-          <div class="absolute top-2 right-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
-          </div>
-
-          <!-- Bay Header & Dual-Mode Toggle Button Group -->
-          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-2 border-b border-border-milled/70">
-            <div class="flex items-center gap-2 pl-4">
-              <span class="font-mono text-xs font-bold uppercase tracking-wider text-text-muted">
-                BAY 02 // DUAL-MODE PHASE OSCILLOSCOPE
-              </span>
-            </div>
-
-            <!-- Mode Switcher -->
-            <div class="flex items-center gap-1 bg-surface-recessed p-1 rounded-[6px] border border-border-milled">
-              <button
-                id="btn-mode-radar"
-                type="button"
-                class="mode-toggle-btn px-2.5 py-1 rounded-[4px] font-mono text-[11px] font-bold uppercase transition-all flex items-center gap-1.5 bg-surface-elevated text-sync-green border border-sync-green/30"
-                data-mode="radar"
-                aria-label="Switch to Polar Phase Radar Mode"
-              >
-                <span class="mode-led w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
-                <span>POLAR RADAR</span>
-              </button>
-              <button
-                id="btn-mode-lissajous"
-                type="button"
-                class="mode-toggle-btn px-2.5 py-1 rounded-[4px] font-mono text-[11px] font-bold uppercase transition-all flex items-center gap-1.5 text-text-muted hover:text-bone"
-                data-mode="lissajous"
-                aria-label="Switch to Lissajous Phase Scope Mode"
-              >
-                <span class="mode-led w-1.5 h-1.5 rounded-full bg-text-dim"></span>
-                <span>LISSAJOUS SCOPE</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Recessed Oscilloscope Screen Cavity -->
-          <div class="recessed-cavity rounded-[8px] p-2 flex-1 flex flex-col justify-center min-h-[300px] sm:min-h-[340px] relative">
-            <canvas
-              id="radar-canvas"
-              class="w-full h-full min-h-[280px] sm:min-h-[320px] rounded-[4px] block cursor-crosshair"
-              aria-label="Dual-Mode Acoustic Phase Radar and Lissajous Scope"
-            ></canvas>
-          </div>
-
-          <!-- Visualizer Bottom Status Readout -->
-          <div class="flex items-center justify-between font-mono text-[10px] text-text-dim pt-2 px-1">
-            <span id="scope-status-left">MODE: POLAR VECTOR RETICLE</span>
-            <span id="scope-status-right" class="text-sync-green">REF: HOST CLOCK_MONOTONIC</span>
-          </div>
-        </div>
-
-        <!-- ======================================================================= -->
-        <!-- BAY 01: MASTER CLOCK GENERATOR (Transport, Tempo, Step, Sync Trigger)  -->
-        <!-- ======================================================================= -->
-        <div class="lg:col-span-5 hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting relative flex flex-col justify-between space-y-4" id="bay-01">
-          <!-- Corner Allen Hex Bolts -->
-          <div class="absolute top-2 left-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
-          </div>
-          <div class="absolute top-2 right-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
-          </div>
-
-          <!-- Bay Header -->
-          <div class="flex items-center justify-between pb-2 border-b border-border-milled/70 pl-4">
-            <span class="font-mono text-xs font-bold uppercase tracking-wider text-text-muted">
-              BAY 01 // MASTER CLOCK GENERATOR
-            </span>
-            <span class="font-mono text-[10px] text-text-dim">HOST TX</span>
-          </div>
-
-          <!-- 1. Master Play/Stop Keycap Trigger -->
-          <div>
+          <!-- Scope Toggle Mode -->
+          <div class="flex items-center rounded-[2px] border border-[#e0e2d3] bg-[#fbfbf7] p-0.5 font-mono text-[11px]">
             <button
-              id="btn-toggle-playback"
+              id="scope-mode-radar"
               type="button"
-              class="w-full tactile-keycap-btn py-3.5 px-4 flex items-center justify-center gap-2.5 text-sm uppercase tracking-wider font-display font-bold text-[#0B0C0E]"
-              aria-label="Start or Stop Multi-Phone Rig Playback"
+              class="px-2.5 py-1 rounded-[2px] bg-[#062314] text-white font-medium"
             >
-              <div class="keycap-inner flex items-center justify-center gap-2">
-                <Play id="icon-play" class="w-4 h-4 fill-current stroke-[2.5]" />
-                <Square id="icon-stop" class="w-4 h-4 fill-current stroke-[2.5] hidden" />
-                <span id="transport-btn-text">START MULTI-PHONE RIG</span>
-              </div>
+              Polar Radar
             </button>
-            <p class="font-mono text-[10px] text-text-dim mt-1.5 text-center">
-              Synthesizes 4-channel synchronized groove (Kick, Snare, Bass, Stabs)
-            </p>
-          </div>
-
-          <!-- 2. Master Tempo BPM Stepper -->
-          <div class="flex items-center justify-between gap-2 p-2 rounded-[6px] bg-surface-recessed border border-border-milled">
-            <div class="flex items-center gap-2">
-              <Activity class="w-3.5 h-3.5 text-signal-orange" />
-              <span class="font-mono text-xs font-semibold uppercase tracking-wider text-text-muted">TEMPO</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <button
-                id="btn-tempo-down"
-                type="button"
-                class="tactile-btn-secondary w-7 h-7 flex items-center justify-center font-mono text-xs font-bold text-bone hover:border-signal-orange transition-colors"
-                aria-label="Decrease Master Tempo"
-              >
-                -
-              </button>
-              <span id="tempo-readout" class="font-mono text-xs font-bold text-bone w-16 text-center tabular-nums">
-                124 BPM
-              </span>
-              <button
-                id="btn-tempo-up"
-                type="button"
-                class="tactile-btn-secondary w-7 h-7 flex items-center justify-center font-mono text-xs font-bold text-bone hover:border-signal-orange transition-colors"
-                aria-label="Increase Master Tempo"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <!-- 3. 16-Step Sequencer LED Bar -->
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between font-mono text-[10px] text-text-dim">
-              <span>16-STEP MASTER CLOCK</span>
-              <span id="transport-step-badge" class="text-signal-orange font-bold tabular-nums">STEP: 01/16</span>
-            </div>
-            <div id="step-sequencer-grid" class="grid grid-cols-16 gap-1 h-2.5">
-              {Array.from({ length: 16 }).map((_, i) => (
-                <div
-                  id={`step-led-${i}`}
-                  class={`step-led h-full rounded-[1px] border border-border-milled transition-all duration-75 ${
-                    i % 4 === 0 ? 'bg-surface-elevated' : 'bg-surface-recessed'
-                  }`}
-                  data-step-index={i}
-                ></div>
-              ))}
-            </div>
-          </div>
-
-          <!-- 4. RoomBeat Phase-Lock Trigger -->
-          <div class="pt-2 border-t border-border-milled/70">
             <button
-              id="btn-engage-sync"
+              id="scope-mode-lissajous"
               type="button"
-              class="w-full tactile-btn-primary bg-[#00E599] hover:bg-[#00FFAA] text-[#0B0C0E] border-[#33FFBB] py-3 px-4 flex items-center justify-center gap-2 text-sm uppercase tracking-wider font-display font-bold shadow-[0_2px_12px_rgba(0,229,153,0.3)] transition-all"
+              class="px-2.5 py-1 rounded-[2px] text-[#626b60] hover:text-[#062314]"
             >
-              <Zap class="w-4 h-4 fill-current stroke-[2.5]" />
-              <span>ENGAGE ROOMBEAT SYNC</span>
+              Lissajous Scope
             </button>
-            <p class="font-mono text-[10px] text-text-dim mt-1.5 text-center">
-              NDK Catmull-Rom resampler slews drift to 0.0ms without pitch jumps
-            </p>
           </div>
         </div>
-
       </div>
 
-      <!-- LOWER DECK: BAY 03 (4-Channel Strip Mixer) + BAY 04 (Jitter Diagnostic Bay) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 relative z-10">
-        
-        <!-- ======================================================================= -->
-        <!-- BAY 03: 4-CHANNEL STRIP MIXER (Origin UI Precision Faders & Switches)   -->
-        <!-- ======================================================================= -->
-        <div class="lg:col-span-8 hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting relative flex flex-col justify-between" id="bay-03">
-          <!-- Corner Allen Hex Bolts -->
-          <div class="absolute top-2 left-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
-          </div>
-          <div class="absolute top-2 right-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
+      <!-- Main Split View: Left Scope + Right 4-Channel Strips -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#e0e2d3]">
+        <!-- Left: Phase Radar / Lissajous Scope (Cols 1-6) -->
+        <div class="lg:col-span-6 p-4 sm:p-6 flex flex-col justify-between bg-[#0b140e] text-white min-h-[360px] sm:min-h-[420px]">
+          <div class="flex items-center justify-between font-mono text-[11px] text-white/60">
+            <span id="scope-title" class="text-[#118d4f] font-semibold">● POLAR ACOUSTIC RADAR</span>
+            <span>SWEEP: 48kHz REALTIME</span>
           </div>
 
-          <!-- Bay Header -->
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-border-milled/70 pl-4">
-            <div>
-              <span class="font-mono text-xs font-bold uppercase tracking-wider text-text-muted">
-                BAY 03 // 4-CHANNEL STRIP MIXER
-              </span>
-              <span class="hidden sm:inline font-mono text-[10px] text-text-dim ml-2">
-                ORIGIN UI PRECISION VERTICAL FADERS &amp; ROCKER SWITCHES
-              </span>
+          <!-- Scope Canvas Container -->
+          <div class="relative my-auto flex h-[280px] sm:h-[320px] w-full items-center justify-center">
+            <canvas id="sim-radar-canvas" class="h-full w-full block"></canvas>
+
+            <!-- Scope Mode Overlay Tag -->
+            <div class="pointer-events-none absolute bottom-2 right-2 rounded-[2px] border border-white/10 bg-black/60 px-2 py-0.5 font-mono text-[10px] text-white/70 backdrop-blur-sm">
+              <span id="scope-phase-correlation">CORRELATION: 0.998 (COHERENT)</span>
             </div>
-            <span class="font-mono text-[10px] text-sync-green">SUMMED 0dB CEILING</span>
           </div>
 
-          <!-- 4 Phone Channel Strips Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
-            
-            <!-- Channel 01: Host -->
-            <div class="channel-strip bg-surface-elevated rounded-[6px] p-3 border border-border-milled flex flex-col justify-between relative" data-channel="0">
-              <!-- Channel Header -->
-              <div class="mb-2">
-                <div class="flex items-center justify-between gap-1 mb-1">
-                  <span class="font-mono text-[10px] font-bold text-signal-orange bg-signal-orange/10 border border-signal-orange/30 px-1.5 py-0.5 rounded-[3px]">
-                    CH 01 // HOST
-                  </span>
-                  <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green tabular-nums">
-                    0.0 ms [REF]
-                  </span>
-                </div>
-                <div class="font-sans font-semibold text-xs text-bone truncate">Pixel 8 Pro</div>
-                <div class="font-mono text-[9px] text-text-dim">Master Clock Reference</div>
-              </div>
-
-              <!-- Precision Vertical Fader & VU Meter Assembly -->
-              <div class="channel-fader-assembly flex items-center justify-between gap-2 py-2">
-                <!-- Numeric dB scale tick marks -->
-                <div class="fader-scale flex flex-col justify-between h-[150px] text-[9px] font-mono text-text-dim select-none pr-1 text-right">
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="100">+3dB</span>
-                  <span class="text-bone font-bold cursor-pointer" data-target-pos="75">0dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="50">-6dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="25">-12dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="0">-inf</span>
-                </div>
-
-                <!-- Vertical Fader Track Container -->
-                <div
-                  class="fader-track-container relative h-[150px] w-12 flex items-center justify-center select-none cursor-pointer"
-                  data-channel-index="0"
-                >
-                  <!-- Recessed Slot -->
-                  <div class="w-2.5 h-full fader-track-recessed rounded-[3px] relative pointer-events-none">
-                    <!-- 0dB Magnetic Detent Marker Notch -->
-                    <div class="absolute left-[-4px] right-[-4px] top-[25%] h-[2px] bg-sync-green/80 rounded-[1px]"></div>
-                  </div>
-                  <!-- Sliding Metallic Handle (Fader Cap) -->
-                  <div
-                    class="fader-handle absolute fader-cap-metallic w-10 h-5 rounded-[3px] cursor-grab active:cursor-grabbing flex flex-col items-center justify-center z-10"
-                    style="bottom: 75%; transform: translateY(50%);"
-                    role="slider"
-                    aria-label="Channel 1 Volume Fader"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-valuenow="75"
-                    tabindex="0"
-                  >
-                    <div class="w-full h-[2px] bg-bone pointer-events-none"></div>
-                    <div class="flex gap-0.5 mt-0.5 pointer-events-none">
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Vertical High-Resolution VU Peak Meter -->
-                <div class="flex flex-col items-center h-[150px] w-3">
-                  <div class="w-2.5 h-full bg-surface-recessed border border-border-milled rounded-[2px] p-[1px] relative overflow-hidden flex flex-col justify-end">
-                    <div class="ch-vu-fill w-full bg-sync-green rounded-[1px] transition-all duration-75" style="height: 0%;"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Real-Time Level Readout -->
-              <div class="flex items-center justify-between text-[10px] font-mono border-t border-border-milled/70 pt-1.5 px-0.5 mb-2">
-                <span class="text-text-dim">GAIN:</span>
-                <span class="ch-db-readout font-bold text-bone">0.0 dB</span>
-              </div>
-
-              <!-- Tactile Rocker Switches (Origin UI style) -->
-              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-border-milled/70">
-                <button
-                  type="button"
-                  class="btn-mute rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Mute Channel 1"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>MUTE</span>
-                </button>
-                <button
-                  type="button"
-                  class="btn-solo rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Solo Channel 1"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>SOLO</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Channel 02: Peer A -->
-            <div class="channel-strip bg-surface-elevated rounded-[6px] p-3 border border-border-milled flex flex-col justify-between relative" data-channel="1">
-              <!-- Channel Header -->
-              <div class="mb-2">
-                <div class="flex items-center justify-between gap-1 mb-1">
-                  <span class="font-mono text-[10px] font-bold text-network-cyan bg-network-cyan/10 border border-network-cyan/30 px-1.5 py-0.5 rounded-[3px]">
-                    CH 02 // P-01
-                  </span>
-                  <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green tabular-nums">
-                    0.0 ms
-                  </span>
-                </div>
-                <div class="font-sans font-semibold text-xs text-bone truncate">Galaxy S24 Ultra</div>
-                <div class="font-mono text-[9px] text-text-dim">DelayNode Resampler</div>
-              </div>
-
-              <!-- Precision Vertical Fader & VU Meter Assembly -->
-              <div class="channel-fader-assembly flex items-center justify-between gap-2 py-2">
-                <div class="fader-scale flex flex-col justify-between h-[150px] text-[9px] font-mono text-text-dim select-none pr-1 text-right">
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="100">+3dB</span>
-                  <span class="text-bone font-bold cursor-pointer" data-target-pos="75">0dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="50">-6dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="25">-12dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="0">-inf</span>
-                </div>
-
-                <div
-                  class="fader-track-container relative h-[150px] w-12 flex items-center justify-center select-none cursor-pointer"
-                  data-channel-index="1"
-                >
-                  <div class="w-2.5 h-full fader-track-recessed rounded-[3px] relative pointer-events-none">
-                    <div class="absolute left-[-4px] right-[-4px] top-[25%] h-[2px] bg-sync-green/80 rounded-[1px]"></div>
-                  </div>
-                  <div
-                    class="fader-handle absolute fader-cap-metallic w-10 h-5 rounded-[3px] cursor-grab active:cursor-grabbing flex flex-col items-center justify-center z-10"
-                    style="bottom: 75%; transform: translateY(50%);"
-                    role="slider"
-                    aria-label="Channel 2 Volume Fader"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-valuenow="75"
-                    tabindex="0"
-                  >
-                    <div class="w-full h-[2px] bg-bone pointer-events-none"></div>
-                    <div class="flex gap-0.5 mt-0.5 pointer-events-none">
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex flex-col items-center h-[150px] w-3">
-                  <div class="w-2.5 h-full bg-surface-recessed border border-border-milled rounded-[2px] p-[1px] relative overflow-hidden flex flex-col justify-end">
-                    <div class="ch-vu-fill w-full bg-sync-green rounded-[1px] transition-all duration-75" style="height: 0%;"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Real-Time Level Readout -->
-              <div class="flex items-center justify-between text-[10px] font-mono border-t border-border-milled/70 pt-1.5 px-0.5 mb-2">
-                <span class="text-text-dim">GAIN:</span>
-                <span class="ch-db-readout font-bold text-bone">0.0 dB</span>
-              </div>
-
-              <!-- Tactile Rocker Switches (Origin UI style) -->
-              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-border-milled/70">
-                <button
-                  type="button"
-                  class="btn-mute rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Mute Channel 2"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>MUTE</span>
-                </button>
-                <button
-                  type="button"
-                  class="btn-solo rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Solo Channel 2"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>SOLO</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Channel 03: Peer B -->
-            <div class="channel-strip bg-surface-elevated rounded-[6px] p-3 border border-border-milled flex flex-col justify-between relative" data-channel="2">
-              <!-- Channel Header -->
-              <div class="mb-2">
-                <div class="flex items-center justify-between gap-1 mb-1">
-                  <span class="font-mono text-[10px] font-bold text-network-cyan bg-network-cyan/10 border border-network-cyan/30 px-1.5 py-0.5 rounded-[3px]">
-                    CH 03 // P-02
-                  </span>
-                  <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green tabular-nums">
-                    0.0 ms
-                  </span>
-                </div>
-                <div class="font-sans font-semibold text-xs text-bone truncate">Sony Xperia 1 V</div>
-                <div class="font-mono text-[9px] text-text-dim">DelayNode Resampler</div>
-              </div>
-
-              <!-- Precision Vertical Fader & VU Meter Assembly -->
-              <div class="channel-fader-assembly flex items-center justify-between gap-2 py-2">
-                <div class="fader-scale flex flex-col justify-between h-[150px] text-[9px] font-mono text-text-dim select-none pr-1 text-right">
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="100">+3dB</span>
-                  <span class="text-bone font-bold cursor-pointer" data-target-pos="75">0dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="50">-6dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="25">-12dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="0">-inf</span>
-                </div>
-
-                <div
-                  class="fader-track-container relative h-[150px] w-12 flex items-center justify-center select-none cursor-pointer"
-                  data-channel-index="2"
-                >
-                  <div class="w-2.5 h-full fader-track-recessed rounded-[3px] relative pointer-events-none">
-                    <div class="absolute left-[-4px] right-[-4px] top-[25%] h-[2px] bg-sync-green/80 rounded-[1px]"></div>
-                  </div>
-                  <div
-                    class="fader-handle absolute fader-cap-metallic w-10 h-5 rounded-[3px] cursor-grab active:cursor-grabbing flex flex-col items-center justify-center z-10"
-                    style="bottom: 75%; transform: translateY(50%);"
-                    role="slider"
-                    aria-label="Channel 3 Volume Fader"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-valuenow="75"
-                    tabindex="0"
-                  >
-                    <div class="w-full h-[2px] bg-bone pointer-events-none"></div>
-                    <div class="flex gap-0.5 mt-0.5 pointer-events-none">
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex flex-col items-center h-[150px] w-3">
-                  <div class="w-2.5 h-full bg-surface-recessed border border-border-milled rounded-[2px] p-[1px] relative overflow-hidden flex flex-col justify-end">
-                    <div class="ch-vu-fill w-full bg-sync-green rounded-[1px] transition-all duration-75" style="height: 0%;"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Real-Time Level Readout -->
-              <div class="flex items-center justify-between text-[10px] font-mono border-t border-border-milled/70 pt-1.5 px-0.5 mb-2">
-                <span class="text-text-dim">GAIN:</span>
-                <span class="ch-db-readout font-bold text-bone">0.0 dB</span>
-              </div>
-
-              <!-- Tactile Rocker Switches (Origin UI style) -->
-              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-border-milled/70">
-                <button
-                  type="button"
-                  class="btn-mute rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Mute Channel 3"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>MUTE</span>
-                </button>
-                <button
-                  type="button"
-                  class="btn-solo rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Solo Channel 3"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>SOLO</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Channel 04: Peer C -->
-            <div class="channel-strip bg-surface-elevated rounded-[6px] p-3 border border-border-milled flex flex-col justify-between relative" data-channel="3">
-              <!-- Channel Header -->
-              <div class="mb-2">
-                <div class="flex items-center justify-between gap-1 mb-1">
-                  <span class="font-mono text-[10px] font-bold text-network-cyan bg-network-cyan/10 border border-network-cyan/30 px-1.5 py-0.5 rounded-[3px]">
-                    CH 04 // P-03
-                  </span>
-                  <span class="ch-delay-badge font-mono text-xs font-bold text-sync-green tabular-nums">
-                    0.0 ms
-                  </span>
-                </div>
-                <div class="font-sans font-semibold text-xs text-bone truncate">Nothing Phone (2)</div>
-                <div class="font-mono text-[9px] text-text-dim">DelayNode Resampler</div>
-              </div>
-
-              <!-- Precision Vertical Fader & VU Meter Assembly -->
-              <div class="channel-fader-assembly flex items-center justify-between gap-2 py-2">
-                <div class="fader-scale flex flex-col justify-between h-[150px] text-[9px] font-mono text-text-dim select-none pr-1 text-right">
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="100">+3dB</span>
-                  <span class="text-bone font-bold cursor-pointer" data-target-pos="75">0dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="50">-6dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="25">-12dB</span>
-                  <span class="hover:text-text-muted cursor-pointer" data-target-pos="0">-inf</span>
-                </div>
-
-                <div
-                  class="fader-track-container relative h-[150px] w-12 flex items-center justify-center select-none cursor-pointer"
-                  data-channel-index="3"
-                >
-                  <div class="w-2.5 h-full fader-track-recessed rounded-[3px] relative pointer-events-none">
-                    <div class="absolute left-[-4px] right-[-4px] top-[25%] h-[2px] bg-sync-green/80 rounded-[1px]"></div>
-                  </div>
-                  <div
-                    class="fader-handle absolute fader-cap-metallic w-10 h-5 rounded-[3px] cursor-grab active:cursor-grabbing flex flex-col items-center justify-center z-10"
-                    style="bottom: 75%; transform: translateY(50%);"
-                    role="slider"
-                    aria-label="Channel 4 Volume Fader"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-valuenow="75"
-                    tabindex="0"
-                  >
-                    <div class="w-full h-[2px] bg-bone pointer-events-none"></div>
-                    <div class="flex gap-0.5 mt-0.5 pointer-events-none">
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                      <span class="w-2.5 h-[1px] bg-text-dim"></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex flex-col items-center h-[150px] w-3">
-                  <div class="w-2.5 h-full bg-surface-recessed border border-border-milled rounded-[2px] p-[1px] relative overflow-hidden flex flex-col justify-end">
-                    <div class="ch-vu-fill w-full bg-sync-green rounded-[1px] transition-all duration-75" style="height: 0%;"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Real-Time Level Readout -->
-              <div class="flex items-center justify-between text-[10px] font-mono border-t border-border-milled/70 pt-1.5 px-0.5 mb-2">
-                <span class="text-text-dim">GAIN:</span>
-                <span class="ch-db-readout font-bold text-bone">0.0 dB</span>
-              </div>
-
-              <!-- Tactile Rocker Switches (Origin UI style) -->
-              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-border-milled/70">
-                <button
-                  type="button"
-                  class="btn-mute rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Mute Channel 4"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>MUTE</span>
-                </button>
-                <button
-                  type="button"
-                  class="btn-solo rocker-paddle py-1 px-1.5 rounded-[4px] flex items-center justify-center gap-1 font-mono text-[10px] font-bold uppercase text-text-muted hover:text-bone hover:border-border-active transition-all"
-                  aria-label="Solo Channel 4"
-                >
-                  <span class="led-dot w-1.5 h-1.5 rounded-full bg-border-milled transition-colors"></span>
-                  <span>SOLO</span>
-                </button>
-              </div>
-            </div>
-
+          <div class="flex items-center justify-between border-t border-white/10 pt-3 font-mono text-[11px] text-white/50">
+            <span>GRID: CONCENTRIC 10ms ISOLINES</span>
+            <span id="scope-hint" class="text-white/70">Green vector = In phase</span>
           </div>
         </div>
 
-        <!-- ======================================================================= -->
-        <!-- BAY 04: JITTER DIAGNOSTIC BAY (Telemetry Dials & Multi-Path Drift)      -->
-        <!-- ======================================================================= -->
-        <div class="lg:col-span-4 hardware-card rounded-[8px] p-4 border border-border-milled top-edge-lighting relative flex flex-col justify-between space-y-4" id="bay-04">
-          <!-- Corner Allen Hex Bolts -->
-          <div class="absolute top-2 left-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
-          </div>
-          <div class="absolute top-2 right-2 pointer-events-none">
-            <svg class="allen-hex-bolt w-2.5 h-2.5 text-border-milled/70" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.2" fill="#13151A" />
-              <polygon points="8,4.5 11,6.2 11,9.8 8,11.5 5,9.8 5,6.2" stroke="#3E4454" stroke-width="1" fill="#07080A" />
-            </svg>
+        <!-- Right: 4 Phone Channel Fader Strips (Cols 7-12) -->
+        <div class="lg:col-span-6 p-4 sm:p-6 bg-white flex flex-col justify-between">
+          <div class="flex items-center justify-between border-b border-[#e0e2d3] pb-3 font-mono text-[11px] text-[#626b60]">
+            <span>CHANNEL STRIPS (4 PHONES)</span>
+            <span class="text-[#062314] font-medium">TEMPO: 124 BPM</span>
           </div>
 
-          <!-- Bay Header -->
-          <div class="flex items-center justify-between pb-2 border-b border-border-milled/70 pl-4">
-            <div class="flex items-center gap-1.5">
-              <AlertTriangle class="w-3.5 h-3.5 text-sync-amber" />
-              <span class="font-mono text-xs font-bold uppercase tracking-wider text-text-muted">
-                BAY 04 // JITTER DIAGNOSTIC
-              </span>
-            </div>
-            <span class="font-mono text-[10px] text-text-dim">TELEMETRY</span>
-          </div>
+          <!-- Channel Strips Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 my-auto">
+            <!-- Channel 1: Host -->
+            <div class="channel-strip flex flex-col items-center rounded-[2px] border border-[#e0e2d3] bg-[#fbfbf7] p-2.5" data-ch="0">
+              <span class="font-mono text-[10px] uppercase font-bold text-[#118d4f]">HOST REF</span>
+              <span class="font-sans text-xs font-semibold text-[#062314] mt-0.5">Pixel 8 Pro</span>
+              <span class="ch-delay-badge mt-1 font-mono text-[11px] font-bold text-[#118d4f]">0.0 ms</span>
 
-          <!-- 3 Real-Time Telemetry Dials / Arc Gauges -->
-          <div class="grid grid-cols-3 gap-2 py-1">
-            
-            <!-- Dial 1: Latency Offset -->
-            <div class="flex flex-col items-center p-2 rounded-[6px] bg-surface-recessed border border-border-milled text-center">
-              <div class="relative w-14 h-14 flex items-center justify-center">
-                <svg viewBox="0 0 72 72" class="w-full h-full">
-                  <!-- Background Track Arc -->
-                  <circle
-                    cx="36"
-                    cy="36"
-                    r="26"
-                    fill="none"
-                    stroke="#262A35"
-                    stroke-width="4.5"
-                    stroke-dasharray="108.9 163.4"
-                    stroke-dashoffset="0"
-                    stroke-linecap="round"
-                    transform="rotate(150 36 36)"
-                  />
-                  <!-- Active Value Arc -->
-                  <circle
-                    id="dial-arc-offset"
-                    cx="36"
-                    cy="36"
-                    r="26"
-                    fill="none"
-                    stroke="#00E599"
-                    stroke-width="4.5"
-                    stroke-dasharray="108.9 163.4"
-                    stroke-dashoffset="108.9"
-                    stroke-linecap="round"
-                    transform="rotate(150 36 36)"
-                    class="transition-all duration-150"
-                  />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <span id="dial-val-offset" class="font-mono text-[11px] font-bold text-sync-green tabular-nums">0.0ms</span>
+              <!-- Vertical Meter & Fader -->
+              <div class="my-3 flex h-32 w-10 items-center justify-center gap-1.5 rounded-[2px] border border-[#e0e2d3] bg-[#f4f5ec] p-1">
+                <!-- VU Meter Bar -->
+                <div class="h-full w-2 rounded-[1px] bg-[#e0e2d3] relative overflow-hidden flex flex-col justify-end">
+                  <div class="ch-vu-fill w-full bg-[#118d4f] transition-all duration-75" style="height: 0%;"></div>
                 </div>
+                <!-- Volume Slider Vertical -->
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="75"
+                  class="ch-fader h-24 w-1 [writing-mode:vertical-lr] [direction:rtl]"
+                  aria-label="Channel 0 Volume"
+                />
               </div>
-              <span class="font-mono text-[9px] uppercase tracking-wider text-text-dim mt-1">LATENCY</span>
+
+              <span class="ch-db font-mono text-[10px] text-[#626b60]">0.0 dB</span>
+              <div class="mt-2 flex gap-1">
+                <button type="button" class="btn-mute pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">M</button>
+                <button type="button" class="btn-solo pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">S</button>
+              </div>
             </div>
 
-            <!-- Dial 2: Packet Loss % -->
-            <div class="flex flex-col items-center p-2 rounded-[6px] bg-surface-recessed border border-border-milled text-center">
-              <div class="relative w-14 h-14 flex items-center justify-center">
-                <svg viewBox="0 0 72 72" class="w-full h-full">
-                  <circle
-                    cx="36"
-                    cy="36"
-                    r="26"
-                    fill="none"
-                    stroke="#262A35"
-                    stroke-width="4.5"
-                    stroke-dasharray="108.9 163.4"
-                    stroke-dashoffset="0"
-                    stroke-linecap="round"
-                    transform="rotate(150 36 36)"
-                  />
-                  <circle
-                    id="dial-arc-loss"
-                    cx="36"
-                    cy="36"
-                    r="26"
-                    fill="none"
-                    stroke="#00E599"
-                    stroke-width="4.5"
-                    stroke-dasharray="108.9 163.4"
-                    stroke-dashoffset="108.9"
-                    stroke-linecap="round"
-                    transform="rotate(150 36 36)"
-                    class="transition-all duration-150"
-                  />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <span id="dial-val-loss" class="font-mono text-[11px] font-bold text-sync-green tabular-nums">0.0%</span>
+            <!-- Channel 2: Peer 1 -->
+            <div class="channel-strip flex flex-col items-center rounded-[2px] border border-[#e0e2d3] bg-[#fbfbf7] p-2.5" data-ch="1">
+              <span class="font-mono text-[10px] uppercase font-bold text-[#062314]">PEER 1</span>
+              <span class="font-sans text-xs font-semibold text-[#062314] mt-0.5">Galaxy S24</span>
+              <span class="ch-delay-badge mt-1 font-mono text-[11px] font-bold text-[#118d4f]">0.0 ms</span>
+
+              <div class="my-3 flex h-32 w-10 items-center justify-center gap-1.5 rounded-[2px] border border-[#e0e2d3] bg-[#f4f5ec] p-1">
+                <div class="h-full w-2 rounded-[1px] bg-[#e0e2d3] relative overflow-hidden flex flex-col justify-end">
+                  <div class="ch-vu-fill w-full bg-[#118d4f] transition-all duration-75" style="height: 0%;"></div>
                 </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="75"
+                  class="ch-fader h-24 w-1 [writing-mode:vertical-lr] [direction:rtl]"
+                  aria-label="Channel 1 Volume"
+                />
               </div>
-              <span class="font-mono text-[9px] uppercase tracking-wider text-text-dim mt-1">PKT LOSS</span>
+
+              <span class="ch-db font-mono text-[10px] text-[#626b60]">0.0 dB</span>
+              <div class="mt-2 flex gap-1">
+                <button type="button" class="btn-mute pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">M</button>
+                <button type="button" class="btn-solo pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">S</button>
+              </div>
             </div>
 
-            <!-- Dial 3: Buffer Depth -->
-            <div class="flex flex-col items-center p-2 rounded-[6px] bg-surface-recessed border border-border-milled text-center">
-              <div class="relative w-14 h-14 flex items-center justify-center">
-                <svg viewBox="0 0 72 72" class="w-full h-full">
-                  <circle
-                    cx="36"
-                    cy="36"
-                    r="26"
-                    fill="none"
-                    stroke="#262A35"
-                    stroke-width="4.5"
-                    stroke-dasharray="108.9 163.4"
-                    stroke-dashoffset="0"
-                    stroke-linecap="round"
-                    transform="rotate(150 36 36)"
-                  />
-                  <circle
-                    id="dial-arc-buffer"
-                    cx="36"
-                    cy="36"
-                    r="26"
-                    fill="none"
-                    stroke="#00E599"
-                    stroke-width="4.5"
-                    stroke-dasharray="108.9 163.4"
-                    stroke-dashoffset="87.1"
-                    stroke-linecap="round"
-                    transform="rotate(150 36 36)"
-                    class="transition-all duration-150"
-                  />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <span id="dial-val-buffer" class="font-mono text-[11px] font-bold text-sync-green tabular-nums">20ms</span>
+            <!-- Channel 3: Peer 2 -->
+            <div class="channel-strip flex flex-col items-center rounded-[2px] border border-[#e0e2d3] bg-[#fbfbf7] p-2.5" data-ch="2">
+              <span class="font-mono text-[10px] uppercase font-bold text-[#062314]">PEER 2</span>
+              <span class="font-sans text-xs font-semibold text-[#062314] mt-0.5">Xiaomi 14</span>
+              <span class="ch-delay-badge mt-1 font-mono text-[11px] font-bold text-[#118d4f]">0.0 ms</span>
+
+              <div class="my-3 flex h-32 w-10 items-center justify-center gap-1.5 rounded-[2px] border border-[#e0e2d3] bg-[#f4f5ec] p-1">
+                <div class="h-full w-2 rounded-[1px] bg-[#e0e2d3] relative overflow-hidden flex flex-col justify-end">
+                  <div class="ch-vu-fill w-full bg-[#118d4f] transition-all duration-75" style="height: 0%;"></div>
                 </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="75"
+                  class="ch-fader h-24 w-1 [writing-mode:vertical-lr] [direction:rtl]"
+                  aria-label="Channel 2 Volume"
+                />
               </div>
-              <span class="font-mono text-[9px] uppercase tracking-wider text-text-dim mt-1">BUFFER</span>
+
+              <span class="ch-db font-mono text-[10px] text-[#626b60]">0.0 dB</span>
+              <div class="mt-2 flex gap-1">
+                <button type="button" class="btn-mute pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">M</button>
+                <button type="button" class="btn-solo pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">S</button>
+              </div>
             </div>
 
+            <!-- Channel 4: Peer 3 -->
+            <div class="channel-strip flex flex-col items-center rounded-[2px] border border-[#e0e2d3] bg-[#fbfbf7] p-2.5" data-ch="3">
+              <span class="font-mono text-[10px] uppercase font-bold text-[#062314]">PEER 3</span>
+              <span class="font-sans text-xs font-semibold text-[#062314] mt-0.5">OnePlus 12</span>
+              <span class="ch-delay-badge mt-1 font-mono text-[11px] font-bold text-[#118d4f]">0.0 ms</span>
+
+              <div class="my-3 flex h-32 w-10 items-center justify-center gap-1.5 rounded-[2px] border border-[#e0e2d3] bg-[#f4f5ec] p-1">
+                <div class="h-full w-2 rounded-[1px] bg-[#e0e2d3] relative overflow-hidden flex flex-col justify-end">
+                  <div class="ch-vu-fill w-full bg-[#118d4f] transition-all duration-75" style="height: 0%;"></div>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="75"
+                  class="ch-fader h-24 w-1 [writing-mode:vertical-lr] [direction:rtl]"
+                  aria-label="Channel 3 Volume"
+                />
+              </div>
+
+              <span class="ch-db font-mono text-[10px] text-[#626b60]">0.0 dB</span>
+              <div class="mt-2 flex gap-1">
+                <button type="button" class="btn-mute pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">M</button>
+                <button type="button" class="btn-solo pill ghost !h-[22px] !px-1.5 font-mono text-[10px] border border-[#e0e2d3]">S</button>
+              </div>
+            </div>
           </div>
 
-          <!-- Wi-Fi Jitter Injection Controls -->
-          <div class="space-y-2 pt-1 border-t border-border-milled/70">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-mono text-[11px] text-text-muted">MANUAL JITTER SLIDER:</span>
-              <span id="jitter-readout-badge" class="font-mono text-xs font-bold text-sync-green px-1.5 py-0.5 rounded bg-surface-recessed border border-border-milled tabular-nums">
-                0.0 ms
-              </span>
-            </div>
-
+          <!-- Bottom Console Telemetry Strips -->
+          <div class="border-t border-[#e0e2d3] pt-3 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px]">
             <div class="flex items-center gap-2">
-              <input
-                id="slider-jitter"
-                type="range"
-                min="0"
-                max="40"
-                step="1"
-                value="0"
-                class="flex-1 h-2 bg-surface-recessed rounded-lg appearance-none cursor-pointer accent-signal-orange border border-border-milled"
-                aria-label="Wi-Fi Jitter Depth Slider"
-              />
-              <button
-                id="btn-random-jitter"
-                type="button"
-                class="tactile-btn-secondary px-2.5 py-1 text-xs font-mono font-semibold uppercase tracking-wider text-bone whitespace-nowrap"
-              >
-                RANDOM
+              <span class="text-[#626b60]">JITTER STRESS:</span>
+              <button id="sim-btn-jitter" type="button" class="pill ghost !h-[24px] !px-2 border border-[#e0e2d3] text-xs">
+                +25ms Spikes
               </button>
             </div>
-
-            <!-- Quick Drift Presets -->
-            <div class="grid grid-cols-3 gap-1.5 font-mono text-[10px]">
-              <button
-                type="button"
-                data-jitter-preset="8"
-                class="btn-preset py-1 px-1.5 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors text-center"
-              >
-                MILD: 8ms
-              </button>
-              <button
-                type="button"
-                data-jitter-preset="22"
-                class="btn-preset py-1 px-1.5 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors text-center"
-              >
-                MOD: 22ms
-              </button>
-              <button
-                type="button"
-                data-jitter-preset="38"
-                class="btn-preset py-1 px-1.5 rounded-[4px] bg-surface-recessed border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-colors text-center"
-              >
-                HEAVY: 38ms
-              </button>
+            <div class="text-[#626b60]">
+              PEERS: <span class="text-[#118d4f] font-bold">4 ONLINE</span> · ZERO CLOUD
             </div>
           </div>
         </div>
-
       </div>
-
-      <!-- Real-Time Acoustic Diagnostic Banner -->
-      <div class="mt-6 pt-4 border-t border-border-milled flex items-center gap-3 relative z-10">
-        <Activity class="w-4 h-4 text-signal-orange shrink-0" />
-        <div id="sim-diagnostic-text" class="font-mono text-xs text-text-muted flex-1 leading-snug">
-          [ STANDBY ] Click "START MULTI-PHONE RIG" to initialize the WebAudio synthesizer (48kHz Float32).
-        </div>
-      </div>
-
     </div>
-
   </div>
 </section>
 
+<!-- WebAudio Engine Client Script -->
 <script>
   import { AudioSimulator } from '../scripts/audioSimulator.js';
   import { RadarCanvas } from '../scripts/radarCanvas.js';
 
-  let simulator = null;
-  let radar = null;
+  let sim: any = null;
+  let radar: any = null;
 
-  function initSimulatorIsland() {
-    const canvas = document.getElementById('radar-canvas');
-    if (!canvas) return;
+  function initSimulator() {
+    const playBtn = document.getElementById('sim-master-play-btn');
+    const playIcon = document.getElementById('sim-play-icon');
+    const playText = document.getElementById('sim-play-text');
+    const toggleLockBtn = document.getElementById('sim-toggle-lock-btn');
+    const lockIndicator = document.getElementById('sim-lock-indicator');
+    const lockText = document.getElementById('sim-lock-text');
+    const statusDot = document.getElementById('sim-status-dot');
+    const statusLabel = document.getElementById('sim-status-label');
 
-    simulator = new AudioSimulator();
-    radar = new RadarCanvas(canvas, simulator);
+    const radarCanvasEl = document.getElementById('sim-radar-canvas') as HTMLCanvasElement;
+    const scopeRadarBtn = document.getElementById('scope-mode-radar');
+    const scopeLissajousBtn = document.getElementById('scope-mode-lissajous');
+    const scopeTitle = document.getElementById('scope-title');
+    const jitterStressBtn = document.getElementById('sim-btn-jitter');
+
+    if (!radarCanvasEl) return;
+
+    sim = new AudioSimulator();
+    radar = new RadarCanvas(radarCanvasEl, sim);
     radar.init();
 
-    // DOM Element References
-    const btnToggle = document.getElementById('btn-toggle-playback');
-    const iconPlay = document.getElementById('icon-play');
-    const iconStop = document.getElementById('icon-stop');
-    const transportText = document.getElementById('transport-btn-text');
-    const transportStepBadge = document.getElementById('transport-step-badge');
-
-    const btnTempoDown = document.getElementById('btn-tempo-down');
-    const btnTempoUp = document.getElementById('btn-tempo-up');
-    const tempoReadout = document.getElementById('tempo-readout');
-
-    const btnRandomJitter = document.getElementById('btn-random-jitter');
-    const sliderJitter = document.getElementById('slider-jitter');
-    const jitterReadoutBadge = document.getElementById('jitter-readout-badge');
-    const btnEngageSync = document.getElementById('btn-engage-sync');
-    const presetButtons = document.querySelectorAll('.btn-preset');
-
-    const engineBeacon = document.getElementById('sim-engine-beacon');
-    const engineDot = document.getElementById('sim-engine-dot');
-    const engineText = document.getElementById('sim-engine-text');
-    const syncBeacon = document.getElementById('sim-sync-beacon');
-    const syncDot = document.getElementById('sim-sync-dot');
-    const syncText = document.getElementById('sim-sync-text');
-    const diagnosticText = document.getElementById('sim-diagnostic-text');
-
-    const btnModeRadar = document.getElementById('btn-mode-radar');
-    const btnModeLissajous = document.getElementById('btn-mode-lissajous');
-    const scopeStatusLeft = document.getElementById('scope-status-left');
-
-    const beamRect = document.getElementById('beam-rect');
-    const dialArcOffset = document.getElementById('dial-arc-offset');
-    const dialValOffset = document.getElementById('dial-val-offset');
-    const dialArcLoss = document.getElementById('dial-arc-loss');
-    const dialValLoss = document.getElementById('dial-val-loss');
-    const dialArcBuffer = document.getElementById('dial-arc-buffer');
-    const dialValBuffer = document.getElementById('dial-val-buffer');
-
-    const channelStrips = document.querySelectorAll('.channel-strip');
-
-    // 1. Play / Stop Toggle
-    btnToggle?.addEventListener('click', async () => {
-      simulator.playKeycapClick();
-      await simulator.toggle();
-      updateTransportUI();
-    });
-
-    function updateTransportUI() {
-      if (simulator.isPlaying) {
-        iconPlay?.classList.add('hidden');
-        iconStop?.classList.remove('hidden');
-        if (transportText) transportText.textContent = 'STOP RIG';
-        
-        // Update engine beacon
-        engineBeacon?.classList.remove('text-text-dim');
-        engineBeacon?.classList.add('text-sync-green', 'border-sync-green/30', 'bg-sync-green/10');
-        engineDot?.classList.remove('bg-text-dim');
-        engineDot?.classList.add('bg-sync-green', 'animate-status-blink');
-        if (engineText) engineText.textContent = 'ENGINE: RUNNING';
-
-        updateDiagnostic();
-      } else {
-        iconPlay?.classList.remove('hidden');
-        iconStop?.classList.add('hidden');
-        if (transportText) transportText.textContent = 'START MULTI-PHONE RIG';
-
-        // Update engine beacon
-        engineBeacon?.classList.remove('text-sync-green', 'border-sync-green/30', 'bg-sync-green/10');
-        engineBeacon?.classList.add('text-text-dim');
-        engineDot?.classList.remove('bg-sync-green', 'animate-status-blink');
-        engineDot?.classList.add('bg-text-dim');
-        if (engineText) engineText.textContent = 'ENGINE: IDLE';
-
-        if (diagnosticText) {
-          diagnosticText.textContent = '[ STANDBY ] Click "START MULTI-PHONE RIG" to initialize the WebAudio synthesizer.';
+    // Play/Pause Master
+    if (playBtn && playText) {
+      playBtn.addEventListener('click', async () => {
+        if (!sim.isPlaying) {
+          await sim.start();
+          playText.textContent = 'STOP AUDIO ENGINE';
+          playBtn.classList.replace('primary', 'ghost');
+          playBtn.classList.add('border', 'border-[#e0e2d3]');
+          if (statusDot) statusDot.className = 'h-1.5 w-1.5 rounded-full bg-[#118d4f] animate-ping';
+          if (statusLabel) statusLabel.textContent = 'ENGINE: RUNNING (124 BPM)';
+        } else {
+          sim.stop();
+          playText.textContent = 'START AUDIO ENGINE';
+          playBtn.classList.remove('ghost', 'border', 'border-[#e0e2d3]');
+          playBtn.classList.add('primary');
+          if (statusDot) statusDot.className = 'h-1.5 w-1.5 rounded-full bg-[#626b60]';
+          if (statusLabel) statusLabel.textContent = 'ENGINE: STANDBY';
         }
-      }
+      });
     }
 
-    // 2. Tempo Stepper Controls
-    btnTempoDown?.addEventListener('click', () => {
-      simulator.playKeycapClick();
-      const newBpm = simulator.setTempo(simulator.tempoBpm - 2);
-      if (tempoReadout) tempoReadout.textContent = `${newBpm} BPM`;
-    });
-
-    btnTempoUp?.addEventListener('click', () => {
-      simulator.playKeycapClick();
-      const newBpm = simulator.setTempo(simulator.tempoBpm + 2);
-      if (tempoReadout) tempoReadout.textContent = `${newBpm} BPM`;
-    });
-
-    // 3. Dual-Mode Visualizer Toggle
-    btnModeRadar?.addEventListener('click', () => {
-      simulator.playKeycapClick();
-      radar.setMode('radar');
-      btnModeRadar.className = 'mode-toggle-btn px-2.5 py-1 rounded-[4px] font-mono text-[11px] font-bold uppercase transition-all flex items-center gap-1.5 bg-surface-elevated text-sync-green border border-sync-green/30';
-      btnModeRadar.querySelector('.mode-led')?.classList.replace('bg-text-dim', 'bg-sync-green');
-      btnModeRadar.querySelector('.mode-led')?.classList.add('animate-status-blink');
-
-      btnModeLissajous.className = 'mode-toggle-btn px-2.5 py-1 rounded-[4px] font-mono text-[11px] font-bold uppercase transition-all flex items-center gap-1.5 text-text-muted hover:text-bone';
-      btnModeLissajous.querySelector('.mode-led')?.classList.replace('bg-sync-green', 'bg-text-dim');
-      btnModeLissajous.querySelector('.mode-led')?.classList.remove('animate-status-blink');
-
-      if (scopeStatusLeft) scopeStatusLeft.textContent = 'MODE: POLAR VECTOR RETICLE';
-    });
-
-    btnModeLissajous?.addEventListener('click', () => {
-      simulator.playKeycapClick();
-      radar.setMode('lissajous');
-      btnModeLissajous.className = 'mode-toggle-btn px-2.5 py-1 rounded-[4px] font-mono text-[11px] font-bold uppercase transition-all flex items-center gap-1.5 bg-surface-elevated text-sync-green border border-sync-green/30';
-      btnModeLissajous.querySelector('.mode-led')?.classList.replace('bg-text-dim', 'bg-sync-green');
-      btnModeLissajous.querySelector('.mode-led')?.classList.add('animate-status-blink');
-
-      btnModeRadar.className = 'mode-toggle-btn px-2.5 py-1 rounded-[4px] font-mono text-[11px] font-bold uppercase transition-all flex items-center gap-1.5 text-text-muted hover:text-bone';
-      btnModeRadar.querySelector('.mode-led')?.classList.replace('bg-sync-green', 'bg-text-dim');
-      btnModeRadar.querySelector('.mode-led')?.classList.remove('animate-status-blink');
-
-      if (scopeStatusLeft) scopeStatusLeft.textContent = 'MODE: LISSAJOUS PHASE CORRELATION';
-    });
-
-    // 4. Wi-Fi Jitter Actions
-    btnRandomJitter?.addEventListener('click', async () => {
-      simulator.playKeycapClick();
-      if (!simulator.isPlaying) {
-        await simulator.start();
-        updateTransportUI();
-      }
-      simulator.injectJitter();
-      const avg = Math.round((simulator.channels[1].targetDelayMs + simulator.channels[2].targetDelayMs + simulator.channels[3].targetDelayMs) / 3);
-      if (sliderJitter) sliderJitter.value = avg;
-      updateSyncUI();
-    });
-
-    sliderJitter?.addEventListener('input', async (e) => {
-      const val = parseFloat(e.target.value);
-      if (val === 0) {
-        simulator.engageSync();
-      } else {
-        if (!simulator.isPlaying) {
-          await simulator.start();
-          updateTransportUI();
-        }
-        simulator.injectJitter(val);
-      }
-      updateSyncUI();
-    });
-
-    presetButtons.forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        simulator.playKeycapClick();
-        const preset = parseFloat(btn.dataset.jitterPreset);
-        if (!simulator.isPlaying) {
-          await simulator.start();
-          updateTransportUI();
-        }
-        if (sliderJitter) sliderJitter.value = preset;
-        simulator.injectJitter(preset);
-        updateSyncUI();
-      });
-    });
-
-    // 5. Engage RoomBeat Sync
-    btnEngageSync?.addEventListener('click', () => {
-      simulator.playKeycapClick();
-      simulator.engageSync();
-      if (sliderJitter) sliderJitter.value = 0;
-      updateSyncUI();
-    });
-
-    function updateSyncUI() {
-      const telemetry = simulator.getTelemetry();
-      const isLocked = telemetry.isLocked;
-      const maxDrift = telemetry.maxDriftMs;
-
-      // Update Border Beam Color: Caution Amber when jittered, Phosphor Green when locked
-      if (beamRect) {
-        beamRect.setAttribute('stroke', isLocked ? '#00E599' : '#FFB800');
-      }
-
-      if (jitterReadoutBadge) {
+    // Toggle Phase Lock vs Jitter Flanger
+    if (toggleLockBtn && lockIndicator && lockText) {
+      toggleLockBtn.addEventListener('click', () => {
+        const isLocked = sim.toggleLock();
         if (isLocked) {
-          jitterReadoutBadge.textContent = '0.0 ms';
-          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-green px-1.5 py-0.5 rounded bg-surface-recessed border border-border-milled tabular-nums';
+          lockIndicator.className = 'h-2 w-2 rounded-full bg-[#118d4f]';
+          lockText.textContent = 'ROOMBEAT LOCKED (0ms)';
         } else {
-          jitterReadoutBadge.textContent = `+${maxDrift.toFixed(1)} ms`;
-          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-amber px-1.5 py-0.5 rounded bg-surface-recessed border border-sync-amber/40 animate-pulse tabular-nums';
+          lockIndicator.className = 'h-2 w-2 rounded-full bg-[#fb651e]';
+          lockText.textContent = 'WIFI JITTER DRIFT (+28ms)';
         }
-      }
-
-      if (syncBeacon && syncDot && syncText) {
-        if (isLocked) {
-          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-green/10 border border-sync-green/30 text-sync-green flex items-center gap-1.5 transition-colors';
-          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink';
-          syncText.textContent = 'SYNC: LOCKED (<0.5ms)';
-        } else {
-          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-amber/10 border border-sync-amber/30 text-sync-amber flex items-center gap-1.5 transition-colors';
-          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-amber animate-pulse';
-          syncText.textContent = `DRIFT: +${maxDrift.toFixed(1)}ms`;
-        }
-      }
-
-      updateDiagnostic();
+      });
     }
 
-    function updateDiagnostic() {
-      if (!diagnosticText || !simulator.isPlaying) return;
-
-      const isLocked = simulator.isLocked;
-      if (isLocked) {
-        diagnosticText.innerHTML = '<span class="text-sync-green font-bold">[ ACOUSTIC PHASE LOCKED ]</span> All 4 phone nodes playing in sub-0.5ms phase alignment. Sound is cohesive, transient attacks are crisp, and output power is summed.';
-      } else {
-        const drift = simulator.channels[2]?.delayMs || 25;
-        diagnosticText.innerHTML = `<span class="text-sync-amber font-bold">[ COMB FILTERING ACTIVE: +${drift.toFixed(1)}ms DRIFT ]</span> Acoustic wave interference canceling frequencies across phone speakers. Notice the hollow timbre and flanging echo.`;
-      }
+    // Jitter Stress button
+    if (jitterStressBtn) {
+      jitterStressBtn.addEventListener('click', () => {
+        sim.injectJitter();
+        if (lockIndicator) lockIndicator.className = 'h-2 w-2 rounded-full bg-[#fb651e]';
+        if (lockText) lockText.textContent = 'JITTER INJECTED (+35ms)';
+      });
     }
 
-    // 6. Wire Precision Vertical Faders & Rocker Switches for all 4 Channels
-    channelStrips.forEach((strip, chIndex) => {
-      const faderContainer = strip.querySelector('.fader-track-container');
-      const faderHandle = strip.querySelector('.fader-handle');
-      const dbReadout = strip.querySelector('.ch-db-readout');
-      const scaleTicks = strip.querySelectorAll('.fader-scale span');
-      const btnMute = strip.querySelector('.btn-mute');
-      const btnSolo = strip.querySelector('.btn-solo');
-
-      // Click or drag on fader container
-      let isDragging = false;
-
-      function updateFaderFromPointer(e) {
-        if (!faderContainer) return;
-        const rect = faderContainer.getBoundingClientRect();
-        const offsetY = rect.bottom - e.clientY;
-        let pct = Math.round((offsetY / rect.height) * 100);
-        pct = Math.max(0, Math.min(100, pct));
-        
-        // Magnetic center detent at 0 dB (pos 75)
-        if (pct >= 72 && pct <= 78) {
-          pct = 75;
-        }
-
-        const res = simulator.setChannelVolume(chIndex, pct);
-        if (faderHandle) {
-          faderHandle.style.bottom = `${res.faderPos}%`;
-          faderHandle.setAttribute('aria-valuenow', res.faderPos.toString());
-        }
-        if (dbReadout) {
-          dbReadout.textContent = res.dbText;
-        }
-      }
-
-      faderContainer?.addEventListener('pointerdown', (e) => {
-        isDragging = true;
-        faderContainer.setPointerCapture(e.pointerId);
-        faderHandle?.classList.add('is-dragging');
-        simulator.playKeycapClick();
-        updateFaderFromPointer(e);
+    // Scope Mode buttons
+    if (scopeRadarBtn && scopeLissajousBtn && scopeTitle) {
+      scopeRadarBtn.addEventListener('click', () => {
+        radar.setMode('radar');
+        scopeRadarBtn.className = 'px-2.5 py-1 rounded-[2px] bg-[#062314] text-white font-medium';
+        scopeLissajousBtn.className = 'px-2.5 py-1 rounded-[2px] text-[#626b60] hover:text-[#062314]';
+        scopeTitle.textContent = '● POLAR ACOUSTIC RADAR';
       });
 
-      faderContainer?.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-        updateFaderFromPointer(e);
+      scopeLissajousBtn.addEventListener('click', () => {
+        radar.setMode('lissajous');
+        scopeLissajousBtn.className = 'px-2.5 py-1 rounded-[2px] bg-[#062314] text-white font-medium';
+        scopeRadarBtn.className = 'px-2.5 py-1 rounded-[2px] text-[#626b60] hover:text-[#062314]';
+        scopeTitle.textContent = '● LISSAJOUS PHASE SCOPE';
       });
+    }
 
-      const stopDrag = (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        faderHandle?.classList.remove('is-dragging');
-        try {
-          faderContainer.releasePointerCapture(e.pointerId);
-        } catch {}
-      };
+    // Channel Strips event handlers (faders, mute, solo)
+    const strips = document.querySelectorAll('.channel-strip');
+    strips.forEach((strip) => {
+      const chIdx = parseInt(strip.getAttribute('data-ch') || '0', 10);
+      const fader = strip.querySelector('.ch-fader') as HTMLInputElement;
+      const dbLabel = strip.querySelector('.ch-db');
+      const muteBtn = strip.querySelector('.btn-mute');
+      const soloBtn = strip.querySelector('.btn-solo');
 
-      faderContainer?.addEventListener('pointerup', stopDrag);
-      faderContainer?.addEventListener('pointercancel', stopDrag);
-
-      // Keyboard Accessibility on Fader Handle
-      faderHandle?.addEventListener('keydown', (e) => {
-        const ch = simulator.channels[chIndex];
-        let newPos = ch.faderPos;
-        if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
-          newPos = Math.min(100, newPos + 5);
-        } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
-          newPos = Math.max(0, newPos - 5);
-        } else if (e.key === 'PageUp') {
-          newPos = Math.min(100, newPos + 25);
-        } else if (e.key === 'PageDown') {
-          newPos = Math.max(0, newPos - 25);
-        } else {
-          return;
-        }
-        e.preventDefault();
-        simulator.playKeycapClick();
-        const res = simulator.setChannelVolume(chIndex, newPos);
-        faderHandle.style.bottom = `${res.faderPos}%`;
-        faderHandle.setAttribute('aria-valuenow', res.faderPos.toString());
-        if (dbReadout) dbReadout.textContent = res.dbText;
-      });
-
-      // Quick Snap by clicking dB tick marks
-      scaleTicks.forEach((tick) => {
-        tick.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const targetPos = parseInt(tick.dataset.targetPos, 10);
-          simulator.playKeycapClick();
-          const res = simulator.setChannelVolume(chIndex, targetPos);
-          if (faderHandle) {
-            faderHandle.style.bottom = `${res.faderPos}%`;
-            faderHandle.setAttribute('aria-valuenow', res.faderPos.toString());
-          }
-          if (dbReadout) dbReadout.textContent = res.dbText;
+      if (fader && dbLabel) {
+        fader.addEventListener('input', () => {
+          const val = parseInt(fader.value, 10);
+          sim.setChannelFader(chIdx, val);
+          dbLabel.textContent = AudioSimulator.faderPosToDb(val);
         });
-      });
+      }
 
-      // Tactile Rocker Switches (Mute & Solo)
-      btnMute?.addEventListener('click', () => {
-        simulator.playKeycapClick();
-        const isMuted = simulator.toggleMute(chIndex);
-        const ledDot = btnMute.querySelector('.led-dot');
+      if (muteBtn) {
+        muteBtn.addEventListener('click', () => {
+          const isMuted = sim.toggleMute(chIdx);
+          muteBtn.classList.toggle('!bg-[#fb651e]', isMuted);
+          muteBtn.classList.toggle('!text-white', isMuted);
+        });
+      }
 
-        if (isMuted) {
-          btnMute.classList.add('bg-sync-red/20', 'border-sync-red/50', 'text-sync-red');
-          btnMute.classList.remove('text-text-muted');
-          ledDot?.classList.add('bg-sync-red', 'shadow-[0_0_6px_#FF334B]');
-          ledDot?.classList.remove('bg-border-milled');
-        } else {
-          btnMute.classList.remove('bg-sync-red/20', 'border-sync-red/50', 'text-sync-red');
-          btnMute.classList.add('text-text-muted');
-          ledDot?.classList.remove('bg-sync-red', 'shadow-[0_0_6px_#FF334B]');
-          ledDot?.classList.add('bg-border-milled');
-        }
-      });
-
-      btnSolo?.addEventListener('click', () => {
-        simulator.playKeycapClick();
-        const isSolo = simulator.toggleSolo(chIndex);
-        const ledDot = btnSolo.querySelector('.led-dot');
-
-        if (isSolo) {
-          btnSolo.classList.add('bg-sync-green/20', 'border-sync-green/50', 'text-sync-green');
-          btnSolo.classList.remove('text-text-muted');
-          ledDot?.classList.add('bg-sync-green', 'shadow-[0_0_6px_#00E599]');
-          ledDot?.classList.remove('bg-border-milled');
-        } else {
-          btnSolo.classList.remove('bg-sync-green/20', 'border-sync-green/50', 'text-sync-green');
-          btnSolo.classList.add('text-text-muted');
-          ledDot?.classList.remove('bg-sync-green', 'shadow-[0_0_6px_#00E599]');
-          ledDot?.classList.add('bg-border-milled');
-        }
-      });
+      if (soloBtn) {
+        soloBtn.addEventListener('click', () => {
+          const isSolo = sim.toggleSolo(chIdx);
+          soloBtn.classList.toggle('!bg-[#118d4f]', isSolo);
+          soloBtn.classList.toggle('!text-white', isSolo);
+        });
+      }
     });
 
-    // 7. High-Speed Telemetry Poller for UI Badges, Meters & Dials (60fps)
-    const arcTotalLen = 108.9;
-
+    // Real-time animation loop for VU meters & delay badges
     function telemetryLoop() {
-      requestAnimationFrame(telemetryLoop);
+      if (sim) {
+        const tel = sim.getTelemetry();
+        strips.forEach((strip, idx) => {
+          const ch = tel.channels[idx];
+          if (!ch) return;
 
-      if (!simulator) return;
-      const tel = simulator.getTelemetry();
-
-      // Step sequencer LED updates
-      if (transportStepBadge) {
-        transportStepBadge.textContent = tel.isPlaying
-          ? `STEP: ${(tel.currentStep + 1).toString().padStart(2, '0')}/16`
-          : 'STEP: 01/16';
-      }
-
-      for (let i = 0; i < 16; i++) {
-        const led = document.getElementById(`step-led-${i}`);
-        if (!led) continue;
-        if (tel.isPlaying && i === tel.currentStep) {
-          led.className = 'step-led h-full rounded-[1px] bg-signal-orange border-signal-orange shadow-[0_0_6px_#FF5500] transition-all duration-75';
-        } else if (i % 4 === 0) {
-          led.className = 'step-led h-full rounded-[1px] bg-surface-elevated border-border-active transition-all duration-75';
-        } else {
-          led.className = 'step-led h-full rounded-[1px] bg-surface-recessed border-border-milled transition-all duration-75';
-        }
-      }
-
-      // Sync Beacon & Perimeter Border Beam updates
-      const isLocked = tel.isLocked;
-      const maxDrift = tel.maxDriftMs;
-
-      if (beamRect) {
-        beamRect.setAttribute('stroke', isLocked ? '#00E599' : '#FFB800');
-      }
-
-      if (jitterReadoutBadge) {
-        if (isLocked) {
-          jitterReadoutBadge.textContent = '0.0 ms';
-          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-green px-1.5 py-0.5 rounded bg-surface-recessed border border-border-milled tabular-nums';
-        } else {
-          jitterReadoutBadge.textContent = `+${maxDrift.toFixed(1)} ms`;
-          jitterReadoutBadge.className = 'font-mono text-xs font-bold text-sync-amber px-1.5 py-0.5 rounded bg-surface-recessed border border-sync-amber/40 animate-pulse tabular-nums';
-        }
-      }
-
-      if (syncBeacon && syncDot && syncText) {
-        if (isLocked) {
-          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-green/10 border border-sync-green/30 text-sync-green flex items-center gap-1.5 transition-colors';
-          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink';
-          syncText.textContent = 'SYNC: LOCKED (<0.5ms)';
-        } else {
-          syncBeacon.className = 'px-2 py-0.5 rounded-[3px] bg-sync-amber/10 border border-sync-amber/30 text-sync-amber flex items-center gap-1.5 transition-colors';
-          syncDot.className = 'w-1.5 h-1.5 rounded-full bg-sync-amber animate-pulse';
-          syncText.textContent = `DRIFT: +${maxDrift.toFixed(1)}ms`;
-        }
-      }
-
-      // Bay 04 Telemetry Dials Update
-      // Dial 1: Latency Offset (0..40ms)
-      if (dialArcOffset && dialValOffset) {
-        const offsetP = Math.min(1.0, maxDrift / 40.0);
-        const offsetDash = arcTotalLen * (1 - offsetP);
-        dialArcOffset.style.strokeDashoffset = offsetDash.toFixed(1);
-        dialValOffset.textContent = isLocked ? '0.0ms' : `+${maxDrift.toFixed(1)}ms`;
-
-        if (isLocked) {
-          dialArcOffset.setAttribute('stroke', '#00E599');
-          dialValOffset.className = 'font-mono text-[11px] font-bold text-sync-green tabular-nums';
-        } else if (maxDrift > 25) {
-          dialArcOffset.setAttribute('stroke', '#FF334B');
-          dialValOffset.className = 'font-mono text-[11px] font-bold text-sync-red tabular-nums';
-        } else {
-          dialArcOffset.setAttribute('stroke', '#FFB800');
-          dialValOffset.className = 'font-mono text-[11px] font-bold text-sync-amber tabular-nums';
-        }
-      }
-
-      // Dial 2: Packet Loss % (0..10%)
-      if (dialArcLoss && dialValLoss) {
-        const lossPct = tel.packetLossPct;
-        const lossP = Math.min(1.0, lossPct / 10.0);
-        const lossDash = arcTotalLen * (1 - lossP);
-        dialArcLoss.style.strokeDashoffset = lossDash.toFixed(1);
-        dialValLoss.textContent = `${lossPct.toFixed(1)}%`;
-
-        if (lossPct === 0) {
-          dialArcLoss.setAttribute('stroke', '#00E599');
-          dialValLoss.className = 'font-mono text-[11px] font-bold text-sync-green tabular-nums';
-        } else if (lossPct > 4) {
-          dialArcLoss.setAttribute('stroke', '#FF334B');
-          dialValLoss.className = 'font-mono text-[11px] font-bold text-sync-red tabular-nums';
-        } else {
-          dialArcLoss.setAttribute('stroke', '#FFB800');
-          dialValLoss.className = 'font-mono text-[11px] font-bold text-sync-amber tabular-nums';
-        }
-      }
-
-      // Dial 3: Buffer Depth (10..60ms, nominal 20ms)
-      if (dialArcBuffer && dialValBuffer) {
-        const bufDepth = tel.bufferDepthMs;
-        const bufP = Math.min(1.0, (bufDepth - 10) / 50.0);
-        const bufDash = arcTotalLen * (1 - bufP);
-        dialArcBuffer.style.strokeDashoffset = bufDash.toFixed(1);
-        dialValBuffer.textContent = `${bufDepth}ms`;
-
-        if (bufDepth <= 22) {
-          dialArcBuffer.setAttribute('stroke', '#00E599');
-          dialValBuffer.className = 'font-mono text-[11px] font-bold text-sync-green tabular-nums';
-        } else {
-          dialArcBuffer.setAttribute('stroke', '#FFB800');
-          dialValBuffer.className = 'font-mono text-[11px] font-bold text-sync-amber tabular-nums';
-        }
-      }
-
-      // Update Channel VU Meters & Delay Readouts
-      channelStrips.forEach((strip, idx) => {
-        const ch = tel.channels[idx];
-        if (!ch) return;
-
-        // Delay badge update
-        const delayBadge = strip.querySelector('.ch-delay-badge');
-        if (delayBadge) {
-          if (idx === 0) {
-            delayBadge.textContent = '0.0 ms [REF]';
-            delayBadge.className = 'ch-delay-badge font-mono text-xs font-bold text-sync-green tabular-nums';
-          } else if (ch.delayMs < 0.5) {
-            delayBadge.textContent = '0.0 ms';
-            delayBadge.className = 'ch-delay-badge font-mono text-xs font-bold text-sync-green tabular-nums';
-          } else {
-            delayBadge.textContent = `+${ch.delayMs.toFixed(1)} ms`;
-            delayBadge.className = 'ch-delay-badge font-mono text-xs font-bold text-sync-amber tabular-nums';
-          }
-        }
-
-        // Vertical VU meter fill
-        const vuFill = strip.querySelector('.ch-vu-fill');
-        if (vuFill) {
-          if (!tel.isPlaying || ch.muted) {
-            vuFill.style.height = '0%';
-          } else {
-            const rmsNormalized = Math.min(1.0, ch.rms * 3.5);
-            const pct = Math.round(rmsNormalized * 100);
-            vuFill.style.height = `${pct}%`;
-
-            if (pct > 85) {
-              vuFill.className = 'ch-vu-fill w-full bg-sync-red rounded-[1px] transition-all duration-75';
-            } else if (pct > 65) {
-              vuFill.className = 'ch-vu-fill w-full bg-sync-amber rounded-[1px] transition-all duration-75';
+          // Delay badge
+          const delayBadge = strip.querySelector('.ch-delay-badge');
+          if (delayBadge) {
+            if (idx === 0) {
+              delayBadge.textContent = '0.0 ms [REF]';
+              delayBadge.className = 'ch-delay-badge mt-1 font-mono text-[11px] font-bold text-[#118d4f]';
+            } else if (ch.delayMs < 0.5) {
+              delayBadge.textContent = '0.0 ms';
+              delayBadge.className = 'ch-delay-badge mt-1 font-mono text-[11px] font-bold text-[#118d4f]';
             } else {
-              vuFill.className = 'ch-vu-fill w-full bg-sync-green rounded-[1px] transition-all duration-75';
+              delayBadge.textContent = `+${ch.delayMs.toFixed(1)} ms`;
+              delayBadge.className = 'ch-delay-badge mt-1 font-mono text-[11px] font-bold text-[#fb651e]';
             }
           }
-        }
-      });
+
+          // VU Meter fill
+          const vuFill = strip.querySelector('.ch-vu-fill') as HTMLElement;
+          if (vuFill) {
+            if (!tel.isPlaying || ch.muted) {
+              vuFill.style.height = '0%';
+            } else {
+              const rmsNorm = Math.min(1.0, ch.rms * 3.5);
+              const pct = Math.round(rmsNorm * 100);
+              vuFill.style.height = `${pct}%`;
+              if (pct > 80) {
+                vuFill.className = 'ch-vu-fill w-full bg-[#fb651e] transition-all duration-75';
+              } else {
+                vuFill.className = 'ch-vu-fill w-full bg-[#118d4f] transition-all duration-75';
+              }
+            }
+          }
+        });
+      }
+      requestAnimationFrame(telemetryLoop);
     }
 
     requestAnimationFrame(telemetryLoop);
   }
 
-  // Mount on DOM ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSimulatorIsland);
+    document.addEventListener('DOMContentLoaded', initSimulator);
   } else {
-    initSimulatorIsland();
+    initSimulator();
   }
 </script>

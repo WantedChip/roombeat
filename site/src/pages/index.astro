@@ -2,24 +2,30 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
+import FeatureBento from '../components/FeatureBento.astro';
 import SyncSimulator from '../components/SyncSimulator.astro';
-import ArchitectureBlueprint from '../components/ArchitectureBlueprint.astro';
-import QrPinDemo from '../components/QrPinDemo.astro';
+import ArchitecturePipeline from '../components/ArchitecturePipeline.astro';
 import ComparisonMatrix from '../components/ComparisonMatrix.astro';
+import TrustSection from '../components/TrustSection.astro';
+import FaqSection from '../components/FaqSection.astro';
+import PreFooterCta from '../components/PreFooterCta.astro';
 import Footer from '../components/Footer.astro';
 ---
 
 <BaseLayout
-  title="RoomBeat — Synchronized Multi-Phone Audio Rig"
-  description="Turn a room of phones into one massive speaker system. 100% offline local Wi-Fi multicast with sub-millisecond NDK Oboe clock synchronization."
+  title="RoomBeat · Synchronized multi-phone audio rig for Android"
+  description="Turn a room of phones into one massive speaker system. Hardware-clocked 20ms Opus frames over local UDP multicast for sub-millisecond acoustic sync with zero cloud relay."
 >
   <Header />
-  <main id="main-content" class="flex-1">
+  <main id="main-content">
     <Hero />
+    <FeatureBento />
     <SyncSimulator />
-    <ArchitectureBlueprint />
-    <QrPinDemo />
+    <ArchitecturePipeline />
     <ComparisonMatrix />
+    <TrustSection />
+    <FaqSection />
+    <PreFooterCta />
   </main>
   <Footer />
 </BaseLayout>

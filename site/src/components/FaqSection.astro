@@ -1,0 +1,109 @@
+---
+---
+
+<section id="faq" class="border-b border-[#e0e2d3] bg-white py-20 sm:py-28">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <!-- Header -->
+    <div class="max-w-3xl">
+      <div class="op-eyebrow">
+        <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
+        <span>Frequently Asked Questions</span>
+      </div>
+      <h2 class="op-title mt-3 text-3xl font-normal tracking-tight text-[#062314] sm:text-4xl md:text-5xl">
+        Answers with technical proof.
+      </h2>
+      <p class="op-sub mt-4 text-[#35433a]">
+        Common architectural and platform questions regarding Android compatibility, audio capture, and network performance.
+      </p>
+    </div>
+
+    <!-- FAQ Accordion List -->
+    <div class="mt-14 max-w-4xl divide-y divide-[#e0e2d3] border-y border-[#e0e2d3]">
+      <!-- Q1 -->
+      <details class="group py-5 [&_summary::-webkit-details-marker]:hidden">
+        <summary class="flex cursor-pointer items-center justify-between font-sans text-lg font-medium text-[#062314] transition-colors hover:text-[#118d4f]">
+          <span>How does RoomBeat achieve sub-5ms sync without a cloud server?</span>
+          <span class="ml-4 font-mono text-xl font-light text-[#626b60] transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <div class="mt-3 font-sans text-sm leading-relaxed text-[#35433a] pr-8">
+          RoomBeat eliminates cloud servers entirely. The host phone broadcasts UDP multicast packets (`239.255.42.99:4242`) directly across the local subnet.
+          Before audio streams, peers execute a 4-way NTP-style timestamp handshake against the host’s `CLOCK_MONOTONIC`.
+          Audio frames carry exact hardware presentation timestamps, and a fractional Catmull-Rom sinc resampler micro-adjusts playback speed by fractions of a percent to prevent clock skew.
+        </div>
+      </details>
+
+      <!-- Q2 -->
+      <details class="group py-5 [&_summary::-webkit-details-marker]:hidden">
+        <summary class="flex cursor-pointer items-center justify-between font-sans text-lg font-medium text-[#062314] transition-colors hover:text-[#118d4f]">
+          <span>Does RoomBeat require root privileges?</span>
+          <span class="ml-4 font-mono text-xl font-light text-[#626b60] transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <div class="mt-3 font-sans text-sm leading-relaxed text-[#35433a] pr-8">
+          No. RoomBeat is 100% rootless and uses standard, officially sanctioned Android platform APIs.
+          Audio capture is handled via Android 11’s `AudioPlaybackCaptureConfiguration` through a system `MediaProjection` consent dialog that you approve once per session.
+        </div>
+      </details>
+
+      <!-- Q3 -->
+      <details class="group py-5 [&_summary::-webkit-details-marker]:hidden">
+        <summary class="flex cursor-pointer items-center justify-between font-sans text-lg font-medium text-[#062314] transition-colors hover:text-[#118d4f]">
+          <span>How does Spotify playback work given Android DRM capture restrictions?</span>
+          <span class="ml-4 font-mono text-xl font-light text-[#626b60] transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <div class="mt-3 font-sans text-sm leading-relaxed text-[#35433a] pr-8">
+          Spotify explicitly marks its audio output as non-capturable by `AudioPlaybackCapture`.
+          To solve this without breaking DRM rules, RoomBeat includes a dedicated Spotify App Remote command-sync pipeline:
+          every phone runs Spotify locally, and the host issues synchronized track cues and micro-seek corrections over the local network to keep all devices playing in phase.
+        </div>
+      </details>
+
+      <!-- Q4 -->
+      <details class="group py-5 [&_summary::-webkit-details-marker]:hidden">
+        <summary class="flex cursor-pointer items-center justify-between font-sans text-lg font-medium text-[#062314] transition-colors hover:text-[#118d4f]">
+          <span>What Android versions are supported (API 30 through API 37)?</span>
+          <span class="ml-4 font-mono text-xl font-light text-[#626b60] transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <div class="mt-3 font-sans text-sm leading-relaxed text-[#35433a] pr-8">
+          The minimum supported version is <strong>Android 11 (API 30)</strong>, where `AudioPlaybackCapture` became rock-solid.
+          RoomBeat is fully compliant with Android 14 (API 34) mediaProjection foreground service types and Android 17 (API 37) `ACCESS_LOCAL_NETWORK` runtime permission gating.
+        </div>
+      </details>
+
+      <!-- Q5 -->
+      <details class="group py-5 [&_summary::-webkit-details-marker]:hidden">
+        <summary class="flex cursor-pointer items-center justify-between font-sans text-lg font-medium text-[#062314] transition-colors hover:text-[#118d4f]">
+          <span>Can I use RoomBeat on a portable phone hotspot without Wi-Fi?</span>
+          <span class="ml-4 font-mono text-xl font-light text-[#626b60] transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <div class="mt-3 font-sans text-sm leading-relaxed text-[#35433a] pr-8">
+          Yes! One phone can turn on its Android Wi-Fi hotspot, and all other phones connect to that network.
+          RoomBeat uses local multicast packets within the hotspot subnet. You do not even need active mobile data or an internet connection.
+        </div>
+      </details>
+
+      <!-- Q6 -->
+      <details class="group py-5 [&_summary::-webkit-details-marker]:hidden">
+        <summary class="flex cursor-pointer items-center justify-between font-sans text-lg font-medium text-[#062314] transition-colors hover:text-[#118d4f]">
+          <span>How much battery does the host phone consume when streaming to 8+ phones?</span>
+          <span class="ml-4 font-mono text-xl font-light text-[#626b60] transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <div class="mt-3 font-sans text-sm leading-relaxed text-[#35433a] pr-8">
+          Because RoomBeat uses hardware UDP multicast rather than unicast TCP, the host phone transmits exactly one datagram per 20ms frame regardless of whether 2 or 32 phones are listening.
+          Opus encoding takes ~1.5% CPU on modern ARM processors, resulting in standard music playback battery drain (approx. 4–6% per hour).
+        </div>
+      </details>
+
+      <!-- Q7 -->
+      <details class="group py-5 [&_summary::-webkit-details-marker]:hidden">
+        <summary class="flex cursor-pointer items-center justify-between font-sans text-lg font-medium text-[#062314] transition-colors hover:text-[#118d4f]">
+          <span>Why not use Bluetooth instead of Wi-Fi?</span>
+          <span class="ml-4 font-mono text-xl font-light text-[#626b60] transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <div class="mt-3 font-sans text-sm leading-relaxed text-[#35433a] pr-8">
+          Standard Bluetooth (Classic A2DP) is limited to 1–2 devices simultaneously, has high packet latency (40–180ms), and does not support synchronized hardware clock broadcasts.
+          Wi-Fi UDP multicast provides 100x the throughput, sub-millisecond clock access, and supports an unlimited number of concurrent listening devices.
+        </div>
+      </details>
+    </div>
+  </div>
+</section>

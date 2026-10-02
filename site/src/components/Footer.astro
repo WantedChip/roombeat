@@ -1,530 +1,91 @@
 ---
-import {
-  Download,
-  ShieldCheck,
-  Cpu,
-  Wifi,
-  Radio,
-  CheckCircle2,
-  ArrowUpRight,
-  ChevronDown,
-  Terminal,
-  FileCode2,
-  Clock,
-  Layers,
-} from 'lucide-astro';
+import RoomBeatIcon from './icons/RoomBeatIcon.astro';
 import GithubIcon from './icons/GithubIcon.astro';
-
-const sdkCompatibility = [
-  {
-    api: 'API 30',
-    os: 'Android 11',
-    role: 'Min SDK',
-    audio: 'Oboe AAudio / OpenSL ES fallback (<5ms)',
-    capture: 'Local Storage (SAF) / Mic acoustic sync',
-    network: 'WifiManager.MulticastLock + NsdManager mDNS',
-    status: 'SUPPORTED',
-    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
-  },
-  {
-    api: 'API 31–33',
-    os: 'Android 12–13',
-    role: 'Standard',
-    audio: 'Direct AAudio MMAP hardware output buffer',
-    capture: 'Exact Alarm presentation scheduling (CLOCK_MONOTONIC)',
-    network: 'SCHEDULE_EXACT_ALARM + dynamic device routing',
-    status: 'SUPPORTED',
-    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
-  },
-  {
-    api: 'API 34',
-    os: 'Android 14',
-    role: 'Capture Engine',
-    audio: 'Oboe AAudio Exclusive Mode + Catmull-Rom Resampler',
-    capture: 'AudioPlaybackCaptureConfiguration + mediaProjection FGS',
-    network: 'Full Wi-Fi multicast lock + foreground notification',
-    status: 'SUPPORTED',
-    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
-  },
-  {
-    api: 'API 35',
-    os: 'Android 15',
-    role: 'Target SDK',
-    audio: '16KB ELF page size alignment + low-jitter thread affinity',
-    capture: 'Lossless stereo system capture + per-device volume balancing',
-    network: 'WIFI_MODE_FULL_LOW_LATENCY + edge-to-edge Compose',
-    status: 'PRIMARY TARGET',
-    statusColor: 'text-signal-orange border-signal-orange/30 bg-signal-orange/10 font-bold',
-  },
-  {
-    api: 'API 36',
-    os: 'Android 16',
-    role: 'Modern',
-    audio: 'Power-optimized NDK C++20 audio threads & zero CPU clipping',
-    capture: 'Continuous system audio projection with zero frame drop',
-    network: 'High-throughput local multicast optimization',
-    status: 'SUPPORTED',
-    statusColor: 'text-sync-green border-sync-green/30 bg-sync-green/10',
-  },
-  {
-    api: 'API 37',
-    os: 'Android 17 / Next',
-    role: 'Forward-Ready',
-    audio: 'Low-latency NDK C++ audio path with high-res clock ticks',
-    capture: 'Multi-channel system audio stream extraction',
-    network: 'Forward-compatible ACCESS_LOCAL_NETWORK permission scaffolding',
-    status: 'FORWARD-READY',
-    statusColor: 'text-network-cyan border-network-cyan/30 bg-network-cyan/10',
-  },
-];
 ---
 
-<footer class="w-full bg-[#0B0C0E] border-t border-border-milled pt-14 pb-8 text-xs font-mono text-text-dim relative z-20">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-    
-    <!-- ================= TOP HARDWARE MODULE CHASSIS ================= -->
-    <div class="hardware-panel rounded-lg p-6 sm:p-8 relative">
-      <!-- Decorative corner Allen hex bolts -->
-      <div class="absolute top-2.5 left-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
-        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
-      </div>
-      <div class="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
-        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
-      </div>
-      <div class="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
-        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
-      </div>
-      <div class="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 rounded-[2px] border border-border-milled bg-[#07080A] flex items-center justify-center" aria-hidden="true">
-        <span class="w-1 h-1 rounded-full bg-[#3E4454]"></span>
-      </div>
-
-      <!-- Module Identifier Header -->
-      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 mb-8 border-b border-border-milled">
-        <div class="flex items-center gap-3">
-          <span class="px-2 py-0.5 rounded-[3px] bg-surface-elevated border border-border-milled text-[11px] font-mono text-signal-orange font-bold uppercase tracking-wider">
-            MODULE // CHASSIS-SPEC-M05
-          </span>
-          <span class="text-text-dim text-xs font-mono">•</span>
-          <span class="font-display font-bold text-sm tracking-tight text-bone uppercase">
-            ROOMBEAT HARDWARE &amp; SPECIFICATION MATRIX
+<footer class="border-t border-[#e0e2d3] bg-white py-16 text-[#35433a]">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <!-- Top 4 Columns -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-8 pb-12 border-b border-[#e0e2d3]">
+      <!-- Brand & Mission (Col 1-2) -->
+      <div class="col-span-2">
+        <div class="flex items-center gap-2.5">
+          <RoomBeatIcon class="h-6 w-6" />
+          <span class="font-sans text-lg font-bold text-[#062314]">RoomBeat</span>
+          <span class="rounded-[2px] border border-[#e0e2d3] bg-[#fbfbf7] px-1.5 py-0.5 font-mono text-[10px] text-[#626b60]">
+            FOSS
           </span>
         </div>
-        <div class="flex items-center gap-2 text-[11px] text-text-muted">
-          <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
-          <span>100% OFFLINE LOCAL LAN MULTICAST</span>
+        <p class="mt-3 max-w-sm font-sans text-sm leading-relaxed text-[#626b60]">
+          Perceptually-synchronized audio across a room full of phones on the same local network.
+          Built with Kotlin, NDK C++, Oboe, and 20ms Opus frames.
+        </p>
+        <div class="mt-5 flex items-center gap-3">
+          <a
+            href="https://github.com/WantedChip/RoomBeat"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="pill ghost !h-[28px] !px-2.5 font-mono text-xs border border-[#e0e2d3]"
+          >
+            <GithubIcon class="h-3.5 w-3.5" />
+            <span>GitHub</span>
+          </a>
+          <span class="font-mono text-xs text-[#626b60]">MIT License</span>
         </div>
       </div>
 
-      <!-- 4-Column Specification Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-8">
-        
-        <!-- Column 1: Identity & Open Source License -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
-            <FileCode2 class="w-4 h-4 text-signal-orange" />
-            <span>Open Source License</span>
-          </div>
-          <div class="recessed-cavity rounded p-3 text-[11px] space-y-1.5">
-            <div class="text-bone font-bold">MIT License</div>
-            <div class="text-text-muted leading-relaxed">
-              Copyright &copy; 2026 WantedChip
-            </div>
-            <p class="text-text-dim text-[10px] leading-normal pt-1">
-              Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
-            </p>
-          </div>
-          <div class="flex flex-col gap-2 pt-1">
-            <a
-              href="https://github.com/WantedChip/RoomBeat"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center justify-between px-3 py-2 rounded-[4px] bg-surface-elevated border border-border-milled text-text-muted hover:text-bone hover:border-border-active transition-all group"
-            >
-              <div class="flex items-center gap-2">
-                <GithubIcon class="w-4 h-4 text-bone" />
-                <span class="font-sans text-xs font-medium">WantedChip/RoomBeat</span>
-              </div>
-              <ArrowUpRight class="w-3.5 h-3.5 text-text-dim group-hover:text-bone transition-colors" />
-            </a>
-
-            <a
-              href="https://github.com/WantedChip/RoomBeat/releases/latest"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center justify-between px-3 py-2 rounded-[4px] bg-signal-orange/10 border border-signal-orange/30 text-signal-orange hover:bg-signal-orange/20 transition-all group"
-            >
-              <div class="flex items-center gap-2">
-                <Download class="w-4 h-4" />
-                <span class="font-sans text-xs font-bold">Download RoomBeat APK</span>
-              </div>
-              <span class="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-signal-orange/20">v1.0.0-rc</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Column 2: Acoustic Pipeline Specs -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
-            <Cpu class="w-4 h-4 text-sync-green" />
-            <span>Acoustic Audio Pipeline</span>
-          </div>
-          <ul class="space-y-2 text-[11px]">
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Sample Rate:</span>
-              <span class="text-bone font-medium">48,000 Hz / Stereo</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Format:</span>
-              <span class="text-bone font-medium">Float32 / 16-bit PCM</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Codec Frame:</span>
-              <span class="text-bone font-medium">Opus 20ms (960 smp/ch)</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Opus Bitrate:</span>
-              <span class="text-bone font-medium">128 kbps (CBR / VBR)</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Transport:</span>
-              <span class="text-network-cyan font-medium">UDP Multicast</span>
-            </li>
-            <li class="flex items-start justify-between">
-              <span class="text-text-muted">Multicast Group:</span>
-              <span class="text-network-cyan font-medium">239.255.42.99:4242</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Column 3: Local Network Privacy Declaration -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
-            <ShieldCheck class="w-4 h-4 text-network-cyan" />
-            <span>Local Privacy Declaration</span>
-          </div>
-          <div class="recessed-cavity rounded p-3 text-[11px] space-y-2">
-            <div class="flex items-center gap-1.5 text-sync-green font-bold">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>0 Analytics Telemetry</span>
-            </div>
-            <div class="flex items-center gap-1.5 text-sync-green font-bold">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>0 Commercial Trackers</span>
-            </div>
-            <div class="flex items-center gap-1.5 text-sync-green font-bold">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>0 Cloud Accounts / Logins</span>
-            </div>
-            <p class="text-text-dim text-[10px] leading-relaxed pt-1 border-t border-border-milled/60">
-              100% offline local subnet traffic. Audio packets never cross the default gateway. Host phone acts as the embedded NTP server.
-            </p>
-          </div>
-        </div>
-
-        <!-- Column 4: Clock Synchronization & Resampler -->
-        <div class="space-y-4">
-          <div class="flex items-center gap-2 text-bone font-sans font-bold text-xs uppercase tracking-wider">
-            <Clock class="w-4 h-4 text-sync-amber" />
-            <span>Synchronization Engine</span>
-          </div>
-          <ul class="space-y-2 text-[11px]">
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Master Clock:</span>
-              <span class="text-bone font-medium">CLOCK_MONOTONIC</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Target Sync:</span>
-              <span class="text-sync-green font-medium">&lt; 0.5 ms (Phase Lock)</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">NDK Resampler:</span>
-              <span class="text-bone font-medium">Catmull-Rom Spline</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Slew Rate:</span>
-              <span class="text-bone font-medium">&plusmn; 0.05% to &plusmn; 0.1%</span>
-            </li>
-            <li class="flex items-start justify-between border-b border-border-milled/50 pb-1">
-              <span class="text-text-muted">Jitter Buffer:</span>
-              <span class="text-bone font-medium">Adaptive 40–120ms</span>
-            </li>
-            <li class="flex items-start justify-between">
-              <span class="text-text-muted">Scaling:</span>
-              <span class="text-bone font-medium">O(1) Unlimited Peers</span>
-            </li>
-          </ul>
-        </div>
-
+      <!-- Column 1: Product -->
+      <div>
+        <h4 class="font-mono text-xs font-semibold uppercase tracking-wider text-[#062314]">Product</h4>
+        <ul class="mt-4 space-y-2.5 font-sans text-sm">
+          <li><a href="#features" class="hover:text-[#062314] transition-colors">Features</a></li>
+          <li><a href="#simulator" class="hover:text-[#062314] transition-colors">Sync Simulator</a></li>
+          <li><a href="#architecture" class="hover:text-[#062314] transition-colors">Architecture</a></li>
+          <li><a href="#compare" class="hover:text-[#062314] transition-colors">Side by Side</a></li>
+          <li><a href="https://github.com/WantedChip/RoomBeat/releases/latest" class="hover:text-[#062314] transition-colors">Download APK</a></li>
+        </ul>
       </div>
 
-      <!-- ================= LASER-ETCHED HARDWARE SERIAL PLATE STENCIL ================= -->
-      <div class="hardware-serial-plate rounded-[6px] p-4 sm:p-5 border border-[#3E4454] relative overflow-hidden">
-        <!-- 4 Machined Corner Rivet Screws -->
-        <div class="absolute top-2 left-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
-          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
-        </div>
-        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
-          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
-        </div>
-        <div class="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
-          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
-        </div>
-        <div class="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-[#07080A] border border-[#5D6475] flex items-center justify-center pointer-events-none">
-          <span class="w-1 h-0.5 bg-[#5D6475]"></span>
-        </div>
-
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div class="space-y-1.5">
-            <div class="flex items-center gap-2 font-mono text-[10px] text-text-dim uppercase tracking-widest">
-              <span>WANTEDCHIP ACOUSTIC SYSTEMS</span>
-              <span>//</span>
-              <span class="text-sync-green">SPEC RATING PLATE</span>
-            </div>
-
-            <!-- Authoritative Laser-Etched Model & Serial Stencil Graphic -->
-            <div class="font-mono font-extrabold text-sm sm:text-base text-bone tracking-wider laser-etched-stencil">
-              MODEL: ROOMBEAT-V1-LAN // SERIAL NO: RB-2026-FOSS
-            </div>
-
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-text-dim pt-1">
-              <span>CHASSIS: 6061-T6 ANODIZED OBSIDIAN</span>
-              <span>BANDWIDTH: O(1) MULTICAST</span>
-              <span>TOOLCHAIN: NDK r27c C++20</span>
-              <span class="text-sync-green">AIR-GAPPED LAN: COMPLIANT</span>
-            </div>
-          </div>
-
-          <!-- Stencil Laser Barcode Graphic -->
-          <div class="shrink-0 flex items-center gap-3 self-end md:self-auto border-t md:border-t-0 md:border-l border-[#3E4454]/60 pt-3 md:pt-0 md:pl-5">
-            <div class="space-y-1">
-              <!-- Simulated 2D Laser Stencil Barcode -->
-              <div class="flex items-center gap-[2px] h-8" aria-hidden="true">
-                <span class="w-0.5 h-full bg-bone"></span>
-                <span class="w-1 h-full bg-bone"></span>
-                <span class="w-0.5 h-full bg-bone/30"></span>
-                <span class="w-1.5 h-full bg-bone"></span>
-                <span class="w-0.5 h-full bg-bone"></span>
-                <span class="w-2 h-full bg-bone"></span>
-                <span class="w-0.5 h-full bg-bone/30"></span>
-                <span class="w-1 h-full bg-bone"></span>
-                <span class="w-0.5 h-full bg-bone"></span>
-                <span class="w-1.5 h-full bg-bone"></span>
-                <span class="w-0.5 h-full bg-bone/30"></span>
-                <span class="w-1 h-full bg-bone"></span>
-                <span class="w-2 h-full bg-bone"></span>
-                <span class="w-0.5 h-full bg-bone"></span>
-                <span class="w-1 h-full bg-bone"></span>
-                <span class="w-0.5 h-full bg-bone/30"></span>
-                <span class="w-1.5 h-full bg-bone"></span>
-              </div>
-              <span class="font-mono text-[9px] text-text-dim tracking-widest block text-center">
-                *RB-2026-FOSS*
-              </span>
-            </div>
-          </div>
-        </div>
+      <!-- Column 2: Developers -->
+      <div>
+        <h4 class="font-mono text-xs font-semibold uppercase tracking-wider text-[#062314]">Developers</h4>
+        <ul class="mt-4 space-y-2.5 font-sans text-sm">
+          <li><a href="https://github.com/WantedChip/RoomBeat" target="_blank" class="hover:text-[#062314] transition-colors">GitHub Repository</a></li>
+          <li><a href="https://github.com/WantedChip/RoomBeat/blob/main/CHANGELOG.md" target="_blank" class="hover:text-[#062314] transition-colors">Changelog</a></li>
+          <li><a href="https://github.com/WantedChip/RoomBeat/blob/main/CONTRIBUTING.md" target="_blank" class="hover:text-[#062314] transition-colors">Contributing</a></li>
+          <li><a href="https://github.com/WantedChip/RoomBeat/blob/main/SECURITY.md" target="_blank" class="hover:text-[#062314] transition-colors">Security Policy</a></li>
+        </ul>
       </div>
 
+      <!-- Column 3: Trust & Legal -->
+      <div>
+        <h4 class="font-mono text-xs font-semibold uppercase tracking-wider text-[#062314]">Trust &amp; Legal</h4>
+        <ul class="mt-4 space-y-2.5 font-sans text-sm">
+          <li><a href="/privacy" class="hover:text-[#062314] transition-colors">Privacy Policy</a></li>
+          <li><a href="#trust" class="hover:text-[#062314] transition-colors">Zero Telemetry Audit</a></li>
+          <li><a href="https://github.com/WantedChip/RoomBeat/blob/main/LICENSE" target="_blank" class="hover:text-[#062314] transition-colors">MIT License</a></li>
+          <li><a href="#faq" class="hover:text-[#062314] transition-colors">FAQ</a></li>
+        </ul>
+      </div>
     </div>
 
-    <!-- ================= EXPANDABLE AOSP ARCHITECTURAL COMPATIBILITY DRAWER (SDK 30–37) ================= -->
-    <div class="space-y-3">
-      
-      <!-- Drawer Interactive Header Button -->
-      <button
-        id="btn-toggle-sdk-drawer"
-        type="button"
-        class="w-full flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5 rounded-[8px] bg-surface-elevated border border-border-milled hover:border-border-active transition-all group cursor-pointer text-left"
-        aria-expanded="false"
-        aria-controls="sdk-drawer-content"
-      >
-        <div class="flex items-center gap-3">
-          <div class="w-7 h-7 rounded-[4px] bg-[#07080A] border border-border-milled flex items-center justify-center text-signal-orange group-hover:text-bone transition-colors">
-            <Layers class="w-4 h-4" />
-          </div>
-          <div>
-            <div class="flex items-center gap-2 font-mono text-[11px] text-signal-orange font-bold uppercase tracking-wider">
-              <span>DRAWER: AOSP-SPEC-30-37</span>
-              <span class="text-text-dim">•</span>
-              <span class="text-sync-green">6 TIERS TESTED &amp; CERTIFIED</span>
-            </div>
-            <h3 class="font-display font-bold text-sm sm:text-base text-bone tracking-tight mt-0.5">
-              Android SDK Compatibility Matrix (API 30 – API 37)
-            </h3>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span id="sdk-drawer-toggle-text" class="text-xs font-mono font-bold text-signal-orange group-hover:text-[#FF661A] transition-colors">
-            [ EXPAND TECHNICAL MATRIX + ]
-          </span>
-          <ChevronDown id="sdk-drawer-chevron" class="w-4 h-4 text-signal-orange transition-transform duration-300" />
-        </div>
-      </button>
-
-      <!-- Expandable Drawer Body -->
-      <div id="sdk-drawer-content" class="hidden hardware-panel rounded-lg overflow-hidden border border-border-milled transition-all duration-300">
-        
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse min-w-[760px] lg:min-w-full">
-            <thead>
-              <tr class="bg-surface-elevated/70 border-b border-border-milled text-[11px] font-mono text-text-muted uppercase tracking-wider">
-                <th class="py-3 px-4 font-bold">API / OS Level</th>
-                <th class="py-3 px-4 font-bold">Role</th>
-                <th class="py-3 px-4 font-bold">Audio Engine &amp; Latency Tier</th>
-                <th class="py-3 px-4 font-bold">Capture &amp; Presentation</th>
-                <th class="py-3 px-4 font-bold">Networking &amp; Permissions</th>
-                <th class="py-3 px-4 font-bold text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-border-milled/60 font-sans">
-              {sdkCompatibility.map((tier) => (
-                <tr class="hover:bg-surface-elevated/30 transition-colors">
-                  <td class="py-3 px-4 font-mono font-bold text-bone whitespace-nowrap">
-                    <div>{tier.api}</div>
-                    <div class="text-[11px] text-text-dim font-normal">{tier.os}</div>
-                  </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="px-2 py-0.5 rounded-[3px] bg-surface-elevated border border-border-milled font-mono text-[10px] text-text-muted">
-                      {tier.role}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 text-text-muted font-mono text-[11px]">
-                    {tier.audio}
-                  </td>
-                  <td class="py-3 px-4 text-text-dim text-[11px]">
-                    {tier.capture}
-                  </td>
-                  <td class="py-3 px-4 text-text-dim font-mono text-[11px]">
-                    {tier.network}
-                  </td>
-                  <td class="py-3 px-4 text-right whitespace-nowrap">
-                    <span class={`inline-block px-2 py-0.5 rounded-[3px] border font-mono text-[10px] tracking-wider uppercase ${tier.statusColor}`}>
-                      {tier.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        <!-- Table Footnote -->
-        <div class="bg-surface-recessed p-3 border-t border-border-milled flex flex-wrap items-center justify-between gap-3 text-[11px] text-text-dim font-mono">
-          <div class="flex items-center gap-2">
-            <span class="text-signal-orange font-bold">NOTE:</span>
-            <span>API 34+ utilizes AudioPlaybackCaptureConfiguration with user MediaProjection consent. API 37 includes forward-compatible ACCESS_LOCAL_NETWORK declarations.</span>
-          </div>
-          <div>
-            <span>TOOLCHAIN: NDK r27c • C++20 • KOTLIN 2.1 • AGP 8.8</span>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- ================= BOTTOM MACHINE STRIP & LEGAL NOTICE ================= -->
-    <div class="pt-8 border-t border-border-milled flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] text-text-dim">
-      
-      <!-- Left: Status Beacon & Multicast Identity -->
-      <div class="flex items-center gap-3">
-        <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
-        <span class="font-mono text-text-muted">
-          STATUS: <span class="text-sync-green font-semibold">ALL LOCAL SYSTEMS NOMINAL</span>
+    <!-- Bottom Status Bar (Graphify style) -->
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-[#626b60]">
+      <!-- Status Badge -->
+      <div class="flex items-center gap-2">
+        <span class="relative flex h-2 w-2">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#118d4f] opacity-75"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-[#118d4f]"></span>
         </span>
-        <span class="text-text-dim">•</span>
-        <span class="font-mono text-text-dim">239.255.42.99:4242</span>
+        <span class="font-semibold text-[#062314]">ALL PROTOCOL SYSTEMS OPERATIONAL</span>
+        <span class="text-[#e0e2d3]">|</span>
+        <span>0.0 ms PHASE DRIFT</span>
       </div>
 
-      <!-- Center: Explicit MIT License & Copyright -->
-      <div class="font-mono text-center md:text-left text-text-muted">
-        <span>MIT License • Copyright &copy; 2026 WantedChip</span>
+      <!-- Copyright -->
+      <div>
+        &copy; {new Date().getFullYear()} RoomBeat Authors · Free &amp; Open Source Software
       </div>
-
-      <!-- Right: Links & Back to Top -->
-      <div class="flex items-center gap-5 font-mono">
-        <a
-          href="/privacy"
-          class="text-text-muted hover:text-signal-orange transition-colors"
-        >
-          Privacy Policy
-        </a>
-        <a
-          href="https://github.com/WantedChip/RoomBeat"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-text-muted hover:text-bone transition-colors"
-        >
-          GitHub
-        </a>
-        <a
-          href="https://github.com/WantedChip/RoomBeat/releases/latest"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-text-muted hover:text-signal-orange transition-colors"
-        >
-          APK Releases
-        </a>
-        <a
-          href="#main-content"
-          class="text-text-muted hover:text-bone transition-colors inline-flex items-center gap-1"
-        >
-          <span>Top &uarr;</span>
-        </a>
-      </div>
-
     </div>
-
   </div>
 </footer>
-
-<!-- Laser-Etched Hardware Serial Plate Stencil Styling -->
-<style>
-  .hardware-serial-plate {
-    background: linear-gradient(135deg, #181B22 0%, #0E1015 45%, #15181F 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 16px rgba(0, 0, 0, 0.6);
-  }
-
-  .laser-etched-stencil {
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9), 0 0 1px rgba(255, 255, 255, 0.35);
-  }
-</style>
-
-<!-- Client Script for Expandable Compatibility Matrix Drawer -->
-<script>
-  import { playKeycapClick } from '../scripts/qrPinDemo.js';
-
-  function initFooterDrawer() {
-    const btnToggle = document.getElementById('btn-toggle-sdk-drawer');
-    const drawerContent = document.getElementById('sdk-drawer-content');
-    const chevron = document.getElementById('sdk-drawer-chevron');
-    const toggleText = document.getElementById('sdk-drawer-toggle-text');
-
-    if (!btnToggle || !drawerContent) return;
-
-    btnToggle.addEventListener('click', () => {
-      playKeycapClick();
-      const isExpanded = btnToggle.getAttribute('aria-expanded') === 'true';
-      const nextState = !isExpanded;
-
-      btnToggle.setAttribute('aria-expanded', String(nextState));
-
-      if (nextState) {
-        drawerContent.classList.remove('hidden');
-        if (chevron) chevron.style.transform = 'rotate(180deg)';
-        if (toggleText) toggleText.textContent = '[ COLLAPSE TECHNICAL MATRIX − ]';
-      } else {
-        drawerContent.classList.add('hidden');
-        if (chevron) chevron.style.transform = 'rotate(0deg)';
-        if (toggleText) toggleText.textContent = '[ EXPAND TECHNICAL MATRIX + ]';
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFooterDrawer);
-  } else {
-    initFooterDrawer();
-  }
-</script>

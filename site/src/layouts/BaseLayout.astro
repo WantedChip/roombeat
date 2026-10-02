@@ -5,76 +5,68 @@ export interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
-  canonicalURL?: string;
+  canonicalUrl?: string;
 }
 
 const {
-  title = 'RoomBeat — Synchronized Multi-Phone Audio Rig',
-  description = 'Turn a room of phones into one massive speaker system. 100% offline local Wi-Fi multicast with sub-millisecond NDK Oboe clock synchronization.',
+  title = 'RoomBeat · Synchronized multi-phone audio rig for Android',
+  description = 'Turn a room of phones into one massive speaker system. Hardware-clocked 20ms Opus frames over local UDP multicast for sub-millisecond acoustic sync with zero cloud relay.',
   ogImage = '/og-image.png',
-  canonicalURL = 'https://roombeat.sohamlabs.workers.dev',
+  canonicalUrl = 'https://roombeat.sohamlabs.workers.dev',
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="bg-chassis-base text-bone antialiased selection:bg-signal-orange selection:text-chassis-base scroll-smooth">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalURL} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="robots" content="index, follow" />
-    <meta name="author" content="WantedChip" />
-    <link rel="sitemap" href="/sitemap.xml" />
-    <meta name="theme-color" content="#0B0C0E" />
-    <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href={canonicalUrl} />
 
-    <!-- OpenGraph / Social Metadata -->
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph / Social -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:site_name" content="RoomBeat" />
 
-    <!-- Twitter Cards -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <!-- Typography Head Preconnect & Style Links -->
-    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <!-- Fonts: Geist & Geist Mono via Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;450;500;600&family=Geist:wght@300;400;450;500;550;600;700&display=swap"
       rel="stylesheet"
-      href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=general-sans@400,500,600&display=swap"
     />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap"
-    />
-    <link rel="stylesheet" href="/global.css" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "RoomBeat",
+        "operatingSystem": "Android 11+ (API 30–37)",
+        "applicationCategory": "AudioApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Turn a room of phones into one massive speaker system via UDP multicast and 20ms Opus frames."
+      }
+    </script>
   </head>
-  <body class="min-h-screen bg-chassis-base text-bone font-sans antialiased overflow-x-hidden flex flex-col">
-    <!-- Subtle technical grid backdrop -->
-    <div
-      class="fixed inset-0 bg-grid-pattern opacity-30 pointer-events-none z-0"
-      aria-hidden="true"
-    ></div>
-
-    <!-- Micro-fine analog noise grain overlay (authentic powder-coated metal chassis finish) -->
-    <div
-      class="analog-noise-texture"
-      aria-hidden="true"
-    ></div>
-
-    <div class="relative z-10 flex flex-col flex-1">
-      <slot />
-    </div>
+  <body class="bg-white text-[#16211b] antialiased selection:bg-[#062314] selection:text-white">
+    <slot />
   </body>
 </html>

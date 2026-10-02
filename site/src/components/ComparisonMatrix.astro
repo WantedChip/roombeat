@@ -1,636 +1,228 @@
 ---
-import {
-  Check,
-  X,
-  AlertTriangle,
-  ShieldCheck,
-  Zap,
-  Wifi,
-  DollarSign,
-  Radio,
-  Layers,
-  Cpu,
-  Lock,
-  ExternalLink,
-  Sliders,
-  TrendingDown,
-} from 'lucide-astro';
 ---
 
-<section id="comparison" class="py-16 md:py-24 border-t border-border-milled relative" aria-labelledby="comparison-title">
-  <!-- Subtle Industrial Grid Accent -->
-  <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
-
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-    
-    <!-- Section Header -->
-    <div class="max-w-3xl mb-12 md:mb-16">
-      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-surface-panel border border-border-milled mb-4">
-        <span class="w-1.5 h-1.5 rounded-full bg-signal-orange"></span>
-        <span class="font-mono text-[11px] font-semibold tracking-wider uppercase text-signal-orange">
-          System Comparison · Technical Honesty
-        </span>
+<section id="compare" class="border-b border-[#e0e2d3] bg-white py-20 sm:py-28">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <!-- Header (Graphify Side by Side) -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-[#e0e2d3]">
+      <div class="max-w-2xl">
+        <div class="op-eyebrow">
+          <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
+          <span>Side by side</span>
+        </div>
+        <h2 class="op-title mt-3 text-3xl font-normal tracking-tight text-[#062314] sm:text-4xl md:text-5xl">
+          Acoustic sync, cloud delay, or walled gardens.
+        </h2>
+        <p class="op-sub mt-4 text-[#35433a]">
+          Five multi-speaker audio tools people consider. Here’s what each architecture actually delivers.
+        </p>
       </div>
-      <h2 id="comparison-title" class="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl text-bone tracking-tight leading-tight">
-        The "Anti-AmpMe" Technical Honesty Matrix
-      </h2>
-      <p class="mt-4 font-sans text-sm sm:text-base text-text-muted leading-relaxed">
-        Phone speaker clustering is a local acoustic physics problem, not an excuse for a <strong class="text-bone">$520/year subscription trap</strong>. Compare RoomBeat’s native C++ NDK multicast pipeline against commercial subscription apps.
-      </p>
+
+      <a
+        href="https://github.com/WantedChip/RoomBeat"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="pill ghost font-mono text-sm border border-[#e0e2d3] self-start md:self-auto"
+      >
+        <span>View MIT Codebase</span>
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
     </div>
 
-    <!-- ================= MASTER HARDWARE PANEL ================= -->
-    <div class="hardware-panel rounded-[8px] overflow-hidden border border-border-milled">
-      
-      <!-- Top Rack Strip with Machined Hex-Bolt Markers -->
-      <div class="bg-[#0D0F13] px-4 py-3 border-b border-border-milled flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div class="flex items-center gap-2">
-          <!-- Mechanical Allen Bolt Graphic -->
-          <span class="w-2.5 h-2.5 rounded-[2px] bg-[#07080A] border border-[#3E4454] flex items-center justify-center">
-            <span class="w-1 h-1 rounded-full bg-[#5D6475]"></span>
-          </span>
-          <span class="font-mono text-[11px] uppercase tracking-wider text-text-muted font-medium">
-            BENCHMARK CHASSIS: M-02 // PEER-TO-PEER SYNC SPECIFICATIONS
-          </span>
-        </div>
-        <div class="flex items-center gap-4 font-mono text-[11px] text-text-dim">
-          <span class="inline-flex items-center gap-1.5 text-sync-green font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink"></span>
-            STANDARDS: FACT-VERIFIED
-          </span>
-          <span class="hidden sm:inline-block">LICENSE: MIT</span>
-        </div>
-      </div>
-
-      <!-- ================= INTERACTIVE CUMULATIVE COST CALCULATOR TICKER ================= -->
-      <div class="p-5 sm:p-6 lg:p-8 bg-[#0D0F14] border-b border-border-milled">
-        
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-mono text-signal-orange uppercase font-bold tracking-wider">
-              <Sliders class="w-3.5 h-3.5" />
-              <span>MODULE: COST-TICKER-CALC // RECURRING TOLL DISSECTOR</span>
-            </div>
-            <h3 class="font-display font-bold text-lg sm:text-xl text-bone mt-1">
-              Cumulative Commercial Toll vs. RoomBeat $0 FOSS
-            </h3>
-          </div>
-
-          <!-- Time Horizon Selector Buttons -->
-          <div class="flex items-center gap-1.5 bg-[#07080A] p-1 rounded-[6px] border border-border-milled text-xs font-mono">
-            <button
-              type="button"
-              id="btn-cost-1yr"
-              class="px-3 py-1.5 rounded-[4px] bg-sync-green/20 text-sync-green font-bold border border-sync-green/60 transition-all cursor-pointer"
-            >
-              1 YEAR
-            </button>
-            <button
-              type="button"
-              id="btn-cost-2yr"
-              class="px-3 py-1.5 rounded-[4px] text-text-muted hover:text-bone border border-transparent transition-all cursor-pointer"
-            >
-              2 YEARS
-            </button>
-            <button
-              type="button"
-              id="btn-cost-3yr"
-              class="px-3 py-1.5 rounded-[4px] text-text-muted hover:text-bone border border-transparent transition-all cursor-pointer"
-            >
-              3 YEARS
-            </button>
-          </div>
-        </div>
-
-        <!-- Interactive Duration Slider -->
-        <div class="mb-6 space-y-2">
-          <div class="flex items-center justify-between text-xs font-mono text-text-dim">
-            <span class="flex items-center gap-2">
-              <span>ACTIVE HORIZON:</span>
-              <strong id="cost-duration-label" class="text-bone font-bold">1 Year</strong>
-              <span>(<span id="cost-weeks-count" class="text-text-muted">52 weeks</span>)</span>
-            </span>
-            <span class="text-sync-amber">SUBSCRIPTION BASIS: $9.99 / WEEK (AMPME VIP)</span>
-          </div>
-
-          <input
-            type="range"
-            id="cost-duration-slider"
-            min="1"
-            max="3"
-            step="1"
-            value="1"
-            class="w-full accent-signal-orange cursor-pointer h-2 bg-[#07080A] rounded-lg border border-border-milled"
-            aria-label="Adjust cumulative cost duration in years"
-          />
-          <div class="flex justify-between text-[10px] font-mono text-text-dim px-1">
-            <span>1 Year (52 Wks)</span>
-            <span>2 Years (104 Wks)</span>
-            <span>3 Years (156 Wks)</span>
-          </div>
-        </div>
-
-        <!-- Dual Comparison Cards: Commercial App Hazard vs. RoomBeat FOSS -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4">
-          
-          <!-- COMMERCIAL SUBSCRIPTION CARD (Caution Hazard Stripes) -->
-          <div class="caution-hazard-panel rounded-[8px] p-5 border border-sync-amber/40 relative overflow-hidden">
-            <div class="flex items-center justify-between mb-3">
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[3px] bg-sync-amber/20 border border-sync-amber/50 font-mono text-[10px] font-bold text-sync-amber uppercase">
-                <AlertTriangle class="w-3 h-3 text-sync-amber" />
-                COMMERCIAL SUBSCRIPTION TOLL (AMPME)
-              </span>
-              <span class="font-mono text-[10px] text-sync-red font-semibold">$9.99 / week</span>
-            </div>
-
-            <div class="my-2">
-              <div class="font-mono text-3xl sm:text-4xl font-extrabold text-sync-red tabular-nums tracking-tight" id="commercial-cost-ticker">
-                $519.48
+    <!-- Responsive Comparison Table (Graphify style) -->
+    <div class="mt-10 overflow-x-auto rounded-[4px] border border-[#e0e2d3] bg-white shadow-sm">
+      <table class="w-full text-left border-collapse min-w-[760px]">
+        <thead>
+          <tr class="border-b border-[#e0e2d3] bg-[#fbfbf7] font-mono text-xs">
+            <th class="py-4 px-5 text-[#626b60] font-semibold w-1/4">CAPABILITY / SPEC</th>
+            <th class="py-4 px-5 text-[#062314] font-bold bg-[#edf8f2] border-x border-[#118d4f]/30 w-1/5">
+              <div class="flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-[#118d4f]"></span>
+                <span>ROOMBEAT</span>
               </div>
-              <span class="font-mono text-xs text-text-muted block mt-1">
-                Cumulative cash surrendered to cloud relays
-              </span>
-            </div>
+            </th>
+            <th class="py-4 px-4 text-[#626b60] font-semibold w-1/6">AmpMe</th>
+            <th class="py-4 px-4 text-[#626b60] font-semibold w-1/6">SoundSeeder</th>
+            <th class="py-4 px-4 text-[#626b60] font-semibold w-1/6">AirPlay 2 / Cast</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#e0e2d3] font-sans text-sm">
+          <!-- Row 1: Architecture -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              Network Transport
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">Hardware UDP Multicast</span>
+              <div class="text-xs text-[#626b60]">Zero cloud roundtrips</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Cloud WebSocket Relay
+              <div class="text-xs text-[#a03d2b]">Routes via remote servers</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Unicast TCP
+              <div class="text-xs text-[#626b60]">Host CPU duplicates streams</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Proprietary Cloud / RTSP
+              <div class="text-xs text-[#626b60]">Walled vendor ecosystem</div>
+            </td>
+          </tr>
 
-            <p class="font-sans text-xs text-text-dim leading-relaxed border-t border-sync-amber/20 pt-3 mt-3">
-              Mandatory cloud relay architecture forces weekly recurring billing. Stops functioning the second subscription lapses.
-            </p>
-          </div>
+          <!-- Row 2: Latency & Drift -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              Acoustic Phase Alignment
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">&lt; 5 ms drift</span>
+              <div class="text-xs text-[#118d4f]">Inaudible comb filtering</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#a03d2b]">
+              150–450 ms
+              <div class="text-xs text-[#a03d2b]">Audible stadium flanging</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              40–120 ms
+              <div class="text-xs text-[#626b60]">Uncorrected clock skew</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              ~15–50 ms
+              <div class="text-xs text-[#626b60]">High latency buffer (2s)</div>
+            </td>
+          </tr>
 
-          <!-- ROOMBEAT FOSS CARD (Illuminated Phosphor Green Badge) -->
-          <div class="roombeat-illuminated-panel rounded-[8px] p-5 border-2 border-sync-green relative overflow-hidden bg-[#00E599]/10 shadow-[0_0_20px_rgba(0,229,153,0.18)]">
-            <div class="flex items-center justify-between mb-3">
-              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[3px] bg-sync-green text-[#0B0C0E] font-mono text-[10px] font-extrabold uppercase shadow-[0_0_8px_#00E599]">
-                <Check class="w-3 h-3 stroke-[3]" />
-                ROOMBEAT · 100% FREE &amp; OPEN SOURCE
-              </span>
-              <span class="font-mono text-[10px] text-sync-green font-bold">MIT LICENSE</span>
-            </div>
+          <!-- Row 3: Pricing -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              Pricing &amp; Cost
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">$0 / MIT Free Software</span>
+              <div class="text-xs text-[#626b60]">No in-app purchases ever</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#a03d2b]">
+              $9.99 / month
+              <div class="text-xs text-[#a03d2b]">$119.99/year predatory paywall</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Freemium (Abandoned)
+              <div class="text-xs text-[#626b60]">No updates since 2019</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              $150+ Hardware Lock-in
+              <div class="text-xs text-[#626b60]">Must buy Apple/Nest devices</div>
+            </td>
+          </tr>
 
-            <div class="my-2">
-              <div class="font-mono text-3xl sm:text-4xl font-extrabold text-sync-green tabular-nums tracking-tight">
-                $0.00
-              </div>
-              <span class="font-mono text-xs text-sync-green/90 font-semibold block mt-1 uppercase tracking-wider">
-                FOREVER UNRESTRICTED · 0 PAYWALLS
-              </span>
-            </div>
+          <!-- Row 4: Privacy & Telemetry -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              Data Privacy &amp; Tracking
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">Zero Telemetry (0 pings)</span>
+              <div class="text-xs text-[#626b60]">No account, no sign-in</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Heavy Tracking &amp; Ads
+              <div class="text-xs text-[#a03d2b]">Ad analytics &amp; user profiling</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Google Play Services telemetry
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Account required
+            </td>
+          </tr>
 
-            <p class="font-sans text-xs text-text-muted leading-relaxed border-t border-sync-green/30 pt-3 mt-3">
-              100% offline local Wi-Fi &amp; portable hotspot multicast. Zero cloud servers, zero ads, zero accounts, unlimited phones forever.
-            </p>
-          </div>
+          <!-- Row 5: Offline & Hotspot -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              Offline Hotspot Support
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">100% Offline Capable</span>
+              <div class="text-xs text-[#626b60]">Works in airplane mode</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#a03d2b]">
+              Fails without Internet
+              <div class="text-xs text-[#a03d2b]">Cannot resolve cloud handshake</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Partial hotspot support
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Requires Wi-Fi router
+            </td>
+          </tr>
 
-        </div>
+          <!-- Row 6: Scale -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              Concurrent Connected Phones
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">8 to 32+ Phones</span>
+              <div class="text-xs text-[#626b60]">O(1) host CPU overhead</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Cloud limited
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              4–6 Phones max
+              <div class="text-xs text-[#626b60]">Host phone overheats</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Up to 6–8 devices
+            </td>
+          </tr>
 
-        <!-- Full-Width Bottom Savings Ticker Banner -->
-        <div class="recessed-cavity rounded-[6px] p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 border border-border-milled">
-          <div class="flex items-center gap-2">
-            <TrendingDown class="w-4 h-4 text-sync-green" />
-            <span class="font-mono text-xs text-text-muted font-semibold uppercase tracking-wider">
-              NET CAPITAL SAVINGS WITH ROOMBEAT:
-            </span>
-          </div>
-          <div class="font-mono text-base sm:text-lg font-bold text-sync-green tabular-nums" id="net-savings-ticker">
-            +$519.48 POCKETED
-          </div>
-        </div>
+          <!-- Row 7: Audio Sources -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              Supported Audio Sources
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">Any Android Audio Source</span>
+              <div class="text-xs text-[#626b60]">Spotify, YouTube, VLC, FLAC</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              In-app web player only
+              <div class="text-xs text-[#a03d2b]">Restricted music selection</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Local MP3 files only
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Vendor supported apps only
+            </td>
+          </tr>
 
-      </div>
-
-      <!-- ================= DETAILED SPECIFICATION TABLE ================= -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[760px] lg:min-w-full">
-          <thead>
-            <tr class="border-b border-border-milled bg-[#101217]">
-              <th scope="col" class="py-4 px-5 text-xs font-mono font-semibold uppercase tracking-wider text-text-dim w-[22%]">
-                Evaluation Metric
-              </th>
-              
-              <!-- ROOMBEAT HIGHLIGHT COLUMN (Illuminated Phosphor Green Badge) -->
-              <th scope="col" class="py-4 px-5 text-xs font-display font-extrabold uppercase tracking-wider text-sync-green bg-[#00E599]/10 border-x-2 border-sync-green/50 w-[28%] relative">
-                <div class="flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink"></span>
-                    <span class="text-bone font-bold text-sm tracking-tight">ROOMBEAT</span>
-                  </div>
-                  <span class="font-mono text-[10px] text-[#0B0C0E] bg-sync-green px-2 py-0.5 rounded-[3px] font-extrabold shadow-[0_0_8px_#00E599]">
-                    $0.00 FOSS
-                  </span>
-                </div>
-              </th>
-
-              <!-- AMPME (Caution Hazard Stripes) -->
-              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[20%] caution-hazard-header border-r border-sync-amber/30">
-                <div class="flex items-center justify-between gap-1">
-                  <span>AmpMe</span>
-                  <span class="font-mono text-[10px] text-sync-amber bg-sync-amber/20 border border-sync-amber/40 px-1.5 py-0.5 rounded-[3px] font-bold">
-                    ⚠ $520+/YR
-                  </span>
-                </div>
-              </th>
-
-              <!-- SOUNDSEEDER -->
-              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[15%]">
-                SoundSeeder
-              </th>
-
-              <!-- RAVE -->
-              <th scope="col" class="py-4 px-5 text-xs font-display font-bold uppercase tracking-wider text-text-muted w-[15%]">
-                Rave
-              </th>
-            </tr>
-          </thead>
-
-          <tbody class="divide-y divide-border-milled text-xs font-sans">
-            
-            <!-- ROW 1: PRICING & LICENSING -->
-            <tr class="hover:bg-[#161920] transition-colors">
-              <td class="py-4 px-5">
-                <div class="flex items-center gap-2 font-display font-bold text-bone">
-                  <DollarSign class="w-4 h-4 text-signal-orange shrink-0" />
-                  <span>Pricing &amp; Model</span>
-                </div>
-                <p class="font-sans text-[11px] text-text-dim mt-0.5">True annual cost to maintain access</p>
-              </td>
-
-              <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
-                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono font-bold text-bone text-xs sm:text-sm">$0 Free &amp; Open Source</span>
-                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
-                      MIT License. Zero paywalls, zero in-app purchases, zero ads. Forever unrestricted for unlimited nodes.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- AmpMe (Caution Stripes) -->
-              <td class="py-4 px-5 text-text-muted caution-hazard-cell border-r border-sync-amber/20">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
-                    <X class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono font-bold text-sync-red">$9.99 / week</span>
-                    <p class="text-[11px] text-text-dim mt-0.5">
-                      ~$520/year VIP subscription. Aggressive paywall after 3-day trial. Free mode strictly crippled.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- SoundSeeder -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-bone font-medium">Free (2 devices)</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  $4.99 one-time unlock for up to 16 devices. 15-min playback limit on free tier.
-                </p>
-              </td>
-
-              <!-- Rave -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-bone font-medium">Free w/ Ads</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  $1.99–$3.99/mo Rave Premium to remove video ads. Requires own streaming accounts.
-                </p>
-              </td>
-            </tr>
-
-            <!-- ROW 2: ACOUSTIC SYNC ENGINE -->
-            <tr class="hover:bg-[#161920] transition-colors">
-              <td class="py-4 px-5">
-                <div class="flex items-center gap-2 font-display font-bold text-bone">
-                  <Cpu class="w-4 h-4 text-sync-green shrink-0" />
-                  <span>Sync Engine</span>
-                </div>
-                <p class="font-sans text-[11px] text-text-dim mt-0.5">Audio thread &amp; drift compensation</p>
-              </td>
-
-              <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
-                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono font-bold text-sync-green">Native C++ NDK Oboe (&lt;0.5ms)</span>
-                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
-                      Hardware MMAP low-latency buffer, monotonic clock presentation target, and NDK fractional speed resampler (±0.05%).
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
-                    <AlertTriangle class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono text-sync-red font-medium">High-Level Java / Web</span>
-                    <p class="text-[11px] text-text-dim mt-0.5">
-                      Noticeable chorus echo (20–100ms drift). Relies on manual user slider calibration.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- SoundSeeder -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-bone font-medium">Java AudioTrack</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Static buffer with manual buffer size tuning. Bluetooth introduces 20–70ms variable lag.
-                </p>
-              </td>
-
-              <!-- Rave -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-text-dim font-medium">Cloud Media Sync</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  100–500ms delay. Unsuitable for acoustic playback in the same room.
-                </p>
-              </td>
-            </tr>
-
-            <!-- ROW 3: NETWORK & OFFLINE UTILITY -->
-            <tr class="hover:bg-[#161920] transition-colors">
-              <td class="py-4 px-5">
-                <div class="flex items-center gap-2 font-display font-bold text-bone">
-                  <Wifi class="w-4 h-4 text-network-cyan shrink-0" />
-                  <span>Network Dependency</span>
-                </div>
-                <p class="font-sans text-[11px] text-text-dim mt-0.5">Offline viability &amp; transport</p>
-              </td>
-
-              <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
-                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono font-bold text-bone">100% Offline Hotspot &amp; LAN</span>
-                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
-                      Direct UDP multicast (`239.255.42.99`). Functions in dead zones, parks, beaches, and camp sites with zero cellular data.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
-                    <X class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono text-sync-red font-medium">Mandatory Internet</span>
-                    <p class="text-[11px] text-text-dim mt-0.5">
-                      Requires active WAN connection and cloud server handshake even when phones are on the same Wi-Fi.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- SoundSeeder -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-sync-green font-medium">Offline Capable</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Works over local Wi-Fi or portable hotspot for local files and DLNA.
-                </p>
-              </td>
-
-              <!-- Rave -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-sync-red font-medium">Mandatory Cloud</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  All audio/video streams pulled independently from external cloud CDNs.
-                </p>
-              </td>
-            </tr>
-
-            <!-- ROW 4: AUDIO PIPELINE & CAPTURE -->
-            <tr class="hover:bg-[#161920] transition-colors">
-              <td class="py-4 px-5">
-                <div class="flex items-center gap-2 font-display font-bold text-bone">
-                  <Radio class="w-4 h-4 text-signal-orange shrink-0" />
-                  <span>Audio Pipeline</span>
-                </div>
-                <p class="font-sans text-[11px] text-text-dim mt-0.5">Codec, latency &amp; system ingest</p>
-              </td>
-
-              <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
-                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono font-bold text-bone">20ms Opus @ 48kHz Stereo</span>
-                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
-                      Low-latency jitter buffer with PLC. Captures system app audio (<code class="text-bone">AudioPlaybackCapture</code> on API 34+), SAF storage, &amp; Spotify App Remote.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
-                <span class="font-mono text-text-dim font-medium">Walled Garden APIs</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  No system-wide audio capture. Limited to in-app YouTube, SoundCloud, or Spotify web player.
-                </p>
-              </td>
-
-              <!-- SoundSeeder -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-text-dim font-medium">PCM / MP3 Unicast</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Cannot capture modern Android app audio (YouTube, TikTok); restricted to local files or UPnP.
-                </p>
-              </td>
-
-              <!-- Rave -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-text-dim font-medium">Cloud Media WebViews</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  High CPU/battery drain from simultaneous video rendering and VoIP audio processing.
-                </p>
-              </td>
-            </tr>
-
-            <!-- ROW 5: PRIVACY & AUTHENTICATION -->
-            <tr class="hover:bg-[#161920] transition-colors">
-              <td class="py-4 px-5">
-                <div class="flex items-center gap-2 font-display font-bold text-bone">
-                  <ShieldCheck class="w-4 h-4 text-sync-green shrink-0" />
-                  <span>Privacy &amp; Accounts</span>
-                </div>
-                <p class="font-sans text-[11px] text-text-dim mt-0.5">Telemetry, logins &amp; data collection</p>
-              </td>
-
-              <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
-                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono font-bold text-sync-green">0 Tracking · 0 Accounts</span>
-                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
-                      Host phone is the server. Zero cloud telemetry, zero analytics SDKs, zero user registration. No data ever leaves the local subnet.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#FF334B]/15 text-sync-red shrink-0 mt-0.5">
-                    <Lock class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono text-sync-red font-medium">Mandatory Social Login</span>
-                    <p class="text-[11px] text-text-dim mt-0.5">
-                      Forces Facebook or Google authentication even for local party joining. Multiple ad trackers embedded.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- SoundSeeder -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-bone font-medium">No Social Login</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Standard Google Play Store licensing validation; privacy friendly.
-                </p>
-              </td>
-
-              <!-- Rave -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-sync-red font-medium">Account Required</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Mandatory user profile. Requires authenticating private Netflix/Spotify credentials.
-                </p>
-              </td>
-            </tr>
-
-            <!-- ROW 6: DEVICE SCALABILITY -->
-            <tr class="hover:bg-[#161920] transition-colors">
-              <td class="py-4 px-5">
-                <div class="flex items-center gap-2 font-display font-bold text-bone">
-                  <Layers class="w-4 h-4 text-network-cyan shrink-0" />
-                  <span>Listener Scalability</span>
-                </div>
-                <p class="font-sans text-[11px] text-text-dim mt-0.5">Bandwidth complexity &amp; peer limits</p>
-              </td>
-
-              <!-- RoomBeat -->
-              <td class="py-4 px-5 bg-[#00E599]/5 border-x-2 border-sync-green/40">
-                <div class="flex items-start gap-2">
-                  <span class="p-1 rounded-[3px] bg-[#00E599]/15 text-sync-green shrink-0 mt-0.5">
-                    <Check class="w-3.5 h-3.5 stroke-[2.5]" />
-                  </span>
-                  <div>
-                    <span class="font-mono font-bold text-bone">Unlimited Peers — O(1) Bandwidth</span>
-                    <p class="font-sans text-[11px] text-text-muted mt-0.5">
-                      Single UDP multicast packet serves 2 or 200 phones simultaneously. Host transmission load does not scale with room size.
-                    </p>
-                  </div>
-                </div>
-              </td>
-
-              <!-- AmpMe -->
-              <td class="py-4 px-5 text-text-muted border-r border-sync-amber/20">
-                <span class="font-mono text-text-dim font-medium">Server Bottleneck</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Cloud relay bandwidth degradation and audio stutters as participant count increases.
-                </p>
-              </td>
-
-              <!-- SoundSeeder -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-text-dim font-medium">Capped at 2 (Free) / 16 (Paid)</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Unicast TCP streaming: host phone transmits duplicate streams per client, choking Wi-Fi bandwidth.
-                </p>
-              </td>
-
-              <!-- Rave -->
-              <td class="py-4 px-5 text-text-muted">
-                <span class="font-mono text-text-dim font-medium">Room Capped</span>
-                <p class="text-[11px] text-text-dim mt-0.5">
-                  Host and server connections degrade under concurrent video synchronization.
-                </p>
-              </td>
-            </tr>
-
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Bottom Citation & Fact-Check Footer -->
-      <div class="bg-[#0D0F13] px-5 py-4 border-t border-border-milled flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[11px] font-mono text-text-dim">
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span class="text-text-muted font-medium">Factual Citations:</span>
-          <span>[1] AmpMe Terms &amp; VIP pricing ($9.99/wk)</span>
-          <span>[2] SoundSeeder Play Store spec (2-device free limit)</span>
-          <span>[3] AOSP Oboe AAudio MMAP Documentation</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-sync-green">
-          <span class="w-1.5 h-1.5 rounded-full bg-sync-green"></span>
-          <span>Zero affiliate sponsorships · 100% engineering honesty</span>
-        </div>
-      </div>
-
+          <!-- Row 8: License -->
+          <tr class="hover:bg-[#fbfbf7]/50 transition-colors">
+            <td class="py-3.5 px-5 font-mono text-xs font-medium text-[#062314]">
+              License &amp; Code Access
+            </td>
+            <td class="py-3.5 px-5 font-medium text-[#062314] bg-[#edf8f2]/40 border-x border-[#118d4f]/30">
+              <span class="font-mono text-xs text-[#118d4f] font-bold">MIT Open Source</span>
+              <div class="text-xs text-[#626b60]">Yours to audit and compile</div>
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Proprietary Closed Source
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Proprietary Closed Source
+            </td>
+            <td class="py-3.5 px-4 text-[#626b60]">
+              Proprietary Closed Source
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-
   </div>
 </section>
-
-<!-- Hazard Stripes and Column Stencil Styles -->
-<style>
-  .caution-hazard-panel {
-    background-color: #14110A;
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgba(255, 184, 0, 0.06) 0px,
-      rgba(255, 184, 0, 0.06) 12px,
-      transparent 12px,
-      transparent 24px
-    );
-  }
-
-  .caution-hazard-header {
-    background-color: #161209;
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgba(255, 184, 0, 0.08) 0px,
-      rgba(255, 184, 0, 0.08) 8px,
-      transparent 8px,
-      transparent 16px
-    );
-  }
-
-  .caution-hazard-cell {
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgba(255, 184, 0, 0.03) 0px,
-      rgba(255, 184, 0, 0.03) 8px,
-      transparent 8px,
-      transparent 16px
-    );
-  }
-</style>
-
-<!-- Client Script for Interactive Cost Calculator Ticker -->
-<script>
-  import '../scripts/comparisonMatrix.js';
-</script>

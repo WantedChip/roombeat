@@ -1,152 +1,170 @@
 ---
-import { Download, Radio } from 'lucide-astro';
+import RoomBeatIcon from './icons/RoomBeatIcon.astro';
 import GithubIcon from './icons/GithubIcon.astro';
 ---
 
-<header class="sticky top-0 z-50 w-full px-2.5 sm:px-6 lg:px-8 pt-2.5 sm:pt-4 pointer-events-none">
-  <div class="pointer-events-auto max-w-7xl mx-auto h-14 sm:h-16 px-3 sm:px-5 floating-console-dock flex items-center justify-between transition-all duration-200">
-    <!-- Brand Wordmark, Protocol Pill & Acoustic Beacon Cluster -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <a href="/" class="flex items-center gap-2 group" aria-label="RoomBeat Home">
-        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-[5px] bg-[#07080A] border border-border-milled flex items-center justify-center text-signal-orange group-hover:border-signal-orange/60 transition-colors shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]">
-          <Radio class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        </div>
-        <div class="flex items-baseline gap-2">
-          <span class="font-display font-extrabold text-base sm:text-lg tracking-tight text-bone group-hover:text-white transition-colors">
-            ROOMBEAT
+<header class="sticky top-0 z-50 w-full border-b border-[#e0e2d3] bg-white/90 backdrop-blur-md transition-all">
+  <!-- Top Announcement Bar (Graphify style) -->
+  <div class="border-b border-[#e0e2d3]/60 bg-[#fbfbf7] px-4 py-1.5 text-xs">
+    <div class="mx-auto flex max-w-7xl items-center justify-between">
+      <div class="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+        <span class="inline-flex items-center gap-1.5 rounded-[2px] bg-[#062314]/5 px-2 py-0.5 font-mono text-[11px] font-medium text-[#062314]">
+          <span class="relative flex h-1.5 w-1.5">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#118d4f] opacity-75"></span>
+            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
           </span>
-        </div>
-      </a>
-
-      <!-- Monospaced Protocol Version Pill with Hover Telemetry Readout -->
-      <div class="relative group/pill hidden sm:inline-flex">
-        <div
-          class="flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#07080A] border border-border-milled hover:border-sync-green/50 text-[11px] font-mono font-medium text-sync-green transition-all cursor-default select-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]"
-          tabindex="0"
-          role="status"
-          aria-label="Protocol Version v1.0-LAN. Hover for telemetry readout."
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-sync-green shadow-[0_0_6px_#00E599]"></span>
-          <span>v1.0-LAN</span>
-        </div>
-
-        <!-- Telemetry Hover Readout Flyout -->
-        <div class="absolute left-0 top-full mt-2 w-72 p-3 rounded-[6px] bg-[#0E1015] border border-border-milled shadow-[0_12px_32px_rgba(0,0,0,0.85),inset_0_1px_0_0_rgba(255,255,255,0.08)] opacity-0 -translate-y-1 pointer-events-none group-hover/pill:opacity-100 group-hover/pill:translate-y-0 group-hover/pill:pointer-events-auto transition-all duration-150 z-50">
-          <div class="flex items-center justify-between border-b border-border-milled/70 pb-1.5 mb-2">
-            <span class="font-mono text-[10px] uppercase font-bold tracking-wider text-text-dim">Protocol Telemetry</span>
-            <span class="font-mono text-[9px] text-sync-green px-1.5 py-0.5 rounded bg-sync-green/10 border border-sync-green/30 font-semibold">ONLINE</span>
-          </div>
-          <div class="font-mono text-[10px] space-y-1 text-text-muted leading-tight">
-            <div class="flex justify-between">
-              <span class="text-text-dim">TRANSPORT:</span>
-              <span class="text-bone font-medium">UDP MULTICAST</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-text-dim">SOCKET:</span>
-              <span class="text-sync-green font-medium">239.255.42.99:4242</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-text-dim">CODEC:</span>
-              <span class="text-bone font-medium">OPUS 48kHz / 20ms</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-text-dim">CLOCK:</span>
-              <span class="text-bone font-medium">NDK MONOTONIC</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-text-dim">JITTER:</span>
-              <span class="text-sync-green font-medium">0.0ms (LOCKED)</span>
-            </div>
-          </div>
-        </div>
+          v1.0.0 STABLE
+        </span>
+        <span class="text-[#35433a] font-sans">
+          Native Android audio synchronization engine · Zero relay cloud · 100% On-device LAN
+        </span>
       </div>
-
-      <!-- Mobile Compact Status Beacon (Visible on small screens) -->
-      <div class="flex lg:hidden items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#07080A] border border-border-milled/80 shadow-[inset_0_1px_2px_rgba(0,0,0,0.7)]" aria-label="Acoustic status beacon: 0.0ms jitter">
-        <div class="relative flex items-center justify-center w-3.5 h-3.5" aria-hidden="true">
-          <span class="absolute inline-flex w-full h-full rounded-full bg-sync-green/25 animate-beacon-ripple"></span>
-          <span class="relative inline-flex w-1.5 h-1.5 rounded-full bg-sync-green shadow-[0_0_6px_#00E599]"></span>
-        </div>
-        <span class="font-mono text-[10px] font-semibold text-sync-green">0.0ms</span>
-      </div>
-    </div>
-
-    <!-- Acoustic Status Beacon (Magic UI Ripple style, Desktop) -->
-    <div
-      class="hidden lg:flex items-center gap-2.5 px-3 py-1 rounded-[6px] bg-[#07080A] border border-border-milled/80 shadow-[inset_0_1px_3px_rgba(0,0,0,0.7)]"
-      aria-label="Acoustic status beacon: UDP Multicast active, zero jitter"
-    >
-      <div class="relative flex items-center justify-center w-5 h-5" aria-hidden="true">
-        <!-- Concentric Expanding Ripples -->
-        <span class="absolute inline-flex w-full h-full rounded-full bg-sync-green/20 animate-beacon-ripple"></span>
-        <span class="absolute inline-flex w-full h-full rounded-full bg-sync-green/30 animate-beacon-ripple-delayed"></span>
-        <!-- Central Phosphor LED -->
-        <span class="relative inline-flex w-2 h-2 rounded-full bg-sync-green shadow-[0_0_8px_#00E599]"></span>
-      </div>
-      <div class="flex items-center gap-1.5 font-mono text-[11px] tracking-tight">
-        <span class="font-bold text-sync-green">UDP MULTICAST:</span>
-        <span class="text-text-bone font-medium">ACTIVE</span>
-        <span class="text-text-dim">·</span>
-        <span class="font-bold text-sync-green">0.0ms</span>
-        <span class="text-text-muted">JITTER</span>
-      </div>
-    </div>
-
-    <!-- Navigation Links -->
-    <nav class="hidden lg:flex items-center gap-6" aria-label="Main Navigation">
       <a
-        href="#features"
-        class="text-[12px] uppercase font-sans tracking-wider font-semibold text-text-muted hover:text-bone transition-colors"
-      >
-        Features
-      </a>
-      <a
-        href="#architecture"
-        class="text-[12px] uppercase font-sans tracking-wider font-semibold text-text-muted hover:text-bone transition-colors"
-      >
-        Architecture
-      </a>
-      <a
-        href="https://github.com/WantedChip/RoomBeat"
+        href="https://github.com/WantedChip/RoomBeat/releases/latest"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-1.5 text-[12px] uppercase font-sans tracking-wider font-semibold text-text-muted hover:text-bone transition-colors"
+        class="hidden items-center gap-1 font-mono text-[11px] font-medium text-[#062314] hover:underline sm:inline-flex"
       >
-        <GithubIcon class="w-3.5 h-3.5 text-text-dim" />
-        <span>GitHub</span>
-        <span class="text-[9px] font-mono text-text-dim bg-[#07080A] border border-border-milled px-1 py-0.2 rounded-[2px]">
-          MIT
+        <span>Release notes</span>
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Navbar -->
+  <div class="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
+    <!-- Brand -->
+    <div class="flex items-center gap-6">
+      <a href="/" class="group flex items-center gap-2.5 text-[#062314] no-underline">
+        <RoomBeatIcon class="h-6 w-6 transition-transform group-hover:scale-105" />
+        <span class="font-sans text-base font-semibold tracking-tight text-[#062314]">RoomBeat</span>
+        <span class="rounded-[2px] border border-[#e0e2d3] bg-[#f4f5ec] px-1.5 py-0.5 font-mono text-[10px] font-medium text-[#35433a]">
+          LAN ENGINE
         </span>
       </a>
-    </nav>
 
-    <!-- Right Controls / Tactile Magnetic Keycap Download Button -->
-    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-1 font-sans text-sm font-medium text-[#35433a]">
+        <a href="#features" class="rounded-[2px] px-3 py-1.5 transition-colors hover:bg-[#062314]/5 hover:text-[#062314]">
+          Features
+        </a>
+        <a href="#simulator" class="rounded-[2px] px-3 py-1.5 transition-colors hover:bg-[#062314]/5 hover:text-[#062314]">
+          Sync Simulator
+        </a>
+        <a href="#architecture" class="rounded-[2px] px-3 py-1.5 transition-colors hover:bg-[#062314]/5 hover:text-[#062314]">
+          Architecture
+        </a>
+        <a href="#compare" class="rounded-[2px] px-3 py-1.5 transition-colors hover:bg-[#062314]/5 hover:text-[#062314]">
+          Side by side
+        </a>
+        <a href="#trust" class="rounded-[2px] px-3 py-1.5 transition-colors hover:bg-[#062314]/5 hover:text-[#062314]">
+          Trust
+        </a>
+        <a href="#faq" class="rounded-[2px] px-3 py-1.5 transition-colors hover:bg-[#062314]/5 hover:text-[#062314]">
+          FAQ
+        </a>
+      </nav>
+    </div>
+
+    <!-- Right Actions -->
+    <div class="flex items-center gap-2.5">
+      <!-- Live Protocol Telemetry Popover Button (Graphify style) -->
+      <div class="relative group/telemetry hidden sm:inline-block">
+        <button
+          type="button"
+          class="pill ghost font-mono text-xs text-[#062314] !h-[30px] !px-2.5 border border-[#e0e2d3]"
+          aria-label="Socket Telemetry"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
+          <span>UDP MULTICAST</span>
+        </button>
+        <!-- Hover Telemetry Card -->
+        <div class="absolute right-0 top-full mt-2 hidden w-72 rounded-[4px] border border-[#e0e2d3] bg-white p-3.5 shadow-xl group-hover/telemetry:block z-50">
+          <div class="border-b border-[#e0e2d3] pb-2 mb-2 flex items-center justify-between">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-[#626b60]">Socket Telemetry</span>
+            <span class="inline-flex items-center gap-1 font-mono text-[10px] text-[#118d4f]">
+              <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span> ACTIVE
+            </span>
+          </div>
+          <div class="space-y-1.5 font-mono text-[11px]">
+            <div class="flex justify-between text-[#35433a]">
+              <span class="text-[#626b60]">Multicast IP:</span>
+              <span class="font-semibold text-[#062314]">239.255.42.99</span>
+            </div>
+            <div class="flex justify-between text-[#35433a]">
+              <span class="text-[#626b60]">UDP Port:</span>
+              <span class="font-semibold text-[#062314]">4242</span>
+            </div>
+            <div class="flex justify-between text-[#35433a]">
+              <span class="text-[#626b60]">Audio Codec:</span>
+              <span class="font-semibold text-[#062314]">Opus 48kHz / 20ms</span>
+            </div>
+            <div class="flex justify-between text-[#35433a]">
+              <span class="text-[#626b60]">Clock Domain:</span>
+              <span class="font-semibold text-[#062314]">CLOCK_MONOTONIC</span>
+            </div>
+            <div class="flex justify-between text-[#35433a]">
+              <span class="text-[#626b60]">Acoustic Jitter:</span>
+              <span class="font-semibold text-[#118d4f]">0.0 ms (LOCKED)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GitHub link with star count -->
       <a
         href="https://github.com/WantedChip/RoomBeat"
         target="_blank"
         rel="noopener noreferrer"
-        class="lg:hidden p-1.5 rounded-[6px] bg-[#07080A] border border-border-milled text-text-muted hover:text-bone transition-colors shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]"
-        aria-label="GitHub Repository"
+        class="pill ghost font-mono text-xs !h-[30px] !px-2.5 border border-[#e0e2d3]"
       >
-        <GithubIcon class="w-4 h-4" />
+        <GithubIcon class="h-3.5 w-3.5" />
+        <span class="hidden sm:inline">GitHub</span>
+        <span class="text-[#626b60] border-l border-[#e0e2d3] pl-1.5 ml-0.5">MIT</span>
       </a>
 
-      <!-- Tactile Magnetic Keycap Download Button -->
-      <div class="magnetic-wrap relative inline-flex items-center" id="magnetic-btn-wrap">
+      <!-- Download APK Primary Pill -->
+      <a
+        href="https://github.com/WantedChip/RoomBeat/releases/latest"
+        class="pill primary !h-[30px] !px-3 font-mono text-xs font-medium"
+      >
+        <span>Download APK</span>
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M19 12l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <!-- Mobile Menu Button -->
+      <button
+        id="mobile-menu-btn"
+        type="button"
+        class="md:hidden pill ghost !h-[30px] !w-[30px] !p-0 border border-[#e0e2d3]"
+        aria-label="Toggle menu"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Nav -->
+  <div id="mobile-nav" class="hidden border-t border-[#e0e2d3] bg-[#fbfbf7] px-4 py-3 md:hidden">
+    <div class="flex flex-col gap-2 font-sans text-sm font-medium text-[#35433a]">
+      <a href="#features" class="px-2 py-1.5 hover:text-[#062314]">Features</a>
+      <a href="#simulator" class="px-2 py-1.5 hover:text-[#062314]">Sync Simulator</a>
+      <a href="#architecture" class="px-2 py-1.5 hover:text-[#062314]">Architecture</a>
+      <a href="#compare" class="px-2 py-1.5 hover:text-[#062314]">Side by side</a>
+      <a href="#trust" class="px-2 py-1.5 hover:text-[#062314]">Trust & Open Source</a>
+      <a href="#faq" class="px-2 py-1.5 hover:text-[#062314]">FAQ</a>
+      <div class="border-t border-[#e0e2d3] pt-2">
         <a
           href="https://github.com/WantedChip/RoomBeat/releases/latest"
-          target="_blank"
-          rel="noopener noreferrer"
-          id="header-download-btn"
-          class="tactile-keycap-btn group/btn relative inline-flex items-center justify-center rounded-[6px] px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-display font-bold uppercase tracking-wider select-none cursor-pointer"
-          role="button"
-          aria-label="Download APK"
+          class="pill primary w-full text-center"
         >
-          <span class="keycap-inner flex items-center gap-1.5 sm:gap-2">
-            <Download class="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.25] transition-transform group-hover/btn:scale-110" />
-            <span class="hidden sm:inline">Download </span><span>APK</span>
-          </span>
+          Download RoomBeat APK (v1.0.0)
         </a>
       </div>
     </div>
@@ -154,46 +172,17 @@ import GithubIcon from './icons/GithubIcon.astro';
 </header>
 
 <script>
-  import gsap from 'gsap';
-
-  function initMagneticButton() {
-    const wrap = document.getElementById('magnetic-btn-wrap');
-    const btn = document.getElementById('header-download-btn');
-
-    if (!wrap || !btn) return;
-
-    // Only apply magnetic pull on fine pointer devices (mouse/trackpad), not touch screens
-    const isFinePointer = window.matchMedia('(pointer: fine)').matches;
-    if (!isFinePointer) return;
-
-    // High performance quickTo animations for smooth cursor pull
-    const xTo = gsap.quickTo(btn, 'x', { duration: 0.35, ease: 'power2.out' });
-    const yTo = gsap.quickTo(btn, 'y', { duration: 0.35, ease: 'power2.out' });
-
-    wrap.addEventListener('mousemove', (e) => {
-      const rect = wrap.getBoundingClientRect();
-      const relX = e.clientX - (rect.left + rect.width / 2);
-      const relY = e.clientY - (rect.top + rect.height / 2);
-
-      // Controlled physical magnetic displacement (max ~8px travel)
-      const pullX = Math.max(-8, Math.min(8, relX * 0.25));
-      const pullY = Math.max(-6, Math.min(6, relY * 0.25));
-
-      xTo(pullX);
-      yTo(pullY);
+  const btn = document.getElementById('mobile-menu-btn');
+  const nav = document.getElementById('mobile-nav');
+  if (btn && nav) {
+    btn.addEventListener('click', () => {
+      nav.classList.toggle('hidden');
     });
-
-    wrap.addEventListener('mouseleave', () => {
-      xTo(0);
-      yTo(0);
+    // Close on link click
+    nav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        nav.classList.add('hidden');
+      });
     });
   }
-
-  // Initialize on DOM load and Astro view transitions
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMagneticButton);
-  } else {
-    initMagneticButton();
-  }
-  document.addEventListener('astro:page-load', initMagneticButton);
 </script>

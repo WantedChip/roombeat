@@ -1,0 +1,291 @@
+---
+---
+
+<section id="features" class="border-b border-[#e0e2d3] bg-[#fbfbf7] py-20 sm:py-28">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <!-- Section Header (Graphify style) -->
+    <div class="max-w-3xl">
+      <div class="op-eyebrow">
+        <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
+        <span>Technical Blueprint</span>
+      </div>
+      <h2 class="op-title mt-3 text-3xl font-normal tracking-tight text-[#062314] sm:text-4xl md:text-5xl">
+        Structure your room can hear.
+      </h2>
+      <p class="op-sub mt-4 text-[#35433a]">
+        Seven platform-level engineering decisions that make multi-device acoustic synchronization
+        reliable across commodity Android hardware without root privileges or cloud intermediaries.
+      </p>
+    </div>
+
+    <!-- Bento Grid (Graphify .fgrid + .fgrid3) -->
+    <div class="mt-14 fgrid">
+      <!-- Card 1: Tall (Rows 1-2, Cols 1-4) -> Interactive Multicast Mesh -->
+      <article class="fcard col-span-12 md:col-span-4 md:row-span-2 group">
+        <div class="ill h-64 md:h-72 flex flex-col justify-between p-5 bg-[#0e1611] text-white">
+          <div class="flex items-center justify-between font-mono text-[11px] text-white/60">
+            <span class="text-[#118d4f] font-semibold">● UDP BROADCAST</span>
+            <span>239.255.42.99:4242</span>
+          </div>
+
+          <!-- Dynamic Visual Mesh in Bento Card -->
+          <div class="relative my-auto flex items-center justify-center">
+            <!-- Pulsing concentric waves -->
+            <div class="absolute h-36 w-36 rounded-full border border-[#118d4f]/30 animate-ping opacity-40"></div>
+            <div class="absolute h-24 w-24 rounded-full border border-[#118d4f]/50"></div>
+            <div class="relative z-10 flex h-14 w-14 flex-col items-center justify-center rounded-[3px] bg-[#118d4f] text-white shadow-lg">
+              <span class="font-mono text-[9px] font-bold">HOST</span>
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <!-- Orbiting Peer nodes -->
+            <div class="absolute -top-3 left-6 flex items-center gap-1.5 rounded-[2px] bg-black/60 px-2 py-0.5 font-mono text-[10px] text-white border border-white/10">
+              <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span> Peer 1 (1.8ms)
+            </div>
+            <div class="absolute -bottom-3 right-6 flex items-center gap-1.5 rounded-[2px] bg-black/60 px-2 py-0.5 font-mono text-[10px] text-white border border-white/10">
+              <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span> Peer 2 (2.1ms)
+            </div>
+          </div>
+
+          <div class="border-t border-white/10 pt-3 font-mono text-[11px] text-white/50 flex justify-between">
+            <span>PACKET FANOUT:</span>
+            <span class="text-[#118d4f] font-semibold">O(1) CONSTANT LOAD</span>
+          </div>
+        </div>
+
+        <div class="txt">
+          <div class="op-eyebrow">TRANSPORT LAYER</div>
+          <h3>Hardware UDP Multicast &amp; MulticastLock</h3>
+          <p>
+            Unicast TCP collapses when multiple phones connect because the host phone has to transmit redundant copies of every audio chunk.
+            RoomBeat transmits a single UDP datagram per 20ms frame to the multicast group. Battery usage and CPU load remain flat whether you connect 2 or 30 phones.
+          </p>
+        </div>
+      </article>
+
+      <!-- Card 2: Top (Col 5-8) -> AAudio / Oboe Low-Latency -->
+      <article class="fcard col-span-12 md:col-span-4 group">
+        <div class="ill h-44 p-4 bg-[#f4f5ec] flex flex-col justify-between">
+          <div class="flex items-center justify-between font-mono text-[11px] text-[#626b60]">
+            <span>AUDIO PIPELINE</span>
+            <span class="text-[#118d4f]">MMAP EXCLUSIVE</span>
+          </div>
+          <!-- Block diagram comparing Java vs NDK -->
+          <div class="space-y-1.5 font-mono text-[10px]">
+            <div class="flex items-center justify-between rounded-[2px] bg-white p-2 border border-[#e0e2d3] text-[#a03d2b] line-through opacity-70">
+              <span>Android Java AudioTrack</span>
+              <span>~35–80ms jitter</span>
+            </div>
+            <div class="flex items-center justify-between rounded-[2px] bg-[#062314] p-2 text-white border border-[#062314]">
+              <span class="flex items-center gap-1 text-[#118d4f] font-semibold">
+                <span>Oboe / AAudio Direct HAL</span>
+              </span>
+              <span class="text-white font-bold">&lt; 4.8ms</span>
+            </div>
+          </div>
+          <div class="font-mono text-[10px] text-[#626b60] text-right">
+            Zero GC pauses · Direct ALSA buffer
+          </div>
+        </div>
+        <div class="txt">
+          <div class="op-eyebrow">HARDWARE HAL</div>
+          <h3>AAudio / Oboe Native Audio Engine</h3>
+          <p>
+            Standard Android media frameworks introduce unpredictable Garbage Collection jitter.
+            RoomBeat routes all audio through NDK C++ and Oboe with exclusive MMAP buffers directly to the audio DSP.
+          </p>
+        </div>
+      </article>
+
+      <!-- Card 3: Top (Col 9-12) -> 20ms Opus Frame Slicing -->
+      <article class="fcard col-span-12 md:col-span-4 group">
+        <div class="ill h-44 p-4 bg-[#f4f5ec] flex flex-col justify-between">
+          <div class="flex items-center justify-between font-mono text-[11px] text-[#626b60]">
+            <span>OPUS ENCODER</span>
+            <span>48kHz / 16-BIT STEREO</span>
+          </div>
+          <!-- Hex/Frame layout -->
+          <div class="rounded-[2px] border border-[#e0e2d3] bg-white p-2.5 font-mono text-[11px]">
+            <div class="flex justify-between border-b border-[#e0e2d3]/50 pb-1 text-[#626b60]">
+              <span>[MAGIC: 0x5242]</span>
+              <span>[SEQ: #008492]</span>
+            </div>
+            <div class="pt-1.5 flex justify-between text-[#062314]">
+              <span>TIMESTAMP:</span>
+              <span class="font-bold text-[#118d4f]">1,740,920,412.028 ms</span>
+            </div>
+            <div class="flex justify-between text-[#35433a]">
+              <span>PAYLOAD SIZE:</span>
+              <span>320 BYTES (96 kbps)</span>
+            </div>
+          </div>
+          <div class="font-mono text-[10px] text-[#118d4f]">
+            PLC enabled · 20ms lookahead buffer
+          </div>
+        </div>
+        <div class="txt">
+          <div class="op-eyebrow">AUDIO COMPRESSION</div>
+          <h3>20ms Opus Frame Slicing</h3>
+          <p>
+            Audio is compressed into pristine 20ms Opus frames with monotonic timestamps.
+            If a Wi-Fi packet drops, Opus Packet Loss Concealment (PLC) mathematically reconstructs the gap without audible clicks.
+          </p>
+        </div>
+      </article>
+
+      <!-- Card 4: Wide (Cols 5-12, Row 2) -> Sub-Millisecond 4-Way NTP Clock Handshake -->
+      <article class="fcard col-span-12 md:col-span-8 group">
+        <div class="ill h-40 p-4 bg-white flex flex-col justify-between border-b border-[#e0e2d3]">
+          <div class="flex items-center justify-between font-mono text-[11px] text-[#626b60]">
+            <span>4-WAY NTP HANDSHAKE PROTOCOL</span>
+            <span class="font-semibold text-[#118d4f]">ACCURACY: ±0.3ms</span>
+          </div>
+
+          <!-- Handshake timeline graphic -->
+          <div class="grid grid-cols-4 gap-2 font-mono text-center text-[10px]">
+            <div class="rounded-[2px] bg-[#fbfbf7] p-2 border border-[#e0e2d3]">
+              <div class="text-[#626b60]">T1 (Host Tx)</div>
+              <div class="font-semibold text-[#062314]">0.000 ms</div>
+            </div>
+            <div class="rounded-[2px] bg-[#fbfbf7] p-2 border border-[#e0e2d3]">
+              <div class="text-[#626b60]">T2 (Peer Rx)</div>
+              <div class="font-semibold text-[#062314]">+1.820 ms</div>
+            </div>
+            <div class="rounded-[2px] bg-[#fbfbf7] p-2 border border-[#e0e2d3]">
+              <div class="text-[#626b60]">T3 (Peer Reply)</div>
+              <div class="font-semibold text-[#062314]">+1.980 ms</div>
+            </div>
+            <div class="rounded-[2px] bg-[#edf8f2] p-2 border border-[#118d4f]/30">
+              <div class="text-[#118d4f] font-semibold">T4 (Calculated)</div>
+              <div class="font-bold text-[#118d4f]">θ = -0.12 ms</div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between font-mono text-[11px] text-[#35433a]">
+            <span>Formula: θ = ((T2 - T1) + (T3 - T4)) / 2</span>
+            <span class="text-[#118d4f]">Continuous Kalman Filter Tracking</span>
+          </div>
+        </div>
+
+        <div class="txt">
+          <div class="op-eyebrow">TIME SYNCHRONIZATION</div>
+          <h3>Sub-Millisecond 4-Way NTP Clock Handshake</h3>
+          <p>
+            Android clocks drift due to crystal thermal differences.
+            Before playing audio, every peer executes continuous 4-way NTP-style timestamp handshakes against the host’s monotonic clock,
+            compensating for network asymmetry and drift within sub-millisecond precision.
+          </p>
+        </div>
+      </article>
+
+      <!-- Card 5: Grid 3 Col 1 -> Dual QR & 6-Digit PIN -->
+      <article class="fcard col-span-12 md:col-span-4 group">
+        <div class="ill h-44 p-4 bg-[#f4f5ec] flex flex-col justify-between">
+          <div class="flex items-center justify-between font-mono text-[11px] text-[#626b60]">
+            <span>ZERO-CONFIG JOIN</span>
+            <span>mDNS / NSD</span>
+          </div>
+          <div class="flex items-center justify-center gap-4 py-1">
+            <!-- Simulated QR code -->
+            <div class="flex h-20 w-20 items-center justify-center rounded-[2px] border border-[#062314] bg-white p-1 shadow-sm">
+              <div class="grid grid-cols-4 gap-0.5 w-full h-full p-1 bg-[#062314]">
+                <div class="bg-white"></div><div class="bg-white"></div><div class="bg-transparent"></div><div class="bg-white"></div>
+                <div class="bg-transparent"></div><div class="bg-white"></div><div class="bg-white"></div><div class="bg-transparent"></div>
+                <div class="bg-white"></div><div class="bg-transparent"></div><div class="bg-white"></div><div class="bg-white"></div>
+                <div class="bg-white"></div><div class="bg-white"></div><div class="bg-transparent"></div><div class="bg-white"></div>
+              </div>
+            </div>
+            <div class="font-mono text-center">
+              <div class="text-[10px] text-[#626b60]">OR 6-DIGIT CODE</div>
+              <div class="text-xl font-bold tracking-widest text-[#062314] mt-0.5">842 190</div>
+              <div class="text-[9px] text-[#118d4f] mt-1">mDNS Auto-Discovered</div>
+            </div>
+          </div>
+          <div class="font-mono text-[10px] text-[#626b60]">
+            No typing IP addresses or subnet masks
+          </div>
+        </div>
+        <div class="txt">
+          <div class="op-eyebrow">PAIRING &amp; DISCOVERY</div>
+          <h3>Instant Dual QR &amp; 6-Digit PIN Join</h3>
+          <p>
+            Room creation generates both a scannable QR code and a 6-digit numeric PIN.
+            Peers join in under 3 seconds using mDNS / Android Network Service Discovery (NSD) with zero manual network setup.
+          </p>
+        </div>
+      </article>
+
+      <!-- Card 6: Grid 3 Col 2 -> AudioPlaybackCapture -->
+      <article class="fcard col-span-12 md:col-span-4 group">
+        <div class="ill h-44 p-4 bg-[#f4f5ec] flex flex-col justify-between">
+          <div class="flex items-center justify-between font-mono text-[11px] text-[#626b60]">
+            <span>CAPTURE ENGINE</span>
+            <span>API 30+ COMPLIANT</span>
+          </div>
+          <div class="space-y-1.5 font-mono text-[11px]">
+            <div class="flex items-center justify-between rounded-[2px] bg-white p-2 border border-[#e0e2d3]">
+              <span class="flex items-center gap-1.5 text-[#062314]">
+                <span class="h-2 w-2 rounded-full bg-[#118d4f]"></span> Local Music &amp; FLAC
+              </span>
+              <span class="text-[#626b60]">Direct NDK</span>
+            </div>
+            <div class="flex items-center justify-between rounded-[2px] bg-white p-2 border border-[#e0e2d3]">
+              <span class="flex items-center gap-1.5 text-[#062314]">
+                <span class="h-2 w-2 rounded-full bg-[#118d4f]"></span> YouTube / VLC / Browser
+              </span>
+              <span class="text-[#626b60]">Capture API</span>
+            </div>
+          </div>
+          <div class="font-mono text-[10px] text-[#118d4f]">
+            Spotify App Remote command-sync supported
+          </div>
+        </div>
+        <div class="txt">
+          <div class="op-eyebrow">CONTENT COMPATIBILITY</div>
+          <h3>AudioPlaybackCapture Engine</h3>
+          <p>
+            Works with any audio source on your phone without rooting.
+            Uses Android 11’s official `AudioPlaybackCaptureConfiguration` for apps, plus high-res local file playback and Spotify App Remote synchronization.
+          </p>
+        </div>
+      </article>
+
+      <!-- Card 7: Grid 3 Col 3 -> Fractional Sinc Resampling -->
+      <article class="fcard col-span-12 md:col-span-4 group">
+        <div class="ill h-44 p-4 bg-[#f4f5ec] flex flex-col justify-between">
+          <div class="flex items-center justify-between font-mono text-[11px] text-[#626b60]">
+            <span>DRIFT KILLER</span>
+            <span class="text-[#118d4f]">CATMULL-ROM RESAMPLER</span>
+          </div>
+          <!-- Resampling wave curves -->
+          <div class="rounded-[2px] border border-[#e0e2d3] bg-white p-2.5 font-mono text-[11px]">
+            <div class="flex justify-between text-[#35433a]">
+              <span>NOMINAL RATE:</span>
+              <span class="font-semibold text-[#062314]">48,000.00 Hz</span>
+            </div>
+            <div class="flex justify-between text-[#35433a] mt-1">
+              <span>DYNAMIC SLEW:</span>
+              <span class="font-semibold text-[#118d4f]">±0.048% micro-tuning</span>
+            </div>
+            <div class="flex justify-between text-[#35433a] mt-1">
+              <span>PITCH DISCOLORATION:</span>
+              <span class="font-semibold text-[#118d4f]">0.00 Cents (Inaudible)</span>
+            </div>
+          </div>
+          <div class="font-mono text-[10px] text-[#626b60]">
+            Eliminates buffer under/overflow without drops
+          </div>
+        </div>
+        <div class="txt">
+          <div class="op-eyebrow">PRECISION PLAYBACK</div>
+          <h3>Fractional Sinc Micro-Resampling</h3>
+          <p>
+            Even identical phones have crystal oscillator variations of ±20 parts per million.
+            RoomBeat continuously fine-tunes playback speed in real time by tiny fractions of a percent, preventing audio drifting over hours of playback.
+          </p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

@@ -1,300 +1,297 @@
 @import "tailwindcss";
-@source "../**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}";
-
-@theme {
-  --color-chassis-base: #0B0C0E;
-  --color-surface-panel: #13151A;
-  --color-surface-elevated: #1A1D24;
-  --color-surface-recessed: #07080A;
-  --color-border-milled: #262A35;
-  --color-border-active: #3E4454;
-  --color-milled: #262A35;
-  --color-active: #3E4454;
-  --color-bone: #F2F4F8;
-  --color-text-bone: #F2F4F8;
-  --color-muted: #9DA5B4;
-  --color-text-muted: #9DA5B4;
-  --color-dim: #5D6475;
-  --color-text-dim: #5D6475;
-  --color-signal-orange: #FF5500;
-  --color-signal-orange-glow: rgba(255, 85, 0, 0.15);
-  --color-sync-green: #00E599;
-  --color-sync-amber: #FFB800;
-  --color-sync-red: #FF334B;
-  --color-spotify-green: #1DB954;
-  --color-network-cyan: #00D2FF;
-
-  --font-display: "Cabinet Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-sans: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
 
 :root {
-  color-scheme: dark;
+  --background: #ffffff;
+  --foreground: #16211b;
+  --surface: #fbfbf7;
+  --surface-alt: #f4f5ec;
+  --surface-card: #ffffff;
+  --border: #e0e2d3;
+  --border-subtle: rgba(6, 35, 20, 0.08);
+  --border-focus: #062314;
+  
+  --ink: #062314;
+  --ink-90: #16211b;
+  --ink-70: #35433a;
+  --ink-50: rgba(6, 35, 20, 0.52);
+  --ink-30: rgba(6, 35, 20, 0.32);
+  --ink-15: rgba(6, 35, 20, 0.15);
+  --ink-10: rgba(6, 35, 20, 0.08);
+  --ink-05: rgba(6, 35, 20, 0.04);
+  
+  --accent-green: #118d4f;
+  --accent-green-soft: #edf8f2;
+  --accent-green-border: rgba(17, 141, 79, 0.25);
+  --accent-green-glow: rgba(17, 141, 79, 0.15);
+  
+  --accent-orange: #fb651e;
+  --accent-orange-soft: #fff2eb;
+  --accent-orange-border: rgba(251, 101, 30, 0.25);
+  
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-body {
-  background-color: var(--color-chassis-base, #0B0C0E);
-  color: var(--color-bone, #F2F4F8);
+/* Global Reset & Typography */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
   font-family: var(--font-sans);
+  color: var(--ink-90);
+  background-color: var(--background);
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tactile Acoustic Industrial Hardware Utilities */
-.hardware-panel {
-  background-color: #13151A;
-  border: 1px solid #262A35;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 4px 16px rgba(0, 0, 0, 0.4);
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--ink-90);
+  overflow-x: hidden;
 }
 
-.hardware-card {
-  background-color: #1A1D24;
-  border: 1px solid #262A35;
+/* Monospace helpers */
+.font-mono {
+  font-family: var(--font-mono);
 }
 
-.recessed-cavity {
-  background-color: #07080A;
-  border: 1px solid #262A35;
-  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(0, 0, 0, 0.5);
-}
-
-.top-edge-lighting {
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-}
-
-.tactile-btn-primary {
-  background-color: #FF5500;
-  color: #0B0C0E;
-  font-family: var(--font-display);
-  font-weight: 700;
-  border-radius: 6px;
-  border: 1px solid #FF884D;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.35), 0 2px 10px rgba(255, 85, 0, 0.35);
-  transition: transform 0.08s ease, filter 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-}
-
-.tactile-btn-primary:hover {
-  background-color: #FF661A;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.45), 0 4px 16px rgba(255, 85, 0, 0.45);
-}
-
-.tactile-btn-primary:active {
-  transform: translateY(1.5px);
-  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 3px rgba(255, 85, 0, 0.2);
-}
-
-.tactile-btn-secondary {
-  background-color: #1A1D24;
-  color: #F2F4F8;
+.font-sans {
   font-family: var(--font-sans);
-  font-weight: 500;
-  border-radius: 6px;
-  border: 1px solid #262A35;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-  transition: transform 0.08s ease, border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 
-.tactile-btn-secondary:hover {
-  border-color: #3E4454;
-  background-color: #21252E;
-  color: #FFFFFF;
-}
-
-.tactile-btn-secondary:active {
-  transform: translateY(1.5px);
-  background-color: #16181E;
-}
-
-/* Animations */
-@keyframes statusBlink {
-  0%, 100% {
-    opacity: 1;
-    filter: drop-shadow(0 0 6px rgba(0, 229, 153, 0.85));
-  }
-  50% {
-    opacity: 0.25;
-    filter: drop-shadow(0 0 1px rgba(0, 229, 153, 0.2));
-  }
-}
-
-.animate-status-blink {
-  animation: statusBlink 1.5s ease-in-out infinite;
-}
-
-@keyframes phosphorPulse {
-  0%, 100% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.animate-phosphor-pulse {
-  animation: phosphorPulse 2s ease-in-out infinite;
-}
-
-/* Acoustic Status Beacon Ripple (Magic UI Ripple style) */
-@keyframes acousticRipple {
-  0% {
-    transform: scale(0.65);
-    opacity: 0.85;
-  }
-  50% {
-    opacity: 0.35;
-  }
-  100% {
-    transform: scale(2.8);
-    opacity: 0;
-  }
-}
-
-.animate-beacon-ripple {
-  animation: acousticRipple 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-.animate-beacon-ripple-delayed {
-  animation: acousticRipple 2.2s cubic-bezier(0.16, 1, 0.3, 1) 0.75s infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-beacon-ripple,
-  .animate-beacon-ripple-delayed,
-  .animate-status-blink,
-  .animate-phosphor-pulse,
-  .animate-border-beam {
-    animation: none !important;
-  }
-}
-
-/* Micro-Fine Analog Noise Overlay (Authentic powder-coated metal finish) */
-.analog-noise-texture {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.038;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 140px 140px;
-}
-
-/* Floating Machined Console Capsule Dock & Specular Lighting */
-.floating-console-dock {
-  background-color: rgba(19, 21, 26, 0.94);
-  border: 1px solid #262A35;
-  border-radius: 8px;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.top-edge-specular {
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-/* Tactile Magnetic Keycap Button */
-.tactile-keycap-btn {
-  background-color: #FF5500;
-  color: #0B0C0E;
-  font-family: var(--font-display);
-  font-weight: 700;
-  border-radius: 6px;
-  border: 1px solid #FF884D;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.4), 0 2px 8px rgba(255, 85, 0, 0.35);
-  transition: background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
-  will-change: transform;
-}
-
-.tactile-keycap-btn:hover {
-  background-color: #FF661A;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 4px 14px rgba(255, 85, 0, 0.45);
-}
-
-.tactile-keycap-btn:active {
-  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.6), 0 1px 2px rgba(255, 85, 0, 0.2);
-}
-
-.tactile-keycap-btn .keycap-inner {
-  transition: transform 0.06s ease;
-}
-
-.tactile-keycap-btn:active .keycap-inner {
-  transform: translateY(1.5px);
-}
-
-/* Subtle Industrial Grid Background */
-.bg-grid-pattern {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(38, 42, 53, 0.25) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(38, 42, 53, 0.25) 1px, transparent 1px);
-}
-
-/* Perimeter Scanning Border Beam (Magic UI Border Beam style) */
-@keyframes borderBeamSweep {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: -100;
-  }
-}
-
-.animate-border-beam {
-  animation: borderBeamSweep 7s linear infinite;
-}
-
-/* Precision Tactile Hardware Fader & Rocker Styles (Origin UI style) */
-.fader-track-recessed {
-  background-color: #07080A;
-  border: 1px solid #262A35;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(0, 0, 0, 0.6);
-}
-
-.fader-cap-metallic {
-  background: linear-gradient(180deg, #4A5263 0%, #2A2E39 35%, #13151A 50%, #262A35 100%);
-  border: 1px solid #4E5669;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 3px 10px rgba(0, 0, 0, 0.7);
-  transition: border-color 0.12s ease, box-shadow 0.12s ease;
-  user-select: none;
-  touch-action: none;
-}
-
-.fader-cap-metallic:hover {
-  border-color: #717D96;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.85);
-}
-
-.fader-cap-metallic.is-dragging {
-  border-color: #FF5500;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 85, 0, 0.4);
-}
-
-.rocker-switch-enclosure {
-  background-color: #0B0C0E;
-  border: 1px solid #262A35;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
-}
-
-.rocker-paddle {
-  background-color: #1A1D24;
-  border: 1px solid #262A35;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0, 0, 0, 0.4);
-  transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
-}
-
-.rocker-paddle:active {
-  transform: translateY(1px);
-}
-
-/* Allen Hex Bolt Head Styling */
-.allen-hex-bolt {
+/* Graphify signature Pill Button Primitives */
+.pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 520;
+  line-height: 1;
+  letter-spacing: -0.15px;
+  white-space: nowrap;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s ease,
+              border-color 0.15s ease,
+              color 0.15s ease,
+              box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.pill:active {
+  transform: scale(0.97);
+}
+
+.pill.lg {
+  height: 42px;
+  padding: 0 18px;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+}
+
+.pill.primary {
+  background-color: var(--ink);
+  color: #ffffff;
+  border-color: var(--ink);
+}
+
+.pill.primary:hover {
+  background-color: #173824;
+  border-color: #173824;
+}
+
+.pill.ghost {
+  background-color: var(--ink-05);
+  color: var(--ink);
+  border-color: transparent;
+}
+
+.pill.ghost:hover {
+  background-color: var(--ink-10);
+}
+
+.pill.outline {
+  background-color: transparent;
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+.pill.outline:hover {
+  background-color: var(--ink-05);
+  border-color: var(--ink-50);
+}
+
+.pill.green {
+  background-color: var(--accent-green);
+  color: #ffffff;
+  border-color: var(--accent-green);
+}
+
+.pill.green:hover {
+  background-color: #0d7541;
+}
+
+/* Eyebrow Label */
+.op-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-50);
+}
+
+/* Section Headings */
+.op-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 550;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.op-sub {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--ink-70);
+  max-width: 620px;
+}
+
+/* Bento Grid System */
+.fgrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .fgrid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+.fcard {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.fcard:hover {
+  border-color: rgba(6, 35, 20, 0.28);
+  box-shadow: 0 4px 20px rgba(6, 35, 20, 0.04);
+}
+
+.fcard .ill {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.fcard .txt {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fcard h3 {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 550;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.fcard p {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-70);
+  margin: 0;
+}
+
+/* Live Telemetry Ping Animation */
+@keyframes ping-slow {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Graphify Symbol Background Grid */
+.symfield {
+  background-size: 180px 180px;
+  background-position: center center;
+}
+
+/* Range input styling matching Graphify aesthetic */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-30);
 }

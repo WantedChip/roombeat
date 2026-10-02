@@ -1,26 +1,5 @@
 # ==============================================================================
 # RoomBeat — Cloudflare Workers / Pages Static Edge Deployment Configuration
-# Sub-phase: v0.9.3
-#
-# HUMAN-RUN DEPLOYMENT COMMANDS:
-# Per RoomBeat Guidelines §2, automated agents ONLY create and maintain configuration
-# files; agents NEVER execute deployment or publishing commands.
-#
-# For human operators deploying to Cloudflare:
-#
-# Option A: Cloudflare Pages CLI Deployment (Recommended for static sites)
-#   cd site
-#   npm run build
-#   npx wrangler pages deploy dist --project-name=roombeat
-#
-# Option B: Cloudflare Workers Static Assets Deployment
-#   cd site
-#   npm run build
-#   npx wrangler deploy
-#
-# Environment variables required for CI/CLI authentication:
-#   - CLOUDFLARE_API_TOKEN
-#   - CLOUDFLARE_ACCOUNT_ID
 # ==============================================================================
 
 name = "roombeat"
@@ -28,7 +7,6 @@ compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
 
 # Static asset configuration for Cloudflare Workers / Pages
-# Deploys pre-built Astro static artifacts from site/dist
 assets = { directory = "./dist" }
 
 # Production edge environment variables

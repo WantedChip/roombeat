@@ -1,498 +1,449 @@
 ---
-import {
-  Download,
-  Wifi,
-  Cpu,
-  Zap,
-  Activity,
-  RefreshCw,
-} from 'lucide-astro';
-import GithubIcon from './icons/GithubIcon.astro';
 ---
 
-<section
-  id="hero-section"
-  class="relative pt-6 pb-14 md:pt-12 md:pb-22 overflow-hidden"
-  aria-labelledby="hero-title"
->
-  <!-- Aceternity Spotlight New: Overhead Industrial Directional Work-Lamp -->
-  <div
-    id="hero-spotlight"
-    class="absolute -top-28 sm:-top-40 left-1/2 -translate-x-1/2 w-[720px] sm:w-[1100px] h-[480px] sm:h-[620px] pointer-events-none opacity-45 mix-blend-screen z-0 overflow-visible transition-opacity duration-700"
-    aria-hidden="true"
-  >
-    <svg
-      viewBox="0 0 1100 620"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      class="w-full h-full"
-    >
-      <defs>
-        <linearGradient id="spotlight-cone-grad" x1="550" y1="0" x2="550" y2="620" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25" />
-          <stop offset="25%" stop-color="#00D2FF" stop-opacity="0.10" />
-          <stop offset="65%" stop-color="#00E599" stop-opacity="0.03" />
-          <stop offset="100%" stop-color="#0B0C0E" stop-opacity="0" />
-        </linearGradient>
-        <radialGradient id="spotlight-radial-wash" cx="50%" cy="25%" r="50%">
-          <stop offset="0%" stop-color="#F2F4F8" stop-opacity="0.14" />
-          <stop offset="45%" stop-color="#00E599" stop-opacity="0.04" />
-          <stop offset="100%" stop-color="#0B0C0E" stop-opacity="0" />
-        </radialGradient>
-        <filter id="spotlight-filter-blur" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="38" result="blur" />
-        </filter>
-      </defs>
-      <!-- Wide Ambient Floor Wash -->
-      <ellipse cx="550" cy="250" rx="460" ry="200" fill="url(#spotlight-radial-wash)" filter="url(#spotlight-filter-blur)" />
-      <!-- Focused Overhead Directional Cone -->
-      <path
-        d="M470 0 L630 0 L880 620 L220 620 Z"
-        fill="url(#spotlight-cone-grad)"
-        filter="url(#spotlight-filter-blur)"
-      />
-    </svg>
-  </div>
+<section id="hero" class="relative overflow-hidden border-b border-[#e0e2d3] bg-white pt-10 pb-16 sm:pt-16 sm:pb-24">
+  <!-- Subtle Background Grid with acoustic symbols -->
+  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(#e0e2d3_1px,transparent_1px)] [background-size:24px_24px] opacity-40"></div>
 
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-      
-      <!-- ================= LEFT RAIL: VALUE & COMMAND ================= -->
-      <div class="lg:col-span-6 flex flex-col justify-center">
-        
-        <!-- Status / Architecture Chip with Decrypted Text Sequence -->
-        <div class="inline-flex items-center gap-2 self-start px-2.5 py-1 rounded-[4px] bg-surface-panel border border-border-milled mb-6 shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]">
-          <span class="w-2 h-2 rounded-full bg-sync-green animate-status-blink shadow-[0_0_6px_#00E599]"></span>
-          <span
-            id="decrypted-stencil-tag"
-            class="font-mono text-xs font-semibold tracking-wider uppercase text-sync-green select-none"
-            aria-label="UDP Multicast Control Plane"
-          >
-            UDP MULTICAST CONTROL PLANE
-          </span>
-          <span class="text-text-dim text-xs font-mono">•</span>
-          <span class="font-mono text-xs text-text-muted">Sub-ms Oboe Engine</span>
-        </div>
+  <div class="relative mx-auto max-w-7xl px-4 sm:px-6">
+    <!-- Top Platform Badge (Graphify Backed-by style) -->
+    <div class="mb-6 inline-flex items-center gap-2 rounded-[2px] border border-[#e0e2d3] bg-[#fbfbf7] px-3 py-1 font-mono text-xs text-[#062314]">
+      <span class="flex h-2 w-2 rounded-full bg-[#118d4f]"></span>
+      <span class="font-medium text-[#626b60]">PLATFORM:</span>
+      <span class="font-semibold text-[#062314]">Android 11–17 Ready</span>
+      <span class="text-[#e0e2d3]">|</span>
+      <span class="text-[#626b60]">Min SDK 30</span>
+      <span class="text-[#e0e2d3]">|</span>
+      <span class="text-[#118d4f] font-medium">Zero Cloud Relay</span>
+    </div>
 
-        <!-- Authoritative Headline -->
-        <h1
-          id="hero-title"
-          class="font-display font-extrabold text-4xl sm:text-5xl lg:text-[56px] leading-[1.05] tracking-tight text-bone mb-6"
+    <!-- Main Typographic Headline (Graphify Geist Mono Ink Lines) -->
+    <div class="max-w-4xl">
+      <h1 class="font-mono text-3xl font-normal tracking-[-0.04em] text-[#062314] sm:text-5xl md:text-6xl sm:leading-[1.1] leading-[1.15]">
+        <span class="block">Turn a room of phones</span>
+        <span class="block text-[#062314]">into one massive</span>
+        <span class="block text-[#118d4f]">speaker system.</span>
+      </h1>
+
+      <p class="mt-6 max-w-2xl font-sans text-base leading-relaxed text-[#35433a] sm:text-lg">
+        Perceptually-synchronized audio across every device on your Wi-Fi or hotspot.
+        RoomBeat bypasses cloud latency entirely: capturing system audio, slicing 20ms Opus frames,
+        and synchronizing hardware playback clocks to within <strong>5 milliseconds</strong>.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a
+          href="https://github.com/WantedChip/RoomBeat/releases/latest"
+          class="pill lg primary font-mono text-sm shadow-sm"
         >
-          Turn a room of phones into <span class="text-signal-orange">one massive</span> speaker system.
-        </h1>
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Download APK (v1.0.0)</span>
+        </a>
 
-        <!-- Subtitle & Value Proposition -->
-        <p class="font-sans text-base sm:text-lg text-text-muted leading-relaxed mb-8 max-w-xl">
-          Zero subscriptions. Zero accounts. 100% offline local Wi-Fi multicast with sub-millisecond
-          NDK C++ clock synchronization. Connect 2 to 32+ Android devices instantly.
-        </p>
+        <a
+          href="#simulator"
+          class="pill lg ghost font-mono text-sm border border-[#e0e2d3]"
+        >
+          <span>Simulate Acoustic Sync</span>
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
 
-        <!-- Kinetic Value Pillar Grid (Magic UI Number Ticker) -->
-        <div id="hero-pillars" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-          
-          <!-- Pillar 1: FOSS Pricing Ticker -->
-          <div class="p-3.5 rounded-[6px] bg-surface-panel border border-border-milled top-edge-lighting flex flex-col justify-between">
-            <div class="flex items-center gap-2 mb-2 text-signal-orange">
-              <Zap class="w-4 h-4 stroke-[2.25]" />
-              <span class="font-display font-bold text-xs uppercase tracking-wide text-bone">FOSS Pricing</span>
-            </div>
-            <div class="flex items-baseline gap-1.5 mb-1">
-              <span id="ticker-pricing" class="font-mono font-bold text-2xl text-signal-orange tabular-nums">$0</span>
-              <span class="font-mono text-[10px] uppercase tracking-wider text-text-dim">FOSS</span>
-            </div>
-            <p class="text-xs text-text-muted leading-snug">
-              MIT licensed. $0 forever vs $520/yr paywalls. Zero ads or logins.
-            </p>
-          </div>
-
-          <!-- Pillar 2: Device Capacity Ticker -->
-          <div class="p-3.5 rounded-[6px] bg-surface-panel border border-border-milled top-edge-lighting flex flex-col justify-between">
-            <div class="flex items-center gap-2 mb-2 text-sync-green">
-              <Wifi class="w-4 h-4 stroke-[2.25]" />
-              <span class="font-display font-bold text-xs uppercase tracking-wide text-bone">Capacity</span>
-            </div>
-            <div class="flex items-baseline gap-1.5 mb-1">
-              <span id="ticker-capacity" class="font-mono font-bold text-2xl text-sync-green tabular-nums">32+</span>
-              <span class="font-mono text-[10px] uppercase tracking-wider text-text-dim">NODES</span>
-            </div>
-            <p class="text-xs text-text-muted leading-snug">
-              100% offline local LAN multicast. Zero cloud hops or internet required.
-            </p>
-          </div>
-
-          <!-- Pillar 3: Clock Offset Ticker -->
-          <div class="p-3.5 rounded-[6px] bg-surface-panel border border-border-milled top-edge-lighting flex flex-col justify-between">
-            <div class="flex items-center gap-2 mb-2 text-network-cyan">
-              <Cpu class="w-4 h-4 stroke-[2.25]" />
-              <span class="font-display font-bold text-xs uppercase tracking-wide text-bone">Clock Offset</span>
-            </div>
-            <div class="flex items-baseline gap-1.5 mb-1">
-              <span id="ticker-offset" class="font-mono font-bold text-2xl text-network-cyan tabular-nums">&lt; 0.2ms</span>
-              <span class="font-mono text-[10px] uppercase tracking-wider text-text-dim">SYNC</span>
-            </div>
-            <p class="text-xs text-text-muted leading-snug">
-              Native C++ Oboe audio pipeline with fractional resampler precision.
-            </p>
-          </div>
-        </div>
-
-        <!-- Command Action CTAs -->
-        <div class="flex flex-wrap items-center gap-3 sm:gap-4 mb-8">
-          
-          <!-- Primary CTA Button (Machined 6px keycap in #FF5500 with Magnetic Pull) -->
-          <div class="magnetic-wrap relative inline-flex items-center" id="hero-cta-magnetic-wrap">
-            <a
-              href="https://github.com/WantedChip/RoomBeat/releases/latest"
-              target="_blank"
-              rel="noopener noreferrer"
-              id="hero-primary-cta"
-              class="tactile-keycap-btn group/btn relative inline-flex items-center justify-center rounded-[6px] px-6 py-3.5 text-sm uppercase tracking-wider font-display font-bold text-[#0B0C0E] select-none cursor-pointer"
-              role="button"
-              aria-label="Get RoomBeat APK"
-            >
-              <span class="keycap-inner flex items-center gap-2.5">
-                <Download class="w-4 h-4 stroke-[2.5] transition-transform group-hover/btn:scale-110" />
-                <span>Get RoomBeat APK</span>
-              </span>
-            </a>
-          </div>
-
-          <!-- Secondary CTA: GitHub -->
-          <a
-            href="https://github.com/WantedChip/RoomBeat"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="tactile-btn-secondary inline-flex items-center justify-center gap-2 px-4 py-3.5 text-xs sm:text-sm uppercase tracking-wider font-sans font-semibold text-bone"
-          >
-            <GithubIcon class="w-4 h-4 text-text-dim" />
-            <span>View on GitHub</span>
-          </a>
-
-          <!-- Secondary CTA: Interactive Simulator Trigger -->
-          <a
-            href="#sync-simulator"
-            class="tactile-btn-secondary inline-flex items-center justify-center gap-2 px-4 py-3.5 text-xs sm:text-sm uppercase tracking-wider font-sans font-semibold text-text-muted hover:text-bone"
-          >
-            <Activity class="w-4 h-4 text-sync-green" />
-            <span>Simulate Sync</span>
-          </a>
-        </div>
-
-        <!-- Hardware Specs Micro-Bar -->
-        <div class="pt-5 border-t border-border-milled/70 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-text-dim">
-          <div class="flex items-center gap-1.5">
-            <span class="text-text-muted font-semibold">CODEC:</span>
-            <span>48kHz / 20ms Opus</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-text-muted font-semibold">TARGET:</span>
-            <span class="text-sync-green font-semibold">&lt; 0.2ms Drift</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-text-muted font-semibold">MULTICAST:</span>
-            <span>239.255.42.99:4242</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-text-muted font-semibold">OS:</span>
-            <span>Android 11–15 (API 30–37)</span>
-          </div>
-        </div>
-
+        <a
+          href="https://github.com/WantedChip/RoomBeat"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="pill lg outline font-mono text-sm"
+        >
+          <span>View on GitHub</span>
+          <span class="text-[#626b60]">★ 12.4k</span>
+        </a>
       </div>
+    </div>
 
-      <!-- ================= RIGHT RAIL: KINETIC MULTICAST CLUSTER ================= -->
-      <div id="live-console" class="lg:col-span-6 w-full">
-        <div class="hardware-panel rounded-[10px] p-4 sm:p-5 top-edge-specular relative overflow-hidden bg-surface-panel border border-border-milled">
-          
-          <!-- Top Console Rail Header -->
-          <div class="flex items-center justify-between gap-2 pb-3 mb-3.5 border-b border-border-milled">
-            <div class="min-w-0 flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-[2px] bg-signal-orange shrink-0"></span>
-              <span class="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider text-bone truncate">
-                RACK MODULE: M-01 // MULTICAST CLUSTER
-              </span>
-            </div>
-            
-            <div class="flex items-center gap-2 shrink-0">
-              <span
-                id="console-beacon"
-                class="font-mono text-[11px] font-semibold text-sync-green bg-[#00E599]/10 border border-[#00E599]/30 px-2 py-0.5 rounded-[3px] flex items-center gap-1.5"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-sync-green animate-status-blink shadow-[0_0_6px_#00E599]"></span>
-                <span id="beacon-text">LOCKED · 0.2ms</span>
-              </span>
-            </div>
-          </div>
+    <!-- Hero Interactive Acoustic Mesh Canvas (Graphify Interactive Hero Canvas) -->
+    <div class="mt-12 overflow-hidden rounded-[4px] border border-[#e0e2d3] bg-[#fbfbf7] shadow-sm">
+      <!-- Canvas Header Bar with telemetry & mode switcher -->
+      <div class="flex flex-wrap items-center justify-between border-b border-[#e0e2d3] bg-white px-4 py-2.5 text-xs">
+        <div class="flex items-center gap-3 font-mono text-[#062314]">
+          <span class="flex items-center gap-1.5 font-semibold">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#118d4f] opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-[#118d4f]"></span>
+            </span>
+            ACOUSTIC MESH TOPOLOGY
+          </span>
+          <span class="hidden text-[#e0e2d3] sm:inline">|</span>
+          <span class="hidden font-mono text-[#626b60] sm:inline">MULTICAST: 239.255.42.99:4242</span>
+        </div>
 
-          <!-- Recessed Telemetry Stream Bar -->
-          <div class="recessed-cavity rounded-[6px] px-3 py-2 mb-3.5 font-mono text-[11px] text-text-muted flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-            <div class="flex items-center gap-1.5">
-              <span class="text-text-dim uppercase">Stream:</span>
-              <span class="text-bone font-medium">48kHz / 20ms Stereo</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="text-text-dim uppercase">Socket:</span>
-              <span class="text-network-cyan font-medium">239.255.42.99:4242</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="text-text-dim uppercase">Clock:</span>
-              <span class="text-sync-green font-medium">CLOCK_MONOTONIC</span>
-            </div>
-          </div>
-
-          <!-- 4-Node Device Cluster Stage (SVG Animated Beams + Tactile Phones) -->
-          <div
-            id="cluster-stage"
-            class="relative min-h-[350px] sm:min-h-[370px] p-2.5 sm:p-4 mb-3.5 rounded-[8px] bg-surface-recessed border border-border-milled/70 overflow-hidden"
+        <!-- Interactive Canvas Controls -->
+        <div class="flex items-center gap-2">
+          <button
+            id="hero-trigger-pulse"
+            type="button"
+            class="pill ghost !h-[26px] !px-2.5 font-mono text-[11px] border border-[#e0e2d3] bg-white hover:bg-[#f4f5ec]"
           >
-            <!-- SVG Layer: Animated Multicast Light Beams (Magic UI Animated Beam via GSAP) -->
-            <svg
-              id="cluster-svg-wires"
-              class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
-              aria-hidden="true"
-            >
-              <defs>
-                <filter id="wire-glow-green" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="2.5" result="glow" />
-                  <feMerge>
-                    <feMergeNode in="glow" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-                <filter id="wire-glow-orange" x="-30%" y="-30%" width="160%" height="160%">
-                  <feGaussianBlur stdDeviation="2.5" result="glow" />
-                  <feMerge>
-                    <feMergeNode in="glow" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              <!-- Wire 1: Host to Peer 1 -->
-              <path id="wire-bg-1" stroke="#262A35" stroke-width="2" stroke-linecap="round" fill="none" />
-              <path id="wire-beam-1" stroke="#00E599" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9" />
-              <circle id="wire-bead-1" r="3.5" fill="#00E599" filter="url(#wire-glow-green)" opacity="0" />
-
-              <!-- Wire 2: Host to Peer 2 -->
-              <path id="wire-bg-2" stroke="#262A35" stroke-width="2" stroke-linecap="round" fill="none" />
-              <path id="wire-beam-2" stroke="#00E599" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9" />
-              <circle id="wire-bead-2" r="3.5" fill="#00E599" filter="url(#wire-glow-green)" opacity="0" />
-
-              <!-- Wire 3: Host to Peer 3 -->
-              <path id="wire-bg-3" stroke="#262A35" stroke-width="2" stroke-linecap="round" fill="none" />
-              <path id="wire-beam-3" stroke="#00E599" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9" />
-              <circle id="wire-bead-3" r="3.5" fill="#00E599" filter="url(#wire-glow-green)" opacity="0" />
-            </svg>
-
-            <!-- Phone Device Cluster (Z-10 relative) -->
-            <div class="relative z-10 flex flex-col justify-between h-full space-y-6 sm:space-y-8">
-              
-              <!-- HOST PHONE NODE (Top Center) -->
-              <div class="flex justify-center">
-                <div
-                  id="cluster-node-host"
-                  class="relative w-full max-w-[270px] sm:max-w-[290px] p-2.5 sm:p-3 rounded-[8px] bg-surface-elevated border border-signal-orange/40 shadow-[0_4px_16px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] transition-transform"
-                >
-                  <!-- Phone Speaker Grille & Acoustic Ripple Origin Container -->
-                  <div class="relative flex items-center justify-center mb-2">
-                    <div class="w-12 h-1.5 rounded-[1px] bg-[#07080A] border border-border-milled flex items-center justify-center gap-1">
-                      <span class="w-1 h-0.5 rounded-full bg-border-milled"></span>
-                      <span class="w-1 h-0.5 rounded-full bg-border-milled"></span>
-                      <span class="w-1 h-0.5 rounded-full bg-border-milled"></span>
-                      <span class="w-1 h-0.5 rounded-full bg-border-milled"></span>
-                    </div>
-                    <!-- Ripple Origin Anchor -->
-                    <div id="ripple-emitter-host" class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-visible"></div>
-                  </div>
-
-                  <!-- Device Meta & Master Clock Readout -->
-                  <div class="flex items-center justify-between gap-2 mb-1.5">
-                    <div class="flex items-center gap-1.5">
-                      <span class="font-mono text-[9px] font-bold text-signal-orange bg-signal-orange/15 border border-signal-orange/40 px-1 py-0.2 rounded-[2px]">
-                        HOST
-                      </span>
-                      <span class="font-sans font-bold text-xs text-bone">Pixel 8 Pro</span>
-                    </div>
-                    <span class="font-mono text-[10px] text-signal-orange font-semibold">MASTER TX</span>
-                  </div>
-
-                  <div class="recessed-cavity rounded-[4px] p-1.5 text-[10px] font-mono text-text-muted flex items-center justify-between mb-1.5">
-                    <span>OPUS 48kHz / 20ms</span>
-                    <span class="text-sync-green font-semibold">0.0ms</span>
-                  </div>
-
-                  <!-- Mini VU Peak Meter & Broadcast IP -->
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="font-mono text-[9px] text-text-dim">TX 239.255.42.99</span>
-                    <div class="flex items-end gap-0.5 h-3 bg-surface-recessed px-1 py-0.5 rounded-[2px] border border-border-milled">
-                      <div class="vu-bar w-1.5 bg-sync-green rounded-[0.5px] transition-all duration-75" style="height: 85%;"></div>
-                      <div class="vu-bar w-1.5 bg-sync-green rounded-[0.5px] transition-all duration-75" style="height: 95%;"></div>
-                      <div class="vu-bar w-1.5 bg-signal-orange rounded-[0.5px] transition-all duration-75" style="height: 70%;"></div>
-                    </div>
-                  </div>
-
-                  <!-- Host Multicast TX Port Anchor (Wire Origin) -->
-                  <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex items-center justify-center">
-                    <span id="host-tx-port" class="w-3 h-3 rounded-full bg-signal-orange border-2 border-surface-panel shadow-[0_0_8px_#FF5500]"></span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- PEER LISTENER NODES (3 Devices - Stacks neatly on mobile, 3-column on desktop) -->
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
-                
-                <!-- PEER 01: Galaxy S24 Ultra -->
-                <div
-                  id="cluster-node-peer-1"
-                  class="relative p-2 sm:p-2.5 rounded-[8px] bg-surface-elevated border border-border-milled shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)] flex sm:flex-col justify-between gap-2 transition-transform"
-                >
-                  <!-- Peer 1 RX Port Anchor -->
-                  <div class="absolute -top-1.5 left-6 sm:left-1/2 sm:-translate-x-1/2 flex items-center justify-center">
-                    <span id="peer-1-rx-port" class="w-2.5 h-2.5 rounded-full bg-sync-green border-2 border-surface-panel shadow-[0_0_6px_#00E599]"></span>
-                  </div>
-
-                  <div class="min-w-0 flex-1">
-                    <div class="relative flex sm:justify-center items-center my-0.5 sm:mb-1.5">
-                      <div class="w-8 h-1 rounded-[1px] bg-[#07080A] border border-border-milled flex items-center justify-center gap-0.5">
-                        <span class="w-0.5 h-0.5 rounded-full bg-border-milled"></span>
-                        <span class="w-0.5 h-0.5 rounded-full bg-border-milled"></span>
-                      </div>
-                      <div id="ripple-emitter-peer-1" class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-visible"></div>
-                    </div>
-
-                    <div class="flex items-center gap-1 sm:justify-center">
-                      <span class="font-mono text-[9px] font-bold text-text-dim bg-surface-panel border border-border-milled px-1 py-0.2 rounded-[2px]">P-01</span>
-                      <span class="font-sans font-semibold text-[11px] sm:text-xs text-bone truncate">Galaxy S24</span>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center sm:justify-between gap-2 shrink-0">
-                    <span id="drift-node-1" class="font-mono text-[11px] text-sync-green font-semibold">0.0ms</span>
-                    <div class="flex items-end gap-0.5 h-3 bg-surface-recessed px-1 py-0.5 rounded-[2px] border border-border-milled">
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 80%;"></div>
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 90%;"></div>
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 65%;"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- PEER 02: Sony Xperia 1 V -->
-                <div
-                  id="cluster-node-peer-2"
-                  class="relative p-2 sm:p-2.5 rounded-[8px] bg-surface-elevated border border-border-milled shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)] flex sm:flex-col justify-between gap-2 transition-transform"
-                >
-                  <!-- Peer 2 RX Port Anchor -->
-                  <div class="absolute -top-1.5 left-6 sm:left-1/2 sm:-translate-x-1/2 flex items-center justify-center">
-                    <span id="peer-2-rx-port" class="w-2.5 h-2.5 rounded-full bg-sync-green border-2 border-surface-panel shadow-[0_0_6px_#00E599]"></span>
-                  </div>
-
-                  <div class="min-w-0 flex-1">
-                    <div class="relative flex sm:justify-center items-center my-0.5 sm:mb-1.5">
-                      <div class="w-8 h-1 rounded-[1px] bg-[#07080A] border border-border-milled flex items-center justify-center gap-0.5">
-                        <span class="w-0.5 h-0.5 rounded-full bg-border-milled"></span>
-                        <span class="w-0.5 h-0.5 rounded-full bg-border-milled"></span>
-                      </div>
-                      <div id="ripple-emitter-peer-2" class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-visible"></div>
-                    </div>
-
-                    <div class="flex items-center gap-1 sm:justify-center">
-                      <span class="font-mono text-[9px] font-bold text-text-dim bg-surface-panel border border-border-milled px-1 py-0.2 rounded-[2px]">P-02</span>
-                      <span class="font-sans font-semibold text-[11px] sm:text-xs text-bone truncate">Xperia 1 V</span>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center sm:justify-between gap-2 shrink-0">
-                    <span id="drift-node-2" class="font-mono text-[11px] text-sync-green font-semibold">+0.1ms</span>
-                    <div class="flex items-end gap-0.5 h-3 bg-surface-recessed px-1 py-0.5 rounded-[2px] border border-border-milled">
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 75%;"></div>
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 85%;"></div>
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 70%;"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- PEER 03: Nothing Phone (2) -->
-                <div
-                  id="cluster-node-peer-3"
-                  class="relative p-2 sm:p-2.5 rounded-[8px] bg-surface-elevated border border-border-milled shadow-[0_2px_8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)] flex sm:flex-col justify-between gap-2 transition-transform"
-                >
-                  <!-- Peer 3 RX Port Anchor -->
-                  <div class="absolute -top-1.5 left-6 sm:left-1/2 sm:-translate-x-1/2 flex items-center justify-center">
-                    <span id="peer-3-rx-port" class="w-2.5 h-2.5 rounded-full bg-sync-green border-2 border-surface-panel shadow-[0_0_6px_#00E599]"></span>
-                  </div>
-
-                  <div class="min-w-0 flex-1">
-                    <div class="relative flex sm:justify-center items-center my-0.5 sm:mb-1.5">
-                      <div class="w-8 h-1 rounded-[1px] bg-[#07080A] border border-border-milled flex items-center justify-center gap-0.5">
-                        <span class="w-0.5 h-0.5 rounded-full bg-border-milled"></span>
-                        <span class="w-0.5 h-0.5 rounded-full bg-border-milled"></span>
-                      </div>
-                      <div id="ripple-emitter-peer-3" class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-visible"></div>
-                    </div>
-
-                    <div class="flex items-center gap-1 sm:justify-center">
-                      <span class="font-mono text-[9px] font-bold text-text-dim bg-surface-panel border border-border-milled px-1 py-0.2 rounded-[2px]">P-03</span>
-                      <span class="font-sans font-semibold text-[11px] sm:text-xs text-bone truncate">Nothing (2)</span>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center sm:justify-between gap-2 shrink-0">
-                    <span id="drift-node-3" class="font-mono text-[11px] text-sync-green font-semibold">-0.1ms</span>
-                    <div class="flex items-end gap-0.5 h-3 bg-surface-recessed px-1 py-0.5 rounded-[2px] border border-border-milled">
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 85%;"></div>
-                      <div class="vu-bar w-1 bg-sync-green rounded-[0.5px]" style="height: 80%;"></div>
-                      <div class="vu-bar w-1 bg-signal-orange rounded-[0.5px]" style="height: 60%;"></div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- Bottom Console Control Dock: Interactive Trigger Beat & Jitter Simulation -->
-          <div class="pt-3 border-t border-border-milled flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-2 text-xs font-mono text-text-dim">
-              <span class="w-2 h-2 rounded-full bg-sync-green shadow-[0_0_6px_#00E599]"></span>
-              <span id="radar-status">ACOUSTIC LOCK: 0.2ms DEVIATION</span>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <!-- Trigger Test Beat Button -->
-              <button
-                id="trigger-beat-btn"
-                type="button"
-                class="tactile-btn-primary inline-flex items-center gap-2 px-3.5 py-2 text-xs uppercase tracking-wider font-display font-bold text-[#0B0C0E] active:translate-y-[1.5px] cursor-pointer"
-                aria-label="Trigger acoustic test beat across cluster"
-              >
-                <Activity class="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Trigger Test Beat</span>
-              </button>
-
-              <!-- Simulate Jitter Button -->
-              <button
-                id="simulate-jitter-btn"
-                type="button"
-                class="tactile-btn-secondary inline-flex items-center gap-1.5 px-3 py-2 text-xs uppercase tracking-wider font-mono font-semibold text-text-muted hover:text-bone hover:border-sync-amber/60 active:translate-y-[1.5px] cursor-pointer"
-                aria-label="Simulate network jitter and resampler recovery"
-              >
-                <RefreshCw id="simulate-icon" class="w-3.5 h-3.5" />
-                <span class="hidden sm:inline">Simulate </span><span>Jitter</span>
-              </button>
-            </div>
-          </div>
-
+            <span class="h-1.5 w-1.5 rounded-full bg-[#fb651e]"></span>
+            <span>Pulse Beat</span>
+          </button>
+          
+          <button
+            id="hero-toggle-jitter"
+            type="button"
+            class="pill ghost !h-[26px] !px-2.5 font-mono text-[11px] border border-[#e0e2d3] bg-white hover:bg-[#f4f5ec]"
+          >
+            <span id="hero-jitter-status-dot" class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
+            <span id="hero-jitter-status-text">RoomBeat Phase-Locked (0ms)</span>
+          </button>
         </div>
       </div>
 
+      <!-- The Canvas Surface -->
+      <div class="relative h-[320px] sm:h-[400px] w-full bg-[#0a120d] overflow-hidden">
+        <canvas id="hero-mesh-canvas" class="h-full w-full block cursor-crosshair"></canvas>
+        
+        <!-- Live HUD Overlays -->
+        <div class="pointer-events-none absolute bottom-3 left-3 flex flex-wrap gap-2 font-mono text-[11px]">
+          <div class="rounded-[2px] border border-white/10 bg-black/60 px-2.5 py-1 text-white backdrop-blur-sm">
+            <span class="text-white/50">PHASE OFFSET:</span> <span id="hud-offset" class="font-bold text-[#118d4f]">0.3 ms</span>
+          </div>
+          <div class="rounded-[2px] border border-white/10 bg-black/60 px-2.5 py-1 text-white backdrop-blur-sm">
+            <span class="text-white/50">PACKET INTERVAL:</span> <span class="font-bold text-white">20.0 ms</span>
+          </div>
+          <div class="rounded-[2px] border border-white/10 bg-black/60 px-2.5 py-1 text-white backdrop-blur-sm hidden sm:inline-block">
+            <span class="text-white/50">ACTIVE NODES:</span> <span class="font-bold text-[#118d4f]">5 / 5 IN SYNC</span>
+          </div>
+        </div>
+
+        <div class="pointer-events-none absolute top-3 right-3 rounded-[2px] border border-white/10 bg-black/60 px-2.5 py-1 font-mono text-[10px] text-white/70 backdrop-blur-sm hidden sm:block">
+          Click canvas to emit acoustic wave · Move cursor to deflect field
+        </div>
+      </div>
+
+      <!-- Hero Proof Strip (Metrics Bar like Graphify Used-by / Stats) -->
+      <div class="grid grid-cols-2 divide-x divide-y sm:divide-y-0 sm:grid-cols-4 divide-[#e0e2d3] border-t border-[#e0e2d3] bg-[#fbfbf7]">
+        <div class="p-4 sm:p-5">
+          <div class="font-mono text-2xl sm:text-3xl font-semibold tracking-tight text-[#062314]">&lt; 5 ms</div>
+          <div class="mt-1 font-sans text-xs text-[#626b60]">Acoustic Phase Alignment</div>
+          <div class="mt-0.5 font-mono text-[10px] text-[#118d4f]">Hardware clock synced</div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div class="font-mono text-2xl sm:text-3xl font-semibold tracking-tight text-[#062314]">8+ Nodes</div>
+          <div class="mt-1 font-sans text-xs text-[#626b60]">Simultaneous Phone Rig</div>
+          <div class="mt-0.5 font-mono text-[10px] text-[#118d4f]">Zero CPU per extra peer</div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div class="font-mono text-2xl sm:text-3xl font-semibold tracking-tight text-[#062314]">0 KB</div>
+          <div class="mt-1 font-sans text-xs text-[#626b60]">Cloud Traffic Transmitted</div>
+          <div class="mt-0.5 font-mono text-[10px] text-[#118d4f]">100% On-device LAN</div>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div class="font-mono text-2xl sm:text-3xl font-semibold tracking-tight text-[#062314]">$0 / FOSS</div>
+          <div class="mt-1 font-sans text-xs text-[#626b60]">MIT Open Source License</div>
+          <div class="mt-0.5 font-mono text-[10px] text-[#118d4f]">No ads, no subscriptions</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Client-side Interactive Script for Multicast Cluster & Hero Motion -->
+<!-- Interactive Hero Mesh Canvas Client Script -->
 <script>
-  import '../scripts/heroCluster.js';
+  (() => {
+    const canvas = document.getElementById('hero-mesh-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let isJittered = false;
+    let jitterOffset = 0;
+    const triggerPulseBtn = document.getElementById('hero-trigger-pulse');
+    const toggleJitterBtn = document.getElementById('hero-toggle-jitter');
+    const jitterDot = document.getElementById('hero-jitter-status-dot');
+    const jitterText = document.getElementById('hero-jitter-status-text');
+    const hudOffset = document.getElementById('hud-offset');
+
+    let width = (canvas.width = canvas.parentElement?.clientWidth || 800);
+    let height = (canvas.height = canvas.parentElement?.clientHeight || 400);
+
+    const onResize = () => {
+      width = canvas.width = canvas.parentElement?.clientWidth || 800;
+      height = canvas.height = canvas.parentElement?.clientHeight || 400;
+    };
+    window.addEventListener('resize', onResize);
+
+    // Nodes representing phones in the room
+    const nodes = [
+      { id: 'host', label: 'HOST (Pixel 8)', x: 0.5, y: 0.5, isHost: true, pulse: 0, color: '#118d4f' },
+      { id: 'p1', label: 'Living Room', x: 0.22, y: 0.28, isHost: false, pulse: 0, delayMs: 1.8, color: '#e0e2d3' },
+      { id: 'p2', label: 'Kitchen', x: 0.78, y: 0.32, isHost: false, pulse: 0, delayMs: 2.4, color: '#e0e2d3' },
+      { id: 'p3', label: 'Balcony', x: 0.26, y: 0.74, isHost: false, pulse: 0, delayMs: 3.1, color: '#e0e2d3' },
+      { id: 'p4', label: 'Bedroom', x: 0.74, y: 0.76, isHost: false, pulse: 0, delayMs: 2.1, color: '#e0e2d3' },
+    ];
+
+    // Wavefronts propagating across the room
+    interface Wavefront {
+      x: number;
+      y: number;
+      radius: number;
+      maxRadius: number;
+      speed: number;
+      alpha: number;
+      color: string;
+    }
+    const waves: Wavefront[] = [];
+
+    // Trigger an acoustic wavefront from host or custom point
+    function emitWave(originX?: number, originY?: number, isJitter = false) {
+      const hX = originX !== undefined ? originX : width * 0.5;
+      const hY = originY !== undefined ? originY : height * 0.5;
+      waves.push({
+        x: hX,
+        y: hY,
+        radius: 4,
+        maxRadius: Math.max(width, height) * 0.85,
+        speed: 2.8,
+        alpha: 1.0,
+        color: isJitter ? '#fb651e' : '#118d4f'
+      });
+      // Host pulse animation
+      nodes[0].pulse = 1.0;
+    }
+
+    // Auto-beat pulse every 1.6s
+    let lastBeat = performance.now();
+    const beatInterval = 1400;
+
+    let mouseX = -100;
+    let mouseY = -100;
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    });
+    canvas.addEventListener('mouseleave', () => {
+      mouseX = -100;
+      mouseY = -100;
+    });
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      emitWave(e.clientX - rect.left, e.clientY - rect.top, isJittered);
+    });
+
+    if (triggerPulseBtn) {
+      triggerPulseBtn.addEventListener('click', () => {
+        emitWave(undefined, undefined, isJittered);
+      });
+    }
+
+    if (toggleJitterBtn) {
+      toggleJitterBtn.addEventListener('click', () => {
+        isJittered = !isJittered;
+        if (isJittered) {
+          if (jitterDot) jitterDot.className = 'h-1.5 w-1.5 rounded-full bg-[#fb651e]';
+          if (jitterText) jitterText.textContent = 'Simulating Wi-Fi Jitter (+32ms Flanger Drift)';
+          if (hudOffset) {
+            hudOffset.textContent = '32.4 ms (DESYNC)';
+            hudOffset.className = 'font-bold text-[#fb651e]';
+          }
+        } else {
+          if (jitterDot) jitterDot.className = 'h-1.5 w-1.5 rounded-full bg-[#118d4f]';
+          if (jitterText) jitterText.textContent = 'RoomBeat Phase-Locked (0ms)';
+          if (hudOffset) {
+            hudOffset.textContent = '0.3 ms';
+            hudOffset.className = 'font-bold text-[#118d4f]';
+          }
+        }
+      });
+    }
+
+    // Animation Loop
+    function render(now: number) {
+      ctx.clearRect(0, 0, width, height);
+
+      // Automatic heartbeat pulses
+      if (now - lastBeat > beatInterval) {
+        emitWave(undefined, undefined, isJittered);
+        lastBeat = now;
+      }
+
+      // Draw subtle coordinate grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw multicast connections from host to peers
+      const hostNode = nodes[0];
+      const hX = hostNode.x * width;
+      const hY = hostNode.y * height;
+
+      nodes.forEach((n, idx) => {
+        if (n.isHost) return;
+        let nX = n.x * width;
+        let nY = n.y * height;
+
+        // Apply visual jitter displacement when un-synced
+        if (isJittered) {
+          const jitterDisplace = Math.sin(now * 0.008 + idx) * 14;
+          nX += jitterDisplace;
+        }
+
+        // Connection line
+        ctx.strokeStyle = isJittered ? 'rgba(251, 101, 30, 0.25)' : 'rgba(17, 141, 79, 0.25)';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(hX, hY);
+        ctx.lineTo(nX, nY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Animated packet dots traveling down multicast ray
+        const progress = ((now * 0.001 * 0.8) + idx * 0.25) % 1;
+        const packetX = hX + (nX - hX) * progress;
+        const packetY = hY + (nY - hY) * progress;
+
+        ctx.fillStyle = isJittered ? '#fb651e' : '#118d4f';
+        ctx.beginPath();
+        ctx.arc(packetX, packetY, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Latency tag on connection midpoint
+        const midX = (hX + nX) / 2;
+        const midY = (hY + nY) / 2;
+        ctx.font = '10px "Geist Mono", monospace';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.textAlign = 'center';
+        const displayLatency = isJittered ? (n.delayMs + 28.4).toFixed(1) : n.delayMs.toFixed(1);
+        ctx.fillText(`${displayLatency}ms`, midX, midY - 6);
+      });
+
+      // Update and draw wavefronts
+      for (let i = waves.length - 1; i >= 0; i--) {
+        const w = waves[i];
+        w.radius += w.speed;
+        w.alpha = Math.max(0, 1 - w.radius / w.maxRadius);
+
+        ctx.strokeStyle = w.color;
+        ctx.globalAlpha = w.alpha * 0.7;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(w.x, w.y, w.radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Secondary harmonic ripple
+        if (w.radius > 20) {
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(w.x, w.y, w.radius - 16, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Check if wave passes peer nodes to trigger phone glow
+        nodes.forEach((n) => {
+          if (n.isHost) return;
+          const nX = n.x * width;
+          const nY = n.y * height;
+          const dist = Math.hypot(nX - w.x, nY - w.y);
+          if (Math.abs(dist - w.radius) < 6) {
+            n.pulse = 1.0;
+          }
+        });
+
+        if (w.alpha <= 0.01) {
+          waves.splice(i, 1);
+        }
+      }
+      ctx.globalAlpha = 1.0;
+
+      // Draw Phone Nodes
+      nodes.forEach((n, idx) => {
+        let nX = n.x * width;
+        let nY = n.y * height;
+
+        if (isJittered && !n.isHost) {
+          nX += Math.sin(now * 0.008 + idx) * 14;
+        }
+
+        // Pulse decay
+        if (n.pulse > 0) {
+          n.pulse = Math.max(0, n.pulse - 0.035);
+        }
+
+        // Mouse hover interaction: gentle repulsion
+        if (mouseX > 0 && mouseY > 0) {
+          const d = Math.hypot(nX - mouseX, nY - mouseY);
+          if (d < 60) {
+            const angle = Math.atan2(nY - mouseY, nX - mouseX);
+            const force = (60 - d) * 0.15;
+            nX += Math.cos(angle) * force;
+            nY += Math.sin(angle) * force;
+          }
+        }
+
+        // Glow ring on pulse
+        if (n.pulse > 0) {
+          ctx.strokeStyle = n.isHost ? '#118d4f' : (isJittered ? '#fb651e' : '#118d4f');
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = n.pulse;
+          ctx.beginPath();
+          ctx.arc(nX, nY, 18 + (1 - n.pulse) * 12, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = 1.0;
+        }
+
+        // Node circle background
+        ctx.fillStyle = n.isHost ? '#118d4f' : '#16211b';
+        ctx.beginPath();
+        ctx.arc(nX, nY, n.isHost ? 14 : 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Node border
+        ctx.strokeStyle = n.isHost ? '#ffffff' : (isJittered ? '#fb651e' : '#e0e2d3');
+        ctx.lineWidth = n.isHost ? 2.5 : 1.5;
+        ctx.stroke();
+
+        // Center dot
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(nX, nY, n.isHost ? 3.5 : 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Labels
+        ctx.font = n.isHost ? 'bold 12px "Geist", sans-serif' : '11px "Geist", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText(n.label, nX, nY + (n.isHost ? 28 : 22));
+
+        // Subtext for host
+        if (n.isHost) {
+          ctx.font = '10px "Geist Mono", monospace';
+          ctx.fillStyle = '#118d4f';
+          ctx.fillText('UDP MULTICAST SOURCE', nX, nY + 41);
+        }
+      });
+
+      requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+  })();
 </script>

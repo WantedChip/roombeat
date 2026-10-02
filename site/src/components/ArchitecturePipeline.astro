@@ -1,0 +1,126 @@
+---
+---
+
+<section id="architecture" class="border-b border-[#e0e2d3] bg-[#fbfbf7] py-20 sm:py-28">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <!-- Header -->
+    <div class="max-w-3xl">
+      <div class="op-eyebrow">
+        <span class="h-1.5 w-1.5 rounded-full bg-[#118d4f]"></span>
+        <span>Hardware Data Pipeline</span>
+      </div>
+      <h2 class="op-title mt-3 text-3xl font-normal tracking-tight text-[#062314] sm:text-4xl md:text-5xl">
+        The 20ms Opus Architecture.
+      </h2>
+      <p class="op-sub mt-4 text-[#35433a]">
+        Every hop between audio capture on the host phone and speaker excitation on the peer devices
+        is locked to hardware monotonic clocks. No cloud relay, no HTTP overhead, no garbage-collected audio buffers.
+      </p>
+    </div>
+
+    <!-- Pipeline Steps (Graphify style cards with interactive inspector) -->
+    <div class="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Step 1: Capture -->
+      <div class="rounded-[4px] border border-[#e0e2d3] bg-white p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between font-mono text-xs text-[#626b60]">
+            <span class="font-bold text-[#062314]">STEP 01</span>
+            <span class="text-[#118d4f]">API 30+ COMPLIANT</span>
+          </div>
+          <h3 class="font-sans text-lg font-semibold text-[#062314] mt-2">AudioPlaybackCapture</h3>
+          <p class="font-sans text-sm text-[#35433a] mt-1.5 leading-relaxed">
+            Uses official Android `MediaProjection` consent to capture device audio in PCM 16-bit 48kHz stereo. Completely source-agnostic without root.
+          </p>
+        </div>
+        <div class="mt-4 rounded-[2px] bg-[#f4f5ec] p-2.5 font-mono text-[11px] text-[#35433a] border border-[#e0e2d3]/60">
+          <code>AudioRecord.Builder()<br/>.setAudioPlaybackCaptureConfig(config)</code>
+        </div>
+      </div>
+
+      <!-- Step 2: SPSC Ringbuffer -->
+      <div class="rounded-[4px] border border-[#e0e2d3] bg-white p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between font-mono text-xs text-[#626b60]">
+            <span class="font-bold text-[#062314]">STEP 02</span>
+            <span class="text-[#118d4f]">LOCK-FREE C++</span>
+          </div>
+          <h3 class="font-sans text-lg font-semibold text-[#062314] mt-2">SPSC Ringbuffer</h3>
+          <p class="font-sans text-sm text-[#35433a] mt-1.5 leading-relaxed">
+            Atomic Single-Producer Single-Consumer circular queue in NDK C++. Completely isolates real-time audio capture threads from network socket I/O.
+          </p>
+        </div>
+        <div class="mt-4 rounded-[2px] bg-[#f4f5ec] p-2.5 font-mono text-[11px] text-[#35433a] border border-[#e0e2d3]/60">
+          <code>std::atomic&lt;size_t&gt; head, tail;<br/>// Zero mutex locks, zero GC stalls</code>
+        </div>
+      </div>
+
+      <!-- Step 3: Opus Encoder -->
+      <div class="rounded-[4px] border border-[#e0e2d3] bg-white p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between font-mono text-xs text-[#626b60]">
+            <span class="font-bold text-[#062314]">STEP 03</span>
+            <span class="text-[#118d4f]">96–160 KBPS</span>
+          </div>
+          <h3 class="font-sans text-lg font-semibold text-[#062314] mt-2">Opus 20ms Frame Encoder</h3>
+          <p class="font-sans text-sm text-[#35433a] mt-1.5 leading-relaxed">
+            Packs 960 stereo PCM audio samples into 20ms Opus frames with sequence IDs, monotonic timestamps, and forward error correction (FEC).
+          </p>
+        </div>
+        <div class="mt-4 rounded-[2px] bg-[#f4f5ec] p-2.5 font-mono text-[11px] text-[#35433a] border border-[#e0e2d3]/60">
+          <code>opus_encode(enc, pcm, 960, out, max);<br/>header.timestamp_us = clock_monotonic();</code>
+        </div>
+      </div>
+
+      <!-- Step 4: UDP Multicast -->
+      <div class="rounded-[4px] border border-[#e0e2d3] bg-white p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between font-mono text-xs text-[#626b60]">
+            <span class="font-bold text-[#062314]">STEP 04</span>
+            <span class="text-[#118d4f]">O(1) NETWORK FANOUT</span>
+          </div>
+          <h3 class="font-sans text-lg font-semibold text-[#062314] mt-2">UDP Multicast Transport</h3>
+          <p class="font-sans text-sm text-[#35433a] mt-1.5 leading-relaxed">
+            Transmits datagrams to `239.255.42.99:4242`. The host phone transmits only once per frame; the local Wi-Fi router broadcasts it to all peers simultaneously.
+          </p>
+        </div>
+        <div class="mt-4 rounded-[2px] bg-[#f4f5ec] p-2.5 font-mono text-[11px] text-[#35433a] border border-[#e0e2d3]/60">
+          <code>val lock = wifiManager.createMulticastLock()<br/>lock.acquire() // Prevents sleep packet drops</code>
+        </div>
+      </div>
+
+      <!-- Step 5: Fractional Resampler -->
+      <div class="rounded-[4px] border border-[#e0e2d3] bg-white p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between font-mono text-xs text-[#626b60]">
+            <span class="font-bold text-[#062314]">STEP 05</span>
+            <span class="text-[#118d4f]">DRIFT ELIMINATOR</span>
+          </div>
+          <h3 class="font-sans text-lg font-semibold text-[#062314] mt-2">Fractional Sinc Resampler</h3>
+          <p class="font-sans text-sm text-[#35433a] mt-1.5 leading-relaxed">
+            Continuously calculates peer clock skew via NTP handshake. Micro-adjusts sample playback speed dynamically by ±0.048% without perceptible pitch warble.
+          </p>
+        </div>
+        <div class="mt-4 rounded-[2px] bg-[#f4f5ec] p-2.5 font-mono text-[11px] text-[#35433a] border border-[#e0e2d3]/60">
+          <code>ratio = 1.0 + (target_delay - curr_delay) * Kp;<br/>catmull_rom_resample(in, out, ratio);</code>
+        </div>
+      </div>
+
+      <!-- Step 6: Oboe / AAudio Sink -->
+      <div class="rounded-[4px] border border-[#e0e2d3] bg-white p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between font-mono text-xs text-[#626b60]">
+            <span class="font-bold text-[#062314]">STEP 06</span>
+            <span class="text-[#118d4f]">&lt; 4.8ms HARDWARE BUFFER</span>
+          </div>
+          <h3 class="font-sans text-lg font-semibold text-[#062314] mt-2">AAudio / Oboe Speaker Sink</h3>
+          <p class="font-sans text-sm text-[#35433a] mt-1.5 leading-relaxed">
+            Outputs audio samples to device hardware speakers via low-latency MMAP stream on a real-time thread scheduled for the exact presentation timestamp.
+          </p>
+        </div>
+        <div class="mt-4 rounded-[2px] bg-[#f4f5ec] p-2.5 font-mono text-[11px] text-[#35433a] border border-[#e0e2d3]/60">
+          <code>oboeStream-&gt;write(buffer, frames, timeout);<br/>// Direct kernel ALSA memory mapping</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
