@@ -3,18 +3,20 @@ export interface Props {
   class?: string;
 }
 
-const { class: className = 'w-5 h-5' } = Astro.props;
+const { class: className = 'w-6 h-6' } = Astro.props;
 ---
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
+  viewBox="0 0 32 32"
   fill="none"
   class={className}
   aria-hidden="true"
 >
-  <rect x="2" y="2" width="20" height="20" rx="3" fill="#062314" />
-  <circle cx="12" cy="12" r="4.5" fill="none" stroke="#ffffff" stroke-width="1.8" />
-  <circle cx="12" cy="12" r="1.8" fill="#118d4f" />
-  <path d="M12 4.5v1.5M12 18v1.5M4.5 12h1.5M18 12h1.5" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+  <rect width="32" height="32" rx="6" fill="#0B0C0E" stroke="#262A35" stroke-width="1.5" />
+  <rect x="6" y="13" width="3" height="6" rx="1" fill="#9DA5B4" />
+  <rect x="11" y="9" width="3" height="14" rx="1" fill="#FF5500" />
+  <rect x="16" y="6" width="3" height="20" rx="1" fill="#00E599" />
+  <rect x="21" y="10" width="3" height="12" rx="1" fill="#FF5500" />
+  <circle cx="26" cy="7" r="2" fill="#00E599" />
 </svg>
